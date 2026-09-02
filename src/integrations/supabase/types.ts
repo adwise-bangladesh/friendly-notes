@@ -2994,6 +2994,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      refresh_order_delivery_status: {
+        Args: { _order_id: string }
+        Returns: Database["public"]["Enums"]["order_delivery_status"]
+      }
       release_order_reservations: {
         Args: { _order_id: string; _reason: string }
         Returns: {
