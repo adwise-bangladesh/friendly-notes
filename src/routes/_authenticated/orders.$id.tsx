@@ -262,6 +262,8 @@ function Page() {
 
           <OrderReturnsPanel order={order} canManage={canManage} />
 
+          {internalVisible && <OrderFinancialsPanel orderId={order.id} canManage={canManage} />
+
 
 
 
