@@ -253,6 +253,162 @@ export type Database = {
           },
         ]
       }
+      inventory_levels: {
+        Row: {
+          available_quantity: number | null
+          created_at: string
+          created_by: string | null
+          damaged: number
+          id: string
+          incoming: number
+          location_id: string
+          low_stock_threshold: number | null
+          on_hand: number
+          product_id: string | null
+          reserved: number
+          updated_at: string
+          updated_by: string | null
+          variant_id: string | null
+        }
+        Insert: {
+          available_quantity?: number | null
+          created_at?: string
+          created_by?: string | null
+          damaged?: number
+          id?: string
+          incoming?: number
+          location_id: string
+          low_stock_threshold?: number | null
+          on_hand?: number
+          product_id?: string | null
+          reserved?: number
+          updated_at?: string
+          updated_by?: string | null
+          variant_id?: string | null
+        }
+        Update: {
+          available_quantity?: number | null
+          created_at?: string
+          created_by?: string | null
+          damaged?: number
+          id?: string
+          incoming?: number
+          location_id?: string
+          low_stock_threshold?: number | null
+          on_hand?: number
+          product_id?: string | null
+          reserved?: number
+          updated_at?: string
+          updated_by?: string | null
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_levels_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_levels_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_levels_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_locations: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_default: boolean
+          name: string
+          status: Database["public"]["Enums"]["entity_status"]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean
+          name: string
+          status?: Database["public"]["Enums"]["entity_status"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean
+          name?: string
+          status?: Database["public"]["Enums"]["entity_status"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      inventory_movements: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          inventory_level_id: string
+          movement_type: Database["public"]["Enums"]["inventory_movement_type"]
+          note: string | null
+          quantity: number
+          reference_id: string | null
+          reference_type: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          inventory_level_id: string
+          movement_type: Database["public"]["Enums"]["inventory_movement_type"]
+          note?: string | null
+          quantity: number
+          reference_id?: string | null
+          reference_type?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          inventory_level_id?: string
+          movement_type?: Database["public"]["Enums"]["inventory_movement_type"]
+          note?: string | null
+          quantity?: number
+          reference_id?: string | null
+          reference_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_movements_inventory_level_id_fkey"
+            columns: ["inventory_level_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_categories: {
         Row: {
           category_id: string
@@ -617,6 +773,38 @@ export type Database = {
         Args: { _campaign_id: string; _quantity: number }
         Returns: number
       }
+      apply_inventory_movement: {
+        Args: {
+          _inventory_level_id: string
+          _movement_type: Database["public"]["Enums"]["inventory_movement_type"]
+          _note?: string
+          _quantity: number
+          _reference_id?: string
+          _reference_type?: string
+        }
+        Returns: {
+          available_quantity: number | null
+          created_at: string
+          created_by: string | null
+          damaged: number
+          id: string
+          incoming: number
+          location_id: string
+          low_stock_threshold: number | null
+          on_hand: number
+          product_id: string | null
+          reserved: number
+          updated_at: string
+          updated_by: string | null
+          variant_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "inventory_levels"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       brand_product_counts: {
         Args: never
         Returns: {
@@ -641,6 +829,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      set_default_inventory_location: {
+        Args: { _location_id: string }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "owner" | "admin" | "staff" | "viewer"
@@ -658,6 +850,14 @@ export type Database = {
         | "fulfillment"
         | "completed"
         | "cancelled"
+      inventory_movement_type:
+        | "initial"
+        | "adjustment_in"
+        | "adjustment_out"
+        | "damage"
+        | "return_in"
+        | "reservation"
+        | "release_reservation"
       product_relationship_type: "related" | "upsell" | "cross_sell"
       product_status: "draft" | "active" | "inactive" | "archived"
       product_type: "simple" | "variable" | "bundle" | "service" | "digital"
@@ -805,6 +1005,15 @@ export const Constants = {
         "fulfillment",
         "completed",
         "cancelled",
+      ],
+      inventory_movement_type: [
+        "initial",
+        "adjustment_in",
+        "adjustment_out",
+        "damage",
+        "return_in",
+        "reservation",
+        "release_reservation",
       ],
       product_relationship_type: ["related", "upsell", "cross_sell"],
       product_status: ["draft", "active", "inactive", "archived"],
