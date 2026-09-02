@@ -77,10 +77,10 @@ export async function createFinancialAdjustment(
     _adjustment_type: input.type,
     _direction: input.direction,
     _amount: input.amount,
-    _reason: input.reason ?? null,
-    _reference: input.reference ?? null,
-    _shipment_id: input.shipmentId ?? null,
-    _return_id: null,
+    _reason: input.reason ?? undefined,
+    _reference: input.reference ?? undefined,
+    _shipment_id: input.shipmentId ?? undefined,
+    _return_id: undefined,
   });
   if (error) throw error;
   return data as unknown as OrderFinancialAdjustment;
@@ -92,7 +92,7 @@ export async function reverseFinancialAdjustment(
 ): Promise<OrderFinancialAdjustment> {
   const { data, error } = await supabase.rpc("reverse_financial_adjustment", {
     _adjustment_id: adjustmentId,
-    _reason: reason ?? null,
+    _reason: reason ?? undefined,
   });
   if (error) throw error;
   return data as unknown as OrderFinancialAdjustment;
@@ -113,12 +113,12 @@ export interface ShipmentFinancialsInput {
 export async function recordShipmentFinancials(input: ShipmentFinancialsInput): Promise<void> {
   const { error } = await supabase.rpc("record_shipment_financials", {
     _shipment_id: input.shipmentId,
-    _collected_amount: input.collectedAmount ?? null,
-    _actual_delivery_fee: input.actualDeliveryFee ?? null,
-    _cod_fee: input.codFee ?? null,
-    _return_charge: input.returnCharge ?? null,
-    _other_courier_charge: input.otherCourierCharge ?? null,
-    _note: input.note ?? null,
+    _collected_amount: input.collectedAmount ?? undefined,
+    _actual_delivery_fee: input.actualDeliveryFee ?? undefined,
+    _cod_fee: input.codFee ?? undefined,
+    _return_charge: input.returnCharge ?? undefined,
+    _other_courier_charge: input.otherCourierCharge ?? undefined,
+    _note: input.note ?? undefined,
   });
   if (error) throw error;
 }
@@ -261,8 +261,8 @@ export async function createCourierSettlement(input: {
   const { data, error } = await supabase.rpc("create_courier_settlement", {
     _courier_account_id: input.courierAccountId,
     _settlement_reference: input.reference,
-    _settlement_date: input.settlementDate ?? null,
-    _notes: input.notes ?? null,
+    _settlement_date: input.settlementDate ?? undefined,
+    _notes: input.notes ?? undefined,
   });
   if (error) throw error;
   return data as unknown as CourierSettlement;
@@ -299,11 +299,11 @@ export async function recordSettlementActuals(
 ): Promise<CourierSettlementItem> {
   const { data, error } = await supabase.rpc("record_settlement_actuals", {
     _item_id: input.itemId,
-    _actual_collected_amount: input.actualCollectedAmount ?? null,
-    _delivery_charge: input.deliveryCharge ?? null,
-    _cod_charge: input.codCharge ?? null,
-    _return_charge: input.returnCharge ?? null,
-    _other_charge: input.otherCharge ?? null,
+    _actual_collected_amount: input.actualCollectedAmount ?? undefined,
+    _delivery_charge: input.deliveryCharge ?? undefined,
+    _cod_charge: input.codCharge ?? undefined,
+    _return_charge: input.returnCharge ?? undefined,
+    _other_charge: input.otherCharge ?? undefined,
   });
   if (error) throw error;
   return data as unknown as CourierSettlementItem;
@@ -317,7 +317,7 @@ export async function setSettlementStatus(
   const { data, error } = await supabase.rpc("set_settlement_status", {
     _settlement_id: settlementId,
     _status: status,
-    _note: note ?? null,
+    _note: note ?? undefined,
   });
   if (error) throw error;
   return data as unknown as CourierSettlement;
