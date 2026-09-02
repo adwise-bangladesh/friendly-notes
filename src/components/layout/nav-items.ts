@@ -49,6 +49,12 @@ export const NAV_ITEMS: NavItem[] = [
       { label: "Locations", to: "/inventory/locations" },
     ],
   },
+  {
+    label: "Finance",
+    to: "/finance/courier-settlements",
+    icon: Banknote,
+    children: [{ label: "Courier Settlements", to: "/finance/courier-settlements" }],
+  },
   { label: "Customers", to: "/customers", icon: Users },
   { label: "Returns", to: "/returns", icon: RotateCcw },
   { label: "Settings", to: "/settings", icon: Settings },
