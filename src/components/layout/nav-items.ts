@@ -3,6 +3,7 @@ import {
   ShoppingCart,
   Package,
   Boxes,
+  Radar,
   Banknote,
   Truck,
   Users,
@@ -20,6 +21,15 @@ export interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
+  {
+    label: "Operations",
+    to: "/operations",
+    icon: Radar,
+    children: [
+      { label: "Command Center", to: "/operations" },
+      { label: "My Work", to: "/operations/my-work" },
+    ],
+  },
   {
     label: "Orders",
     to: "/orders",

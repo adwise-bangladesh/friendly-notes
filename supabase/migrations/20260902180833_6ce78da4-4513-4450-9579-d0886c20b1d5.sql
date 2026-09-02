@@ -1,0 +1,1 @@
+grant execute on function public.operations_attention_feed(integer,integer,integer,integer,integer,integer,integer,integer) to supabase_read_only_user;

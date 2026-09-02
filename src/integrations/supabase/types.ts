@@ -1452,6 +1452,92 @@ export type Database = {
           },
         ]
       }
+      operational_assignment_events: {
+        Row: {
+          actor_id: string | null
+          assigned_to: string | null
+          assignment_id: string | null
+          created_at: string
+          event_type: Database["public"]["Enums"]["operation_assignment_event_type"]
+          id: string
+          note: string | null
+          source_id: string
+          source_type: Database["public"]["Enums"]["operation_source_type"]
+        }
+        Insert: {
+          actor_id?: string | null
+          assigned_to?: string | null
+          assignment_id?: string | null
+          created_at?: string
+          event_type: Database["public"]["Enums"]["operation_assignment_event_type"]
+          id?: string
+          note?: string | null
+          source_id: string
+          source_type: Database["public"]["Enums"]["operation_source_type"]
+        }
+        Update: {
+          actor_id?: string | null
+          assigned_to?: string | null
+          assignment_id?: string | null
+          created_at?: string
+          event_type?: Database["public"]["Enums"]["operation_assignment_event_type"]
+          id?: string
+          note?: string | null
+          source_id?: string
+          source_type?: Database["public"]["Enums"]["operation_source_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operational_assignment_events_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "operational_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operational_assignments: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          assigned_to: string
+          created_at: string
+          id: string
+          note: string | null
+          released_at: string | null
+          released_by: string | null
+          source_id: string
+          source_type: Database["public"]["Enums"]["operation_source_type"]
+          updated_at: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          assigned_to: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          released_at?: string | null
+          released_by?: string | null
+          source_id: string
+          source_type: Database["public"]["Enums"]["operation_source_type"]
+          updated_at?: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          assigned_to?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          released_at?: string | null
+          released_by?: string | null
+          source_id?: string
+          source_type?: Database["public"]["Enums"]["operation_source_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_addresses: {
         Row: {
           address_line: string
@@ -3953,6 +4039,40 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      assert_operation_source_exists: {
+        Args: {
+          _source_id: string
+          _source_type: Database["public"]["Enums"]["operation_source_type"]
+        }
+        Returns: undefined
+      }
+      assign_operational_work: {
+        Args: {
+          _assigned_to: string
+          _note?: string
+          _source_id: string
+          _source_type: Database["public"]["Enums"]["operation_source_type"]
+        }
+        Returns: {
+          assigned_at: string
+          assigned_by: string | null
+          assigned_to: string
+          created_at: string
+          id: string
+          note: string | null
+          released_at: string | null
+          released_by: string | null
+          source_id: string
+          source_type: Database["public"]["Enums"]["operation_source_type"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "operational_assignments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       assign_shipment_courier: {
         Args: {
           _account_id?: string
@@ -4717,6 +4837,49 @@ export type Database = {
       next_stocktake_number: { Args: never; Returns: string }
       next_transfer_number: { Args: never; Returns: string }
       normalize_bd_phone: { Args: { _phone: string }; Returns: string }
+      operations_attention_feed: {
+        Args: {
+          _limit?: number
+          _low_stock_default?: number
+          _picking_stale_hours?: number
+          _purchase_order_overdue_days?: number
+          _shipment_stale_hours?: number
+          _stocktake_stale_hours?: number
+          _transfer_stale_hours?: number
+          _verification_pending_hours?: number
+        }
+        Returns: {
+          assignable: boolean
+          assigned_to: string
+          assigned_to_name: string
+          assignment_source_type: string
+          category: string
+          due_at: string
+          href: string
+          id: string
+          occurred_at: string
+          reason: string
+          severity: string
+          source_id: string
+          source_type: string
+          state: string
+          subtitle: string
+          title: string
+        }[]
+      }
+      operations_recent_activity: {
+        Args: { _limit?: number }
+        Returns: {
+          actor_name: string
+          category: string
+          created_at: string
+          event_type: string
+          href: string
+          id: string
+          message: string
+          reference: string
+        }[]
+      }
       order_financials: { Args: { _order_id: string }; Returns: Json }
       order_fulfillment_summary: {
         Args: { _order_id: string }
@@ -5116,6 +5279,14 @@ export type Database = {
       refresh_order_delivery_status: {
         Args: { _order_id: string }
         Returns: Database["public"]["Enums"]["order_delivery_status"]
+      }
+      release_operational_work: {
+        Args: {
+          _note?: string
+          _source_id: string
+          _source_type: Database["public"]["Enums"]["operation_source_type"]
+        }
+        Returns: undefined
       }
       release_order_reservations: {
         Args: { _order_id: string; _reason: string }
@@ -6148,6 +6319,12 @@ export type Database = {
         | "received"
         | "cancelled"
       item_cost_type: "base_cost" | "additional_cost"
+      operation_assignment_event_type: "assigned" | "reassigned" | "released"
+      operation_source_type:
+        | "order_verification"
+        | "order_fulfillment"
+        | "order_return"
+        | "shipment_exception"
       order_delivery_status:
         | "not_shipped"
         | "partially_shipped"
@@ -6641,6 +6818,13 @@ export const Constants = {
         "cancelled",
       ],
       item_cost_type: ["base_cost", "additional_cost"],
+      operation_assignment_event_type: ["assigned", "reassigned", "released"],
+      operation_source_type: [
+        "order_verification",
+        "order_fulfillment",
+        "order_return",
+        "shipment_exception",
+      ],
       order_delivery_status: [
         "not_shipped",
         "partially_shipped",
