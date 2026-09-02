@@ -97,6 +97,14 @@ export const testIntegrationConnection = createServerFn({ method: "POST" })
     }
 
     try {
+      // Clear the cached city list first so the adapter is forced to make a
+      // real authenticated call to the provider instead of serving the cache.
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin
+        .from("courier_locations")
+        .delete()
+        .eq("provider_id", account.provider_id)
+        .eq("kind", "city");
       const cities = await adapter.listCities(account.id);
       await logCourierCall({
         providerId: account.provider_id,
