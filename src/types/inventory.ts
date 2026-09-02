@@ -37,6 +37,12 @@ export const MOVEMENT_TYPE_LABELS: Record<InventoryMovementType, string> = {
   purchase_in: "Purchase Received",
   purchase_damaged_in: "Purchase Damaged",
   damaged_out: "Damaged Removed",
+  transfer_out: "Transfer Out",
+  transfer_in: "Transfer In",
+  transfer_incoming_in: "Transfer In Transit",
+  transfer_incoming_out: "Transfer Arrived",
+  stocktake_in: "Stocktake Increase",
+  stocktake_out: "Stocktake Decrease",
 };
 
 export const MOVEMENT_TYPE_HELP: Record<InventoryMovementType, string> = {
@@ -53,6 +59,12 @@ export const MOVEMENT_TYPE_HELP: Record<InventoryMovementType, string> = {
     "Goods that arrived damaged from a supplier. Recorded as damaged, never as sellable stock.",
   damaged_out:
     "Damaged stock removed — written off, returned to the supplier, or a reversed damage record.",
+  transfer_out: "Stock dispatched from this location to another location.",
+  transfer_in: "Stock received at this location from a transfer.",
+  transfer_incoming_in: "Stock in transit towards this location. Not sellable yet.",
+  transfer_incoming_out: "In-transit stock arrived and left the incoming pool.",
+  stocktake_in: "Physical count was higher than the system. Corrected upwards.",
+  stocktake_out: "Physical count was lower than the system. Corrected downwards.",
 };
 
 /** Movements that increase on hand. */
@@ -61,6 +73,8 @@ export const INBOUND_MOVEMENTS: InventoryMovementType[] = [
   "adjustment_in",
   "return_in",
   "purchase_in",
+  "transfer_in",
+  "stocktake_in",
 ];
 
 export function movementDirection(type: InventoryMovementType): "in" | "out" | "hold" {
@@ -68,6 +82,7 @@ export function movementDirection(type: InventoryMovementType): "in" | "out" | "
   if (type === "purchase_damaged_in") return "hold";
   if (type === "reservation") return "hold";
   if (type === "release_reservation") return "hold";
+  if (type === "transfer_incoming_in" || type === "transfer_incoming_out") return "hold";
   return "out";
 }
 
