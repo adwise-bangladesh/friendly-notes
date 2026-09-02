@@ -27,9 +27,11 @@ import { getActiveLocations } from "@/lib/inventory";
 import {
   createOrderFulfillment,
   getOrderFulfillmentSummary,
+  getOrderFulfillmentEvents,
   getOrderFulfillments,
 } from "@/lib/fulfillment-records";
 import {
+  FULFILLMENT_EVENT_LABELS,
   FULFILLMENT_RECORD_STATUS_LABELS,
   FULFILLMENT_RECORD_STATUS_TONE,
 } from "@/types/fulfillment-records";
@@ -63,6 +65,10 @@ export function OrderFulfillmentsPanel({
   const { data: summary } = useQuery({
     queryKey: ["order-fulfillment-summary", order.id],
     queryFn: () => getOrderFulfillmentSummary(order.id),
+  });
+  const { data: timeline = [] } = useQuery({
+    queryKey: ["order-fulfillment-events", order.id],
+    queryFn: () => getOrderFulfillmentEvents(order.id),
   });
   const { data: locations = [] } = useQuery({
     queryKey: ["inventory-locations", "active"],
@@ -103,6 +109,7 @@ export function OrderFulfillmentsPanel({
       setQuantities({});
       void queryClient.invalidateQueries({ queryKey: ["order-fulfillments", order.id] });
       void queryClient.invalidateQueries({ queryKey: ["order-fulfillment-summary", order.id] });
+      void queryClient.invalidateQueries({ queryKey: ["order-fulfillment-events", order.id] });
       void queryClient.invalidateQueries({ queryKey: ["order", order.id] });
       void queryClient.invalidateQueries({ queryKey: ["fulfillment-record-queue"] });
       toast.success("Fulfillment created");
