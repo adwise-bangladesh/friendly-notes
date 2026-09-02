@@ -25,6 +25,7 @@ import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders.$id'
 import { Route as AuthenticatedOrdersFulfillmentRouteImport } from './routes/_authenticated/orders.fulfillment'
 import { Route as AuthenticatedOrdersNewRouteImport } from './routes/_authenticated/orders.new'
+import { Route as AuthenticatedOrdersShipmentsRouteImport } from './routes/_authenticated/orders.shipments'
 import { Route as AuthenticatedOrdersVerificationRouteImport } from './routes/_authenticated/orders.verification'
 import { Route as AuthenticatedProductsIndexRouteImport } from './routes/_authenticated/products.index'
 import { Route as AuthenticatedProductsIdRouteImport } from './routes/_authenticated/products.$id'
@@ -117,6 +118,12 @@ const AuthenticatedOrdersNewRoute = AuthenticatedOrdersNewRouteImport.update({
   path: '/orders/new',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOrdersShipmentsRoute =
+  AuthenticatedOrdersShipmentsRouteImport.update({
+    id: '/orders/shipments',
+    path: '/orders/shipments',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOrdersVerificationRoute =
   AuthenticatedOrdersVerificationRouteImport.update({
     id: '/orders/verification',
@@ -173,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders/fulfillment': typeof AuthenticatedOrdersFulfillmentRoute
   '/orders/new': typeof AuthenticatedOrdersNewRoute
+  '/orders/shipments': typeof AuthenticatedOrdersShipmentsRoute
   '/orders/verification': typeof AuthenticatedOrdersVerificationRoute
   '/products/$id': typeof AuthenticatedProductsIdRoute
   '/products/brands': typeof AuthenticatedProductsBrandsRoute
@@ -197,6 +205,7 @@ export interface FileRoutesByTo {
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders/fulfillment': typeof AuthenticatedOrdersFulfillmentRoute
   '/orders/new': typeof AuthenticatedOrdersNewRoute
+  '/orders/shipments': typeof AuthenticatedOrdersShipmentsRoute
   '/orders/verification': typeof AuthenticatedOrdersVerificationRoute
   '/products/$id': typeof AuthenticatedProductsIdRoute
   '/products/brands': typeof AuthenticatedProductsBrandsRoute
@@ -223,6 +232,7 @@ export interface FileRoutesById {
   '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/_authenticated/orders/fulfillment': typeof AuthenticatedOrdersFulfillmentRoute
   '/_authenticated/orders/new': typeof AuthenticatedOrdersNewRoute
+  '/_authenticated/orders/shipments': typeof AuthenticatedOrdersShipmentsRoute
   '/_authenticated/orders/verification': typeof AuthenticatedOrdersVerificationRoute
   '/_authenticated/products/$id': typeof AuthenticatedProductsIdRoute
   '/_authenticated/products/brands': typeof AuthenticatedProductsBrandsRoute
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/orders/$id'
     | '/orders/fulfillment'
     | '/orders/new'
+    | '/orders/shipments'
     | '/orders/verification'
     | '/products/$id'
     | '/products/brands'
@@ -273,6 +284,7 @@ export interface FileRouteTypes {
     | '/orders/$id'
     | '/orders/fulfillment'
     | '/orders/new'
+    | '/orders/shipments'
     | '/orders/verification'
     | '/products/$id'
     | '/products/brands'
@@ -298,6 +310,7 @@ export interface FileRouteTypes {
     | '/_authenticated/orders/$id'
     | '/_authenticated/orders/fulfillment'
     | '/_authenticated/orders/new'
+    | '/_authenticated/orders/shipments'
     | '/_authenticated/orders/verification'
     | '/_authenticated/products/$id'
     | '/_authenticated/products/brands'
@@ -432,6 +445,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrdersNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/orders/shipments': {
+      id: '/_authenticated/orders/shipments'
+      path: '/orders/shipments'
+      fullPath: '/orders/shipments'
+      preLoaderRoute: typeof AuthenticatedOrdersShipmentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/orders/verification': {
       id: '/_authenticated/orders/verification'
       path: '/orders/verification'
@@ -493,6 +513,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOrdersIdRoute: typeof AuthenticatedOrdersIdRoute
   AuthenticatedOrdersFulfillmentRoute: typeof AuthenticatedOrdersFulfillmentRoute
   AuthenticatedOrdersNewRoute: typeof AuthenticatedOrdersNewRoute
+  AuthenticatedOrdersShipmentsRoute: typeof AuthenticatedOrdersShipmentsRoute
   AuthenticatedOrdersVerificationRoute: typeof AuthenticatedOrdersVerificationRoute
   AuthenticatedProductsIdRoute: typeof AuthenticatedProductsIdRoute
   AuthenticatedProductsBrandsRoute: typeof AuthenticatedProductsBrandsRoute
@@ -513,6 +534,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOrdersIdRoute: AuthenticatedOrdersIdRoute,
   AuthenticatedOrdersFulfillmentRoute: AuthenticatedOrdersFulfillmentRoute,
   AuthenticatedOrdersNewRoute: AuthenticatedOrdersNewRoute,
+  AuthenticatedOrdersShipmentsRoute: AuthenticatedOrdersShipmentsRoute,
   AuthenticatedOrdersVerificationRoute: AuthenticatedOrdersVerificationRoute,
   AuthenticatedProductsIdRoute: AuthenticatedProductsIdRoute,
   AuthenticatedProductsBrandsRoute: AuthenticatedProductsBrandsRoute,
