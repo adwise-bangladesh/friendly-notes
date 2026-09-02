@@ -409,6 +409,272 @@ export type Database = {
           },
         ]
       }
+      order_addresses: {
+        Row: {
+          address_line: string
+          address_type: string
+          area: string | null
+          country: string
+          created_at: string
+          district: string | null
+          division: string | null
+          id: string
+          order_id: string
+          phone: string
+          postal_code: string | null
+          recipient_name: string
+          updated_at: string
+        }
+        Insert: {
+          address_line: string
+          address_type?: string
+          area?: string | null
+          country?: string
+          created_at?: string
+          district?: string | null
+          division?: string | null
+          id?: string
+          order_id: string
+          phone: string
+          postal_code?: string | null
+          recipient_name: string
+          updated_at?: string
+        }
+        Update: {
+          address_line?: string
+          address_type?: string
+          area?: string | null
+          country?: string
+          created_at?: string
+          district?: string | null
+          division?: string | null
+          id?: string
+          order_id?: string
+          phone?: string
+          postal_code?: string | null
+          recipient_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_addresses_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          compare_at_price: number | null
+          created_at: string
+          discount_amount: number
+          id: string
+          line_total: number | null
+          order_id: string
+          product_id: string | null
+          product_name: string
+          product_type: Database["public"]["Enums"]["product_type"] | null
+          quantity: number
+          sku: string | null
+          sort_order: number
+          unit_price: number
+          variant_id: string | null
+          variant_name: string | null
+        }
+        Insert: {
+          compare_at_price?: number | null
+          created_at?: string
+          discount_amount?: number
+          id?: string
+          line_total?: number | null
+          order_id: string
+          product_id?: string | null
+          product_name: string
+          product_type?: Database["public"]["Enums"]["product_type"] | null
+          quantity: number
+          sku?: string | null
+          sort_order?: number
+          unit_price: number
+          variant_id?: string | null
+          variant_name?: string | null
+        }
+        Update: {
+          compare_at_price?: number | null
+          created_at?: string
+          discount_amount?: number
+          id?: string
+          line_total?: number | null
+          order_id?: string
+          product_id?: string | null
+          product_name?: string
+          product_type?: Database["public"]["Enums"]["product_type"] | null
+          quantity?: number
+          sku?: string | null
+          sort_order?: number
+          unit_price?: number
+          variant_id?: string | null
+          variant_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_notes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_internal: boolean
+          note: string
+          note_type: Database["public"]["Enums"]["order_note_type"]
+          order_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_internal?: boolean
+          note: string
+          note_type?: Database["public"]["Enums"]["order_note_type"]
+          order_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_internal?: boolean
+          note?: string
+          note_type?: Database["public"]["Enums"]["order_note_type"]
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_notes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          adjustment: number
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_charge: number
+          delivery_status: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount: number | null
+          financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total: number
+          id: string
+          order_discount: number
+          order_number: string
+          packing_charge: number
+          paid_amount: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          placed_at: string | null
+          product_discount: number
+          shipping_charge: number
+          source: Database["public"]["Enums"]["order_source"]
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          updated_at: string
+          updated_by: string | null
+          verification_status: Database["public"]["Enums"]["order_verification_status"]
+        }
+        Insert: {
+          adjustment?: number
+          cancelled_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_email?: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_charge?: number
+          delivery_status?: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount?: number | null
+          financial_status?: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_status?: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total?: number
+          id?: string
+          order_discount?: number
+          order_number: string
+          packing_charge?: number
+          paid_amount?: number
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          placed_at?: string | null
+          product_discount?: number
+          shipping_charge?: number
+          source?: Database["public"]["Enums"]["order_source"]
+          status?: Database["public"]["Enums"]["order_status"]
+          subtotal?: number
+          updated_at?: string
+          updated_by?: string | null
+          verification_status?: Database["public"]["Enums"]["order_verification_status"]
+        }
+        Update: {
+          adjustment?: number
+          cancelled_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_email?: string | null
+          customer_name?: string
+          customer_phone?: string
+          delivery_charge?: number
+          delivery_status?: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount?: number | null
+          financial_status?: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_status?: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total?: number
+          id?: string
+          order_discount?: number
+          order_number?: string
+          packing_charge?: number
+          paid_amount?: number
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          placed_at?: string | null
+          product_discount?: number
+          shipping_charge?: number
+          source?: Database["public"]["Enums"]["order_source"]
+          status?: Database["public"]["Enums"]["order_status"]
+          subtotal?: number
+          updated_at?: string
+          updated_by?: string | null
+          verification_status?: Database["public"]["Enums"]["order_verification_status"]
+        }
+        Relationships: []
+      }
       product_categories: {
         Row: {
           category_id: string
@@ -814,12 +1080,92 @@ export type Database = {
       }
       can_manage_commerce: { Args: { _user_id: string }; Returns: boolean }
       can_read_commerce: { Args: { _user_id: string }; Returns: boolean }
+      cancel_order: {
+        Args: { _order_id: string; _reason?: string }
+        Returns: {
+          adjustment: number
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_charge: number
+          delivery_status: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount: number | null
+          financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total: number
+          id: string
+          order_discount: number
+          order_number: string
+          packing_charge: number
+          paid_amount: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          placed_at: string | null
+          product_discount: number
+          shipping_charge: number
+          source: Database["public"]["Enums"]["order_source"]
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          updated_at: string
+          updated_by: string | null
+          verification_status: Database["public"]["Enums"]["order_verification_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       category_product_counts: {
         Args: never
         Returns: {
           category_id: string
           product_count: number
         }[]
+      }
+      create_order: {
+        Args: { _payload: Json }
+        Returns: {
+          adjustment: number
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_charge: number
+          delivery_status: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount: number | null
+          financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total: number
+          id: string
+          order_discount: number
+          order_number: string
+          packing_charge: number
+          paid_amount: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          placed_at: string | null
+          product_discount: number
+          shipping_charge: number
+          source: Database["public"]["Enums"]["order_source"]
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          updated_at: string
+          updated_by: string | null
+          verification_status: Database["public"]["Enums"]["order_verification_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       has_role: {
         Args: {
@@ -829,6 +1175,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      next_order_number: { Args: never; Returns: string }
       set_default_inventory_location: {
         Args: { _location_id: string }
         Returns: string
@@ -858,6 +1205,31 @@ export type Database = {
         | "return_in"
         | "reservation"
         | "release_reservation"
+      order_delivery_status: "not_shipped"
+      order_financial_status: "not_applicable"
+      order_fulfillment_status: "unfulfilled"
+      order_note_type: "general" | "system"
+      order_source:
+        | "admin"
+        | "web"
+        | "mobile"
+        | "facebook"
+        | "whatsapp"
+        | "phone"
+        | "import"
+        | "api"
+      order_status: "draft" | "created" | "cancelled"
+      order_verification_status: "not_required" | "pending"
+      payment_method:
+        | "cod"
+        | "cash"
+        | "bkash"
+        | "nagad"
+        | "rocket"
+        | "card"
+        | "bank_transfer"
+        | "other"
+      payment_status: "unpaid" | "partial" | "paid" | "refunded"
       product_relationship_type: "related" | "upsell" | "cross_sell"
       product_status: "draft" | "active" | "inactive" | "archived"
       product_type: "simple" | "variable" | "bundle" | "service" | "digital"
@@ -1015,6 +1387,33 @@ export const Constants = {
         "reservation",
         "release_reservation",
       ],
+      order_delivery_status: ["not_shipped"],
+      order_financial_status: ["not_applicable"],
+      order_fulfillment_status: ["unfulfilled"],
+      order_note_type: ["general", "system"],
+      order_source: [
+        "admin",
+        "web",
+        "mobile",
+        "facebook",
+        "whatsapp",
+        "phone",
+        "import",
+        "api",
+      ],
+      order_status: ["draft", "created", "cancelled"],
+      order_verification_status: ["not_required", "pending"],
+      payment_method: [
+        "cod",
+        "cash",
+        "bkash",
+        "nagad",
+        "rocket",
+        "card",
+        "bank_transfer",
+        "other",
+      ],
+      payment_status: ["unpaid", "partial", "paid", "refunded"],
       product_relationship_type: ["related", "upsell", "cross_sell"],
       product_status: ["draft", "active", "inactive", "archived"],
       product_type: ["simple", "variable", "bundle", "service", "digital"],
