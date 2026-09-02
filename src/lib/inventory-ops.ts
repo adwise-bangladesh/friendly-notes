@@ -62,7 +62,7 @@ const LEDGER_SELECT = `
 
 interface LedgerJoin {
   level: {
-    location: { name: string } | null;
+    location: { id: string; name: string } | null;
     product: { name: string; sku: string | null } | null;
     variant: {
       title: string;
@@ -110,7 +110,7 @@ export async function getMovementLedger(options?: {
     names = Object.fromEntries((profiles ?? []).map((p) => [p.id, p.full_name]));
   }
 
-  const mapped: MovementLedgerRow[] = rows.map((r) => {
+  const mapped: (MovementLedgerRow & { locationId: string | null })[] = rows.map((r) => {
     const parentName = r.level?.variant?.product?.name ?? r.level?.product?.name ?? "Unknown item";
     return {
       ...r,
@@ -118,12 +118,13 @@ export async function getMovementLedger(options?: {
       variantTitle: r.level?.variant?.title ?? null,
       sku: r.level?.variant?.sku ?? r.level?.product?.sku ?? null,
       locationName: r.level?.location?.name ?? "Unknown location",
+      locationId: r.level?.location?.id ?? null,
       actorName: r.created_by ? (names[r.created_by] ?? null) : null,
     };
   });
 
   const filtered = options?.locationId
-    ? mapped.filter((r) => (r.level as unknown as { location?: { name?: string } } | null) && true)
+    ? mapped.filter((r) => r.locationId === options.locationId)
     : mapped;
 
   const term = options?.search?.trim().toLowerCase();
