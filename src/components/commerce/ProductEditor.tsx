@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FormSection } from "./FormSection";
+import { ProductInventorySection } from "@/components/inventory/ProductInventorySection";
 import { ProductCategoryPicker } from "./ProductCategoryPicker";
 import { ProductMediaManager } from "./ProductMediaManager";
 import { ProductVariantsEditor } from "./ProductVariantsEditor";
@@ -682,6 +683,22 @@ export function ProductEditor({ record }: Props) {
             />
           </FormSection>
         </div>
+
+        {record?.id && (
+          <div className="rounded-md border border-border bg-card p-4">
+            <FormSection
+              title="Inventory"
+              description="Stock is held per location. Quantities change only through recorded stock movements."
+            >
+              <ProductInventorySection
+                productId={record.id}
+                productType={draft.product_type}
+                supplyModel={draft.supply_model}
+                variants={record.product_variants.map((v) => ({ id: v.id, title: v.title }))}
+              />
+            </FormSection>
+          </div>
+        )}
 
         {isGroupBuy && (
           <div className="rounded-md border border-border bg-card p-4">

@@ -29,7 +29,15 @@ export const NAV_ITEMS: NavItem[] = [
       { label: "Brands", to: "/products/brands" },
     ],
   },
-  { label: "Inventory", to: "/inventory", icon: Boxes },
+  {
+    label: "Inventory",
+    to: "/inventory",
+    icon: Boxes,
+    children: [
+      { label: "Stock Overview", to: "/inventory" },
+      { label: "Locations", to: "/inventory/locations" },
+    ],
+  },
   { label: "Customers", to: "/customers", icon: Users },
   { label: "Returns", to: "/returns", icon: RotateCcw },
   { label: "Settings", to: "/settings", icon: Settings },
