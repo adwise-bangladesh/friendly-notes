@@ -92,3 +92,114 @@ export const RELATIONSHIP_TYPE_LABELS: Record<ProductRelationshipType, string> =
   cross_sell: "Cross-sell",
   bundle_item: "Bundle Item",
 };
+
+/* ---------- Product list + editor read shapes (Step 4) ---------- */
+
+export interface ProductListRow {
+  id: string;
+  name: string;
+  slug: string;
+  sku: string | null;
+  product_type: ProductType;
+  supply_model: SupplyModel;
+  status: ProductStatus;
+  visibility: EntityVisibility;
+  featured: boolean;
+  price: number;
+  compare_at_price: number | null;
+  updated_at: string;
+  brand: { id: string; name: string } | null;
+  product_categories: { is_primary: boolean; category: { id: string; name: string } | null }[];
+  product_media: { url: string; is_primary: boolean; sort_order: number }[];
+  product_variants: { id: string; price: number | null }[];
+}
+
+export interface ProductRelationshipWithProduct extends ProductRelationship {
+  related_product: {
+    id: string;
+    name: string;
+    slug: string;
+    status: ProductStatus;
+    product_media: { url: string; is_primary: boolean }[];
+  } | null;
+}
+
+export interface ProductEditorRecord extends Product {
+  product_categories: ProductCategory[];
+  product_variants: ProductVariant[];
+  product_media: ProductMedia[];
+  product_relationships: ProductRelationshipWithProduct[];
+}
+
+export interface ProductPickerOption {
+  id: string;
+  name: string;
+  slug: string;
+  status: ProductStatus;
+  product_media: { url: string; is_primary: boolean }[];
+}
+
+/* Draft shape used by the product editor form */
+export interface ProductCategoryDraft {
+  category_id: string;
+  is_primary: boolean;
+}
+
+export interface ProductMediaDraft {
+  key: string;
+  url: string;
+  alt_text: string | null;
+  is_primary: boolean;
+}
+
+export interface ProductVariantDraft {
+  key: string;
+  title: string;
+  sku: string | null;
+  barcode: string | null;
+  price: number | null;
+  compare_at_price: number | null;
+  status: VariantStatus;
+}
+
+export interface ProductRelationshipDraft {
+  key: string;
+  related_product_id: string;
+  relationship_type: ProductRelationshipType;
+  name: string;
+  thumbnail: string | null;
+}
+
+export interface ProductDraft {
+  name: string;
+  slug: string;
+  sku: string | null;
+  short_description: string | null;
+  description: string | null;
+  brand_id: string | null;
+  product_type: ProductType;
+  supply_model: SupplyModel;
+  status: ProductStatus;
+  visibility: EntityVisibility;
+  featured: boolean;
+  price: number;
+  compare_at_price: number | null;
+  categories: ProductCategoryDraft[];
+  media: ProductMediaDraft[];
+  variants: ProductVariantDraft[];
+  relationships: ProductRelationshipDraft[];
+}
+
+export const PRODUCT_TYPE_HELP: Record<ProductType, string> = {
+  simple: "Standard single product with one price. Example: a T-shirt.",
+  variable: "Multiple purchasable options, each with its own SKU and price. Example: T-shirt in Black / M.",
+  bundle: "Several products sold together as one item. Example: a skin care bundle.",
+  service: "Non-physical service. Example: a website consultation.",
+  digital: "Digital product delivered as a file or licence. Example: an ebook.",
+};
+
+export const SUPPLY_MODEL_HELP: Record<SupplyModel, string> = {
+  in_stock: "Fulfilled from managed inventory held in your own stock.",
+  local_sourcing: "Sourced locally after the order is received or confirmed. No stock required.",
+  preorder: "Obtained after the customer orders. May need extra fulfilment time.",
+};
