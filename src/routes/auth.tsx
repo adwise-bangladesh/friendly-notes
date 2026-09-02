@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { APP_CONFIG } from "@/lib/app-config";
 
 export const Route = createFileRoute("/auth")({
-  ssr: false,
+
   head: () => ({
     meta: [
       { title: "Sign in · Commerce Operations" },
