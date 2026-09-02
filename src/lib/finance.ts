@@ -51,7 +51,7 @@ const SETTLEMENT_ITEM_SELECT = `
 /* ---------- Order financials ---------- */
 
 export async function getOrderFinancials(orderId: string): Promise<OrderFinancialSnapshot> {
-  const { data, error } = await supabase.rpc("order_financials", rpcArgs({ _order_id: orderId });
+  const { data, error } = await supabase.rpc("order_financials", { _order_id: orderId });
   if (error) throw error;
   return data as unknown as OrderFinancialSnapshot;
 }
@@ -289,7 +289,7 @@ export async function addSettlementItem(
 }
 
 export async function removeSettlementItem(itemId: string): Promise<void> {
-  const { error } = await supabase.rpc("remove_settlement_item", rpcArgs({ _item_id: itemId });
+  const { error } = await supabase.rpc("remove_settlement_item", { _item_id: itemId });
   if (error) throw error;
 }
 
