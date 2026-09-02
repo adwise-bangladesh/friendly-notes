@@ -25,6 +25,7 @@ export const NAV_ITEMS: NavItem[] = [
     children: [
       { label: "All Orders", to: "/orders" },
       { label: "Verification", to: "/orders/verification" },
+      { label: "Warehouse", to: "/orders/fulfillment" },
     ],
   },
   {

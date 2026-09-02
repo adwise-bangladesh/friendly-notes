@@ -33,9 +33,12 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
 export { VERIFICATION_STATUS_LABELS } from "./verification";
 
 
-export const FULFILLMENT_STATUS_LABELS: Record<FulfillmentStatus, string> = {
-  unfulfilled: "Unfulfilled",
-};
+export type { ReservationStatus } from "./fulfillment";
+export {
+  FULFILLMENT_STATUS_LABELS,
+  RESERVATION_STATUS_LABELS,
+} from "./fulfillment";
+
 
 export const DELIVERY_STATUS_LABELS: Record<DeliveryStatus, string> = {
   not_shipped: "Not shipped",

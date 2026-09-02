@@ -409,6 +409,106 @@ export type Database = {
           },
         ]
       }
+      inventory_reservations: {
+        Row: {
+          committed_at: string | null
+          committed_by: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          inventory_level_id: string
+          location_id: string
+          order_id: string
+          order_item_id: string
+          product_id: string | null
+          quantity: number
+          released_at: string | null
+          released_by: string | null
+          status: Database["public"]["Enums"]["reservation_record_status"]
+          updated_at: string
+          variant_id: string | null
+        }
+        Insert: {
+          committed_at?: string | null
+          committed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          inventory_level_id: string
+          location_id: string
+          order_id: string
+          order_item_id: string
+          product_id?: string | null
+          quantity: number
+          released_at?: string | null
+          released_by?: string | null
+          status?: Database["public"]["Enums"]["reservation_record_status"]
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Update: {
+          committed_at?: string | null
+          committed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          inventory_level_id?: string
+          location_id?: string
+          order_id?: string
+          order_item_id?: string
+          product_id?: string | null
+          quantity?: number
+          released_at?: string | null
+          released_by?: string | null
+          status?: Database["public"]["Enums"]["reservation_record_status"]
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_reservations_inventory_level_id_fkey"
+            columns: ["inventory_level_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_levels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_reservations_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_reservations_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_reservations_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_reservations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_reservations_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_addresses: {
         Row: {
           address_line: string
@@ -732,17 +832,22 @@ export type Database = {
           delivery_status: Database["public"]["Enums"]["order_delivery_status"]
           due_amount: number | null
           financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason: string | null
+          fulfillment_location_id: string | null
           fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
           grand_total: number
           id: string
           order_discount: number
           order_number: string
+          packed_at: string | null
           packing_charge: number
           paid_amount: number
           payment_method: Database["public"]["Enums"]["payment_method"]
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          reservation_status: Database["public"]["Enums"]["reservation_status"]
+          reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
           risk_reason: string | null
           shipping_charge: number
@@ -771,17 +876,22 @@ export type Database = {
           delivery_status?: Database["public"]["Enums"]["order_delivery_status"]
           due_amount?: number | null
           financial_status?: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason?: string | null
+          fulfillment_location_id?: string | null
           fulfillment_status?: Database["public"]["Enums"]["order_fulfillment_status"]
           grand_total?: number
           id?: string
           order_discount?: number
           order_number: string
+          packed_at?: string | null
           packing_charge?: number
           paid_amount?: number
           payment_method?: Database["public"]["Enums"]["payment_method"]
           payment_status?: Database["public"]["Enums"]["payment_status"]
           placed_at?: string | null
           product_discount?: number
+          reservation_status?: Database["public"]["Enums"]["reservation_status"]
+          reserved_at?: string | null
           risk_level?: Database["public"]["Enums"]["verification_risk_level"]
           risk_reason?: string | null
           shipping_charge?: number
@@ -810,17 +920,22 @@ export type Database = {
           delivery_status?: Database["public"]["Enums"]["order_delivery_status"]
           due_amount?: number | null
           financial_status?: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason?: string | null
+          fulfillment_location_id?: string | null
           fulfillment_status?: Database["public"]["Enums"]["order_fulfillment_status"]
           grand_total?: number
           id?: string
           order_discount?: number
           order_number?: string
+          packed_at?: string | null
           packing_charge?: number
           paid_amount?: number
           payment_method?: Database["public"]["Enums"]["payment_method"]
           payment_status?: Database["public"]["Enums"]["payment_status"]
           placed_at?: string | null
           product_discount?: number
+          reservation_status?: Database["public"]["Enums"]["reservation_status"]
+          reserved_at?: string | null
           risk_level?: Database["public"]["Enums"]["verification_risk_level"]
           risk_reason?: string | null
           shipping_charge?: number
@@ -837,7 +952,15 @@ export type Database = {
           verification_priority?: Database["public"]["Enums"]["verification_priority"]
           verification_status?: Database["public"]["Enums"]["order_verification_status"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_fulfillment_location_id_fkey"
+            columns: ["fulfillment_location_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_locations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_categories: {
         Row: {
@@ -1261,17 +1384,22 @@ export type Database = {
           delivery_status: Database["public"]["Enums"]["order_delivery_status"]
           due_amount: number | null
           financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason: string | null
+          fulfillment_location_id: string | null
           fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
           grand_total: number
           id: string
           order_discount: number
           order_number: string
+          packed_at: string | null
           packing_charge: number
           paid_amount: number
           payment_method: Database["public"]["Enums"]["payment_method"]
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          reservation_status: Database["public"]["Enums"]["reservation_status"]
+          reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
           risk_reason: string | null
           shipping_charge: number
@@ -1305,7 +1433,7 @@ export type Database = {
       can_manage_commerce: { Args: { _user_id: string }; Returns: boolean }
       can_read_commerce: { Args: { _user_id: string }; Returns: boolean }
       cancel_order: {
-        Args: { _order_id: string; _reason?: string }
+        Args: { _force?: boolean; _order_id: string; _reason?: string }
         Returns: {
           adjustment: number
           cancelled_at: string | null
@@ -1318,17 +1446,22 @@ export type Database = {
           delivery_status: Database["public"]["Enums"]["order_delivery_status"]
           due_amount: number | null
           financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason: string | null
+          fulfillment_location_id: string | null
           fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
           grand_total: number
           id: string
           order_discount: number
           order_number: string
+          packed_at: string | null
           packing_charge: number
           paid_amount: number
           payment_method: Database["public"]["Enums"]["payment_method"]
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          reservation_status: Database["public"]["Enums"]["reservation_status"]
+          reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
           risk_reason: string | null
           shipping_charge: number
@@ -1359,8 +1492,8 @@ export type Database = {
           product_count: number
         }[]
       }
-      create_order: {
-        Args: { _payload: Json }
+      commit_order_inventory: {
+        Args: { _order_id: string }
         Returns: {
           adjustment: number
           cancelled_at: string | null
@@ -1373,17 +1506,22 @@ export type Database = {
           delivery_status: Database["public"]["Enums"]["order_delivery_status"]
           due_amount: number | null
           financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason: string | null
+          fulfillment_location_id: string | null
           fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
           grand_total: number
           id: string
           order_discount: number
           order_number: string
+          packed_at: string | null
           packing_charge: number
           paid_amount: number
           payment_method: Database["public"]["Enums"]["payment_method"]
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          reservation_status: Database["public"]["Enums"]["reservation_status"]
+          reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
           risk_reason: string | null
           shipping_charge: number
@@ -1406,6 +1544,66 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      create_order: {
+        Args: { _payload: Json }
+        Returns: {
+          adjustment: number
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_charge: number
+          delivery_status: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount: number | null
+          financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason: string | null
+          fulfillment_location_id: string | null
+          fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total: number
+          id: string
+          order_discount: number
+          order_number: string
+          packed_at: string | null
+          packing_charge: number
+          paid_amount: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          placed_at: string | null
+          product_discount: number
+          reservation_status: Database["public"]["Enums"]["reservation_status"]
+          reserved_at: string | null
+          risk_level: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason: string | null
+          shipping_charge: number
+          source: Database["public"]["Enums"]["order_source"]
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          updated_at: string
+          updated_by: string | null
+          verification_attempt_count: number
+          verification_confirmed_at: string | null
+          verification_failure_reason: string | null
+          verification_last_attempt_at: string | null
+          verification_next_action_at: string | null
+          verification_priority: Database["public"]["Enums"]["verification_priority"]
+          verification_status: Database["public"]["Enums"]["order_verification_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      fulfillment_transition_allowed: {
+        Args: {
+          _from: Database["public"]["Enums"]["order_fulfillment_status"]
+          _to: Database["public"]["Enums"]["order_fulfillment_status"]
+        }
+        Returns: boolean
       }
       has_role: {
         Args: {
@@ -1440,17 +1638,128 @@ export type Database = {
           delivery_status: Database["public"]["Enums"]["order_delivery_status"]
           due_amount: number | null
           financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason: string | null
+          fulfillment_location_id: string | null
           fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
           grand_total: number
           id: string
           order_discount: number
           order_number: string
+          packed_at: string | null
           packing_charge: number
           paid_amount: number
           payment_method: Database["public"]["Enums"]["payment_method"]
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          reservation_status: Database["public"]["Enums"]["reservation_status"]
+          reserved_at: string | null
+          risk_level: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason: string | null
+          shipping_charge: number
+          source: Database["public"]["Enums"]["order_source"]
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          updated_at: string
+          updated_by: string | null
+          verification_attempt_count: number
+          verification_confirmed_at: string | null
+          verification_failure_reason: string | null
+          verification_last_attempt_at: string | null
+          verification_next_action_at: string | null
+          verification_priority: Database["public"]["Enums"]["verification_priority"]
+          verification_status: Database["public"]["Enums"]["order_verification_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      release_order_reservations: {
+        Args: { _order_id: string; _reason: string }
+        Returns: {
+          adjustment: number
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_charge: number
+          delivery_status: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount: number | null
+          financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason: string | null
+          fulfillment_location_id: string | null
+          fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total: number
+          id: string
+          order_discount: number
+          order_number: string
+          packed_at: string | null
+          packing_charge: number
+          paid_amount: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          placed_at: string | null
+          product_discount: number
+          reservation_status: Database["public"]["Enums"]["reservation_status"]
+          reserved_at: string | null
+          risk_level: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason: string | null
+          shipping_charge: number
+          source: Database["public"]["Enums"]["order_source"]
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          updated_at: string
+          updated_by: string | null
+          verification_attempt_count: number
+          verification_confirmed_at: string | null
+          verification_failure_reason: string | null
+          verification_last_attempt_at: string | null
+          verification_next_action_at: string | null
+          verification_priority: Database["public"]["Enums"]["verification_priority"]
+          verification_status: Database["public"]["Enums"]["order_verification_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      reserve_order_inventory: {
+        Args: { _order_id: string }
+        Returns: {
+          adjustment: number
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_charge: number
+          delivery_status: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount: number | null
+          financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason: string | null
+          fulfillment_location_id: string | null
+          fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total: number
+          id: string
+          order_discount: number
+          order_number: string
+          packed_at: string | null
+          packing_charge: number
+          paid_amount: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          placed_at: string | null
+          product_discount: number
+          reservation_status: Database["public"]["Enums"]["reservation_status"]
+          reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
           risk_reason: string | null
           shipping_charge: number
@@ -1478,6 +1787,59 @@ export type Database = {
         Args: { _location_id: string }
         Returns: string
       }
+      set_order_fulfillment_state: {
+        Args: { _action: string; _order_id: string; _reason?: string }
+        Returns: {
+          adjustment: number
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_charge: number
+          delivery_status: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount: number | null
+          financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason: string | null
+          fulfillment_location_id: string | null
+          fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total: number
+          id: string
+          order_discount: number
+          order_number: string
+          packed_at: string | null
+          packing_charge: number
+          paid_amount: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          placed_at: string | null
+          product_discount: number
+          reservation_status: Database["public"]["Enums"]["reservation_status"]
+          reserved_at: string | null
+          risk_level: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason: string | null
+          shipping_charge: number
+          source: Database["public"]["Enums"]["order_source"]
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          updated_at: string
+          updated_by: string | null
+          verification_attempt_count: number
+          verification_confirmed_at: string | null
+          verification_failure_reason: string | null
+          verification_last_attempt_at: string | null
+          verification_next_action_at: string | null
+          verification_priority: Database["public"]["Enums"]["verification_priority"]
+          verification_status: Database["public"]["Enums"]["order_verification_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_order_verification_priority: {
         Args: {
           _order_id: string
@@ -1495,17 +1857,22 @@ export type Database = {
           delivery_status: Database["public"]["Enums"]["order_delivery_status"]
           due_amount: number | null
           financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason: string | null
+          fulfillment_location_id: string | null
           fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
           grand_total: number
           id: string
           order_discount: number
           order_number: string
+          packed_at: string | null
           packing_charge: number
           paid_amount: number
           payment_method: Database["public"]["Enums"]["payment_method"]
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          reservation_status: Database["public"]["Enums"]["reservation_status"]
+          reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
           risk_reason: string | null
           shipping_charge: number
@@ -1549,17 +1916,22 @@ export type Database = {
           delivery_status: Database["public"]["Enums"]["order_delivery_status"]
           due_amount: number | null
           financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason: string | null
+          fulfillment_location_id: string | null
           fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
           grand_total: number
           id: string
           order_discount: number
           order_number: string
+          packed_at: string | null
           packing_charge: number
           paid_amount: number
           payment_method: Database["public"]["Enums"]["payment_method"]
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          reservation_status: Database["public"]["Enums"]["reservation_status"]
+          reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
           risk_reason: string | null
           shipping_charge: number
@@ -1600,17 +1972,22 @@ export type Database = {
           delivery_status: Database["public"]["Enums"]["order_delivery_status"]
           due_amount: number | null
           financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason: string | null
+          fulfillment_location_id: string | null
           fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
           grand_total: number
           id: string
           order_discount: number
           order_number: string
+          packed_at: string | null
           packing_charge: number
           paid_amount: number
           payment_method: Database["public"]["Enums"]["payment_method"]
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          reservation_status: Database["public"]["Enums"]["reservation_status"]
+          reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
           risk_reason: string | null
           shipping_charge: number
@@ -1667,9 +2044,18 @@ export type Database = {
         | "return_in"
         | "reservation"
         | "release_reservation"
+        | "fulfillment_out"
       order_delivery_status: "not_shipped"
       order_financial_status: "not_applicable"
-      order_fulfillment_status: "unfulfilled"
+      order_fulfillment_status:
+        | "not_started"
+        | "on_hold"
+        | "ready"
+        | "picking"
+        | "picked"
+        | "packing"
+        | "packed"
+        | "ready_for_courier"
       order_note_type: "general" | "system"
       order_source:
         | "admin"
@@ -1704,6 +2090,14 @@ export type Database = {
       product_relationship_type: "related" | "upsell" | "cross_sell"
       product_status: "draft" | "active" | "inactive" | "archived"
       product_type: "simple" | "variable" | "bundle" | "service" | "digital"
+      reservation_record_status: "active" | "released" | "committed"
+      reservation_status:
+        | "not_required"
+        | "pending"
+        | "reserved"
+        | "partial"
+        | "failed"
+        | "released"
       supply_model: "in_stock" | "local_sourcing" | "preorder" | "group_buy"
       variant_status: "active" | "inactive"
       verification_attempt_outcome:
@@ -1893,10 +2287,20 @@ export const Constants = {
         "return_in",
         "reservation",
         "release_reservation",
+        "fulfillment_out",
       ],
       order_delivery_status: ["not_shipped"],
       order_financial_status: ["not_applicable"],
-      order_fulfillment_status: ["unfulfilled"],
+      order_fulfillment_status: [
+        "not_started",
+        "on_hold",
+        "ready",
+        "picking",
+        "picked",
+        "packing",
+        "packed",
+        "ready_for_courier",
+      ],
       order_note_type: ["general", "system"],
       order_source: [
         "admin",
@@ -1934,6 +2338,15 @@ export const Constants = {
       product_relationship_type: ["related", "upsell", "cross_sell"],
       product_status: ["draft", "active", "inactive", "archived"],
       product_type: ["simple", "variable", "bundle", "service", "digital"],
+      reservation_record_status: ["active", "released", "committed"],
+      reservation_status: [
+        "not_required",
+        "pending",
+        "reserved",
+        "partial",
+        "failed",
+        "released",
+      ],
       supply_model: ["in_stock", "local_sourcing", "preorder", "group_buy"],
       variant_status: ["active", "inactive"],
       verification_attempt_outcome: [

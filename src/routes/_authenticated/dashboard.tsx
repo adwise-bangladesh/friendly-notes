@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getVerificationQueue } from "@/lib/verification";
+import { getFulfillmentQueue } from "@/lib/fulfillment";
+import { FULFILLMENT_STATUS_LABELS } from "@/types/fulfillment";
 import {
   AlertTriangle,
   Activity,
@@ -99,6 +101,45 @@ function VerificationAttention() {
   );
 }
 
+/** Live warehouse counts — pick / pack / hold work waiting right now. */
+function ProcessingQueue() {
+  const { data: rows, isLoading } = useQuery({
+    queryKey: ["fulfillment-queue", "dashboard"],
+    queryFn: () => getFulfillmentQueue({ limit: 500 }),
+  });
+
+  if (isLoading) {
+    return <p className="px-3 py-3 text-[12.5px] text-muted-foreground">Loading…</p>;
+  }
+  if (!rows || rows.length === 0) {
+    return (
+      <EmptyState
+        compact
+        title="Queue empty"
+        description="Confirmed orders with stock held appear here for picking and packing."
+      />
+    );
+  }
+
+  const stats = (["ready", "picking", "packing", "packed", "on_hold"] as const).map((s) => ({
+    label: FULFILLMENT_STATUS_LABELS[s],
+    value: rows.filter((r) => r.fulfillment_status === s).length,
+  }));
+
+  return (
+    <ul className="divide-y divide-border">
+      {stats.map((s) => (
+        <li key={s.label} className="flex items-center justify-between px-3 py-2 text-[13px]">
+          <Link to="/orders/fulfillment" className="text-muted-foreground hover:text-foreground">
+            {s.label}
+          </Link>
+          <span className="font-semibold tabular-nums">{s.value}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function DashboardPage() {
   const { data: profile } = useProfile();
 
@@ -125,11 +166,7 @@ function DashboardPage() {
           <VerificationAttention />
         </Panel>
         <Panel title="Processing Queue" icon={ListChecks}>
-          <EmptyState
-            compact
-            title="Queue empty"
-            description="Pick, pack and dispatch stages appear here."
-          />
+          <ProcessingQueue />
         </Panel>
         <Panel title="Low Stock" icon={Boxes}>
           <EmptyState
