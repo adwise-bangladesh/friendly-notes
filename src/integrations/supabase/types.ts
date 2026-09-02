@@ -579,6 +579,146 @@ export type Database = {
           },
         ]
       }
+      order_verification_attempts: {
+        Row: {
+          ai_result: Json | null
+          attempt_number: number
+          completed_at: string | null
+          created_at: string
+          duration_seconds: number | null
+          external_call_id: string | null
+          failure_reason: string | null
+          id: string
+          initiated_by: string | null
+          method: Database["public"]["Enums"]["verification_method"]
+          notes: string | null
+          order_id: string
+          outcome: Database["public"]["Enums"]["verification_attempt_outcome"]
+          provider: string | null
+          recording_reference: string | null
+          scheduled_at: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["verification_attempt_status"]
+          transcript_reference: string | null
+        }
+        Insert: {
+          ai_result?: Json | null
+          attempt_number: number
+          completed_at?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          external_call_id?: string | null
+          failure_reason?: string | null
+          id?: string
+          initiated_by?: string | null
+          method: Database["public"]["Enums"]["verification_method"]
+          notes?: string | null
+          order_id: string
+          outcome?: Database["public"]["Enums"]["verification_attempt_outcome"]
+          provider?: string | null
+          recording_reference?: string | null
+          scheduled_at?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["verification_attempt_status"]
+          transcript_reference?: string | null
+        }
+        Update: {
+          ai_result?: Json | null
+          attempt_number?: number
+          completed_at?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          external_call_id?: string | null
+          failure_reason?: string | null
+          id?: string
+          initiated_by?: string | null
+          method?: Database["public"]["Enums"]["verification_method"]
+          notes?: string | null
+          order_id?: string
+          outcome?: Database["public"]["Enums"]["verification_attempt_outcome"]
+          provider?: string | null
+          recording_reference?: string | null
+          scheduled_at?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["verification_attempt_status"]
+          transcript_reference?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_verification_attempts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_verification_events: {
+        Row: {
+          attempt_id: string | null
+          created_at: string
+          created_by: string | null
+          event_type: Database["public"]["Enums"]["verification_event_type"]
+          from_status:
+            | Database["public"]["Enums"]["order_verification_status"]
+            | null
+          id: string
+          message: string
+          metadata: Json | null
+          order_id: string
+          to_status:
+            | Database["public"]["Enums"]["order_verification_status"]
+            | null
+        }
+        Insert: {
+          attempt_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          event_type: Database["public"]["Enums"]["verification_event_type"]
+          from_status?:
+            | Database["public"]["Enums"]["order_verification_status"]
+            | null
+          id?: string
+          message: string
+          metadata?: Json | null
+          order_id: string
+          to_status?:
+            | Database["public"]["Enums"]["order_verification_status"]
+            | null
+        }
+        Update: {
+          attempt_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          event_type?: Database["public"]["Enums"]["verification_event_type"]
+          from_status?:
+            | Database["public"]["Enums"]["order_verification_status"]
+            | null
+          id?: string
+          message?: string
+          metadata?: Json | null
+          order_id?: string
+          to_status?:
+            | Database["public"]["Enums"]["order_verification_status"]
+            | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_verification_events_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "order_verification_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_verification_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           adjustment: number
@@ -603,12 +743,20 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          risk_level: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason: string | null
           shipping_charge: number
           source: Database["public"]["Enums"]["order_source"]
           status: Database["public"]["Enums"]["order_status"]
           subtotal: number
           updated_at: string
           updated_by: string | null
+          verification_attempt_count: number
+          verification_confirmed_at: string | null
+          verification_failure_reason: string | null
+          verification_last_attempt_at: string | null
+          verification_next_action_at: string | null
+          verification_priority: Database["public"]["Enums"]["verification_priority"]
           verification_status: Database["public"]["Enums"]["order_verification_status"]
         }
         Insert: {
@@ -634,12 +782,20 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["payment_status"]
           placed_at?: string | null
           product_discount?: number
+          risk_level?: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason?: string | null
           shipping_charge?: number
           source?: Database["public"]["Enums"]["order_source"]
           status?: Database["public"]["Enums"]["order_status"]
           subtotal?: number
           updated_at?: string
           updated_by?: string | null
+          verification_attempt_count?: number
+          verification_confirmed_at?: string | null
+          verification_failure_reason?: string | null
+          verification_last_attempt_at?: string | null
+          verification_next_action_at?: string | null
+          verification_priority?: Database["public"]["Enums"]["verification_priority"]
           verification_status?: Database["public"]["Enums"]["order_verification_status"]
         }
         Update: {
@@ -665,12 +821,20 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["payment_status"]
           placed_at?: string | null
           product_discount?: number
+          risk_level?: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason?: string | null
           shipping_charge?: number
           source?: Database["public"]["Enums"]["order_source"]
           status?: Database["public"]["Enums"]["order_status"]
           subtotal?: number
           updated_at?: string
           updated_by?: string | null
+          verification_attempt_count?: number
+          verification_confirmed_at?: string | null
+          verification_failure_reason?: string | null
+          verification_last_attempt_at?: string | null
+          verification_next_action_at?: string | null
+          verification_priority?: Database["public"]["Enums"]["verification_priority"]
           verification_status?: Database["public"]["Enums"]["order_verification_status"]
         }
         Relationships: []
@@ -1071,6 +1235,66 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      apply_verification_transition: {
+        Args: {
+          _attempt_id?: string
+          _event: Database["public"]["Enums"]["verification_event_type"]
+          _failure_reason?: string
+          _message: string
+          _metadata?: Json
+          _order_id: string
+          _risk_level?: Database["public"]["Enums"]["verification_risk_level"]
+          _risk_reason?: string
+          _scheduled_at?: string
+          _to: Database["public"]["Enums"]["order_verification_status"]
+          _touch_attempt?: boolean
+        }
+        Returns: {
+          adjustment: number
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_charge: number
+          delivery_status: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount: number | null
+          financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total: number
+          id: string
+          order_discount: number
+          order_number: string
+          packing_charge: number
+          paid_amount: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          placed_at: string | null
+          product_discount: number
+          risk_level: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason: string | null
+          shipping_charge: number
+          source: Database["public"]["Enums"]["order_source"]
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          updated_at: string
+          updated_by: string | null
+          verification_attempt_count: number
+          verification_confirmed_at: string | null
+          verification_failure_reason: string | null
+          verification_last_attempt_at: string | null
+          verification_next_action_at: string | null
+          verification_priority: Database["public"]["Enums"]["verification_priority"]
+          verification_status: Database["public"]["Enums"]["order_verification_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       brand_product_counts: {
         Args: never
         Returns: {
@@ -1105,12 +1329,20 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          risk_level: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason: string | null
           shipping_charge: number
           source: Database["public"]["Enums"]["order_source"]
           status: Database["public"]["Enums"]["order_status"]
           subtotal: number
           updated_at: string
           updated_by: string | null
+          verification_attempt_count: number
+          verification_confirmed_at: string | null
+          verification_failure_reason: string | null
+          verification_last_attempt_at: string | null
+          verification_next_action_at: string | null
+          verification_priority: Database["public"]["Enums"]["verification_priority"]
           verification_status: Database["public"]["Enums"]["order_verification_status"]
         }
         SetofOptions: {
@@ -1152,12 +1384,20 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          risk_level: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason: string | null
           shipping_charge: number
           source: Database["public"]["Enums"]["order_source"]
           status: Database["public"]["Enums"]["order_status"]
           subtotal: number
           updated_at: string
           updated_by: string | null
+          verification_attempt_count: number
+          verification_confirmed_at: string | null
+          verification_failure_reason: string | null
+          verification_last_attempt_at: string | null
+          verification_next_action_at: string | null
+          verification_priority: Database["public"]["Enums"]["verification_priority"]
           verification_status: Database["public"]["Enums"]["order_verification_status"]
         }
         SetofOptions: {
@@ -1176,9 +1416,231 @@ export type Database = {
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       next_order_number: { Args: never; Returns: string }
+      record_verification_attempt: {
+        Args: {
+          _duration_seconds?: number
+          _failure_reason?: string
+          _method: Database["public"]["Enums"]["verification_method"]
+          _notes?: string
+          _order_id: string
+          _outcome: Database["public"]["Enums"]["verification_attempt_outcome"]
+          _provider?: string
+          _risk_reason?: string
+          _scheduled_at?: string
+        }
+        Returns: {
+          adjustment: number
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_charge: number
+          delivery_status: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount: number | null
+          financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total: number
+          id: string
+          order_discount: number
+          order_number: string
+          packing_charge: number
+          paid_amount: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          placed_at: string | null
+          product_discount: number
+          risk_level: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason: string | null
+          shipping_charge: number
+          source: Database["public"]["Enums"]["order_source"]
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          updated_at: string
+          updated_by: string | null
+          verification_attempt_count: number
+          verification_confirmed_at: string | null
+          verification_failure_reason: string | null
+          verification_last_attempt_at: string | null
+          verification_next_action_at: string | null
+          verification_priority: Database["public"]["Enums"]["verification_priority"]
+          verification_status: Database["public"]["Enums"]["order_verification_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_default_inventory_location: {
         Args: { _location_id: string }
         Returns: string
+      }
+      set_order_verification_priority: {
+        Args: {
+          _order_id: string
+          _priority: Database["public"]["Enums"]["verification_priority"]
+        }
+        Returns: {
+          adjustment: number
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_charge: number
+          delivery_status: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount: number | null
+          financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total: number
+          id: string
+          order_discount: number
+          order_number: string
+          packing_charge: number
+          paid_amount: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          placed_at: string | null
+          product_discount: number
+          risk_level: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason: string | null
+          shipping_charge: number
+          source: Database["public"]["Enums"]["order_source"]
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          updated_at: string
+          updated_by: string | null
+          verification_attempt_count: number
+          verification_confirmed_at: string | null
+          verification_failure_reason: string | null
+          verification_last_attempt_at: string | null
+          verification_next_action_at: string | null
+          verification_priority: Database["public"]["Enums"]["verification_priority"]
+          verification_status: Database["public"]["Enums"]["order_verification_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_order_verification_state: {
+        Args: {
+          _action: string
+          _order_id: string
+          _reason?: string
+          _risk_level?: Database["public"]["Enums"]["verification_risk_level"]
+          _scheduled_at?: string
+        }
+        Returns: {
+          adjustment: number
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_charge: number
+          delivery_status: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount: number | null
+          financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total: number
+          id: string
+          order_discount: number
+          order_number: string
+          packing_charge: number
+          paid_amount: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          placed_at: string | null
+          product_discount: number
+          risk_level: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason: string | null
+          shipping_charge: number
+          source: Database["public"]["Enums"]["order_source"]
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          updated_at: string
+          updated_by: string | null
+          verification_attempt_count: number
+          verification_confirmed_at: string | null
+          verification_failure_reason: string | null
+          verification_last_attempt_at: string | null
+          verification_next_action_at: string | null
+          verification_priority: Database["public"]["Enums"]["verification_priority"]
+          verification_status: Database["public"]["Enums"]["order_verification_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      start_order_verification: {
+        Args: {
+          _method?: Database["public"]["Enums"]["verification_method"]
+          _order_id: string
+        }
+        Returns: {
+          adjustment: number
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_charge: number
+          delivery_status: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount: number | null
+          financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total: number
+          id: string
+          order_discount: number
+          order_number: string
+          packing_charge: number
+          paid_amount: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          placed_at: string | null
+          product_discount: number
+          risk_level: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason: string | null
+          shipping_charge: number
+          source: Database["public"]["Enums"]["order_source"]
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          updated_at: string
+          updated_by: string | null
+          verification_attempt_count: number
+          verification_confirmed_at: string | null
+          verification_failure_reason: string | null
+          verification_last_attempt_at: string | null
+          verification_next_action_at: string | null
+          verification_priority: Database["public"]["Enums"]["verification_priority"]
+          verification_status: Database["public"]["Enums"]["order_verification_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      verification_max_attempts: { Args: never; Returns: number }
+      verification_transition_allowed: {
+        Args: {
+          _from: Database["public"]["Enums"]["order_verification_status"]
+          _to: Database["public"]["Enums"]["order_verification_status"]
+        }
+        Returns: boolean
       }
     }
     Enums: {
@@ -1219,7 +1681,16 @@ export type Database = {
         | "import"
         | "api"
       order_status: "draft" | "created" | "cancelled"
-      order_verification_status: "not_required" | "pending"
+      order_verification_status:
+        | "not_required"
+        | "pending"
+        | "in_progress"
+        | "manual_review"
+        | "rescheduled"
+        | "confirmed"
+        | "unreachable"
+        | "failed"
+        | "cancelled"
       payment_method:
         | "cod"
         | "cash"
@@ -1235,6 +1706,42 @@ export type Database = {
       product_type: "simple" | "variable" | "bundle" | "service" | "digital"
       supply_model: "in_stock" | "local_sourcing" | "preorder" | "group_buy"
       variant_status: "active" | "inactive"
+      verification_attempt_outcome:
+        | "pending"
+        | "answered"
+        | "confirmed"
+        | "rejected"
+        | "no_answer"
+        | "busy"
+        | "invalid_number"
+        | "callback_requested"
+        | "risk_flagged"
+        | "failed"
+      verification_attempt_status:
+        | "pending"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
+      verification_event_type:
+        | "verification_started"
+        | "attempt_created"
+        | "attempt_completed"
+        | "callback_scheduled"
+        | "moved_to_manual_review"
+        | "risk_flagged"
+        | "verification_confirmed"
+        | "verification_failed"
+        | "verification_unreachable"
+        | "verification_cancelled"
+        | "priority_changed"
+      verification_method:
+        | "ai_voice"
+        | "manual_call"
+        | "sms"
+        | "whatsapp"
+        | "other"
+      verification_priority: "low" | "normal" | "high" | "urgent"
+      verification_risk_level: "none" | "low" | "medium" | "high"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1402,7 +1909,17 @@ export const Constants = {
         "api",
       ],
       order_status: ["draft", "created", "cancelled"],
-      order_verification_status: ["not_required", "pending"],
+      order_verification_status: [
+        "not_required",
+        "pending",
+        "in_progress",
+        "manual_review",
+        "rescheduled",
+        "confirmed",
+        "unreachable",
+        "failed",
+        "cancelled",
+      ],
       payment_method: [
         "cod",
         "cash",
@@ -1419,6 +1936,46 @@ export const Constants = {
       product_type: ["simple", "variable", "bundle", "service", "digital"],
       supply_model: ["in_stock", "local_sourcing", "preorder", "group_buy"],
       variant_status: ["active", "inactive"],
+      verification_attempt_outcome: [
+        "pending",
+        "answered",
+        "confirmed",
+        "rejected",
+        "no_answer",
+        "busy",
+        "invalid_number",
+        "callback_requested",
+        "risk_flagged",
+        "failed",
+      ],
+      verification_attempt_status: [
+        "pending",
+        "in_progress",
+        "completed",
+        "cancelled",
+      ],
+      verification_event_type: [
+        "verification_started",
+        "attempt_created",
+        "attempt_completed",
+        "callback_scheduled",
+        "moved_to_manual_review",
+        "risk_flagged",
+        "verification_confirmed",
+        "verification_failed",
+        "verification_unreachable",
+        "verification_cancelled",
+        "priority_changed",
+      ],
+      verification_method: [
+        "ai_voice",
+        "manual_call",
+        "sms",
+        "whatsapp",
+        "other",
+      ],
+      verification_priority: ["low", "normal", "high", "urgent"],
+      verification_risk_level: ["none", "low", "medium", "high"],
     },
   },
 } as const

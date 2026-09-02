@@ -1,4 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { getVerificationQueue } from "@/lib/verification";
 import {
   AlertTriangle,
   Activity,
@@ -50,6 +52,53 @@ function Panel({
   );
 }
 
+/** Real counts only — nothing is shown until the database returns rows. */
+function VerificationAttention() {
+  const { data: rows, isLoading } = useQuery({
+    queryKey: ["verification-queue", "dashboard"],
+    queryFn: () => getVerificationQueue({ limit: 500 }),
+  });
+
+  if (isLoading) {
+    return <p className="px-3 py-3 text-[12.5px] text-muted-foreground">Loading…</p>;
+  }
+  if (!rows || rows.length === 0) {
+    return (
+      <EmptyState
+        compact
+        title="Nothing waiting"
+        description="No orders are currently awaiting verification."
+      />
+    );
+  }
+
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+  const stats = [
+    { label: "Pending verification", value: rows.filter((r) => r.verification_status === "pending").length },
+    { label: "Manual review", value: rows.filter((r) => r.verification_status === "manual_review").length },
+    {
+      label: "Callbacks today",
+      value: rows.filter(
+        (r) => r.verification_next_action_at && new Date(r.verification_next_action_at) <= endOfDay,
+      ).length,
+    },
+  ];
+
+  return (
+    <ul className="divide-y divide-border">
+      {stats.map((s) => (
+        <li key={s.label} className="flex items-center justify-between px-3 py-2 text-[13px]">
+          <Link to="/orders/verification" className="text-muted-foreground hover:text-foreground">
+            {s.label}
+          </Link>
+          <span className="font-semibold tabular-nums">{s.value}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function DashboardPage() {
   const { data: profile } = useProfile();
 
@@ -72,12 +121,8 @@ function DashboardPage() {
             description="Connects once the Orders module is built."
           />
         </Panel>
-        <Panel title="Orders Requiring Attention" icon={AlertTriangle}>
-          <EmptyState
-            compact
-            title="Nothing to review"
-            description="Failed deliveries and holds will surface here."
-          />
+        <Panel title="Verification Attention" icon={AlertTriangle}>
+          <VerificationAttention />
         </Panel>
         <Panel title="Processing Queue" icon={ListChecks}>
           <EmptyState
