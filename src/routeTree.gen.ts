@@ -41,6 +41,7 @@ import { Route as AuthenticatedFinanceCourierSettlementsIdRouteImport } from './
 import { Route as AuthenticatedOrdersFulfillmentsIdRouteImport } from './routes/_authenticated/orders.fulfillments.$id'
 import { Route as AuthenticatedOrdersShipmentsIdRouteImport } from './routes/_authenticated/orders.shipments_.$id'
 import { Route as AuthenticatedProcurementPurchaseOrdersIndexRouteImport } from './routes/_authenticated/procurement.purchase-orders.index'
+import { Route as AuthenticatedProcurementPurchaseOrdersIdRouteImport } from './routes/_authenticated/procurement.purchase-orders.$id'
 import { Route as AuthenticatedProcurementPurchaseOrdersNewRouteImport } from './routes/_authenticated/procurement.purchase-orders.new'
 import { Route as ApiPublicCouriersProviderWebhookRouteImport } from './routes/api/public/couriers.$provider.webhook'
 
@@ -222,6 +223,12 @@ const AuthenticatedProcurementPurchaseOrdersIndexRoute =
     path: '/procurement/purchase-orders/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProcurementPurchaseOrdersIdRoute =
+  AuthenticatedProcurementPurchaseOrdersIdRouteImport.update({
+    id: '/procurement/purchase-orders/$id',
+    path: '/procurement/purchase-orders/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProcurementPurchaseOrdersNewRoute =
   AuthenticatedProcurementPurchaseOrdersNewRouteImport.update({
     id: '/procurement/purchase-orders/new',
@@ -266,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/finance/courier-settlements/$id': typeof AuthenticatedFinanceCourierSettlementsIdRoute
   '/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
   '/orders/shipments/$id': typeof AuthenticatedOrdersShipmentsIdRoute
+  '/procurement/purchase-orders/$id': typeof AuthenticatedProcurementPurchaseOrdersIdRoute
   '/procurement/purchase-orders/new': typeof AuthenticatedProcurementPurchaseOrdersNewRoute
   '/procurement/purchase-orders/': typeof AuthenticatedProcurementPurchaseOrdersIndexRoute
   '/api/public/couriers/$provider/webhook': typeof ApiPublicCouriersProviderWebhookRoute
@@ -301,6 +309,7 @@ export interface FileRoutesByTo {
   '/finance/courier-settlements/$id': typeof AuthenticatedFinanceCourierSettlementsIdRoute
   '/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
   '/orders/shipments/$id': typeof AuthenticatedOrdersShipmentsIdRoute
+  '/procurement/purchase-orders/$id': typeof AuthenticatedProcurementPurchaseOrdersIdRoute
   '/procurement/purchase-orders/new': typeof AuthenticatedProcurementPurchaseOrdersNewRoute
   '/procurement/purchase-orders': typeof AuthenticatedProcurementPurchaseOrdersIndexRoute
   '/api/public/couriers/$provider/webhook': typeof ApiPublicCouriersProviderWebhookRoute
@@ -338,6 +347,7 @@ export interface FileRoutesById {
   '/_authenticated/finance/courier-settlements_/$id': typeof AuthenticatedFinanceCourierSettlementsIdRoute
   '/_authenticated/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
   '/_authenticated/orders/shipments_/$id': typeof AuthenticatedOrdersShipmentsIdRoute
+  '/_authenticated/procurement/purchase-orders/$id': typeof AuthenticatedProcurementPurchaseOrdersIdRoute
   '/_authenticated/procurement/purchase-orders/new': typeof AuthenticatedProcurementPurchaseOrdersNewRoute
   '/_authenticated/procurement/purchase-orders/': typeof AuthenticatedProcurementPurchaseOrdersIndexRoute
   '/api/public/couriers/$provider/webhook': typeof ApiPublicCouriersProviderWebhookRoute
@@ -375,6 +385,7 @@ export interface FileRouteTypes {
     | '/finance/courier-settlements/$id'
     | '/orders/fulfillments/$id'
     | '/orders/shipments/$id'
+    | '/procurement/purchase-orders/$id'
     | '/procurement/purchase-orders/new'
     | '/procurement/purchase-orders/'
     | '/api/public/couriers/$provider/webhook'
@@ -410,6 +421,7 @@ export interface FileRouteTypes {
     | '/finance/courier-settlements/$id'
     | '/orders/fulfillments/$id'
     | '/orders/shipments/$id'
+    | '/procurement/purchase-orders/$id'
     | '/procurement/purchase-orders/new'
     | '/procurement/purchase-orders'
     | '/api/public/couriers/$provider/webhook'
@@ -446,6 +458,7 @@ export interface FileRouteTypes {
     | '/_authenticated/finance/courier-settlements_/$id'
     | '/_authenticated/orders/fulfillments/$id'
     | '/_authenticated/orders/shipments_/$id'
+    | '/_authenticated/procurement/purchase-orders/$id'
     | '/_authenticated/procurement/purchase-orders/new'
     | '/_authenticated/procurement/purchase-orders/'
     | '/api/public/couriers/$provider/webhook'
@@ -687,6 +700,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProcurementPurchaseOrdersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/procurement/purchase-orders/$id': {
+      id: '/_authenticated/procurement/purchase-orders/$id'
+      path: '/procurement/purchase-orders/$id'
+      fullPath: '/procurement/purchase-orders/$id'
+      preLoaderRoute: typeof AuthenticatedProcurementPurchaseOrdersIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/procurement/purchase-orders/new': {
       id: '/_authenticated/procurement/purchase-orders/new'
       path: '/procurement/purchase-orders/new'
@@ -730,6 +750,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFinanceCourierSettlementsIdRoute: typeof AuthenticatedFinanceCourierSettlementsIdRoute
   AuthenticatedOrdersFulfillmentsIdRoute: typeof AuthenticatedOrdersFulfillmentsIdRoute
   AuthenticatedOrdersShipmentsIdRoute: typeof AuthenticatedOrdersShipmentsIdRoute
+  AuthenticatedProcurementPurchaseOrdersIdRoute: typeof AuthenticatedProcurementPurchaseOrdersIdRoute
   AuthenticatedProcurementPurchaseOrdersNewRoute: typeof AuthenticatedProcurementPurchaseOrdersNewRoute
   AuthenticatedProcurementPurchaseOrdersIndexRoute: typeof AuthenticatedProcurementPurchaseOrdersIndexRoute
 }
@@ -763,6 +784,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOrdersFulfillmentsIdRoute:
     AuthenticatedOrdersFulfillmentsIdRoute,
   AuthenticatedOrdersShipmentsIdRoute: AuthenticatedOrdersShipmentsIdRoute,
+  AuthenticatedProcurementPurchaseOrdersIdRoute:
+    AuthenticatedProcurementPurchaseOrdersIdRoute,
   AuthenticatedProcurementPurchaseOrdersNewRoute:
     AuthenticatedProcurementPurchaseOrdersNewRoute,
   AuthenticatedProcurementPurchaseOrdersIndexRoute:
