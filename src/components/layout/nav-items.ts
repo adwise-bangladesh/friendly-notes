@@ -106,5 +106,14 @@ export const NAV_ITEMS: NavItem[] = [
       { label: "History", to: "/automation/executions" },
     ],
   },
+  {
+    label: "Integrations",
+    to: "/integrations",
+    icon: Plug,
+    children: [
+      { label: "Overview", to: "/integrations" },
+      { label: "Activity", to: "/integrations/logs" },
+    ],
+  },
   { label: "Settings", to: "/settings", icon: Settings },
 ];
