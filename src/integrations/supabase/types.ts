@@ -703,6 +703,139 @@ export type Database = {
           },
         ]
       }
+      customer_manual_flags: {
+        Row: {
+          cleared_at: string | null
+          cleared_by: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          flag: Database["public"]["Enums"]["customer_manual_flag_type"]
+          id: string
+          is_active: boolean
+          reason: string
+          updated_at: string
+        }
+        Insert: {
+          cleared_at?: string | null
+          cleared_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          flag: Database["public"]["Enums"]["customer_manual_flag_type"]
+          id?: string
+          is_active?: boolean
+          reason: string
+          updated_at?: string
+        }
+        Update: {
+          cleared_at?: string | null
+          cleared_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          flag?: Database["public"]["Enums"]["customer_manual_flag_type"]
+          id?: string
+          is_active?: boolean
+          reason?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_manual_flags_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_notes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          id: string
+          note: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          id?: string
+          note: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          id?: string
+          note?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_notes_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customers: {
+        Row: {
+          block_reason: string | null
+          blocked_at: string | null
+          blocked_by: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          id: string
+          name: string
+          primary_phone: string
+          primary_phone_normalized: string | null
+          secondary_phone: string | null
+          secondary_phone_normalized: string | null
+          status: Database["public"]["Enums"]["customer_status"]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          block_reason?: string | null
+          blocked_at?: string | null
+          blocked_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          primary_phone: string
+          primary_phone_normalized?: string | null
+          secondary_phone?: string | null
+          secondary_phone_normalized?: string | null
+          status?: Database["public"]["Enums"]["customer_status"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          block_reason?: string | null
+          blocked_at?: string | null
+          blocked_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          primary_phone?: string
+          primary_phone_normalized?: string | null
+          secondary_phone?: string | null
+          secondary_phone_normalized?: string | null
+          status?: Database["public"]["Enums"]["customer_status"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       goods_receipt_items: {
         Row: {
           created_at: string
@@ -2137,6 +2270,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_email: string | null
+          customer_id: string | null
           customer_name: string
           customer_phone: string
           delivery_charge: number
@@ -2181,6 +2315,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           customer_email?: string | null
+          customer_id?: string | null
           customer_name: string
           customer_phone: string
           delivery_charge?: number
@@ -2225,6 +2360,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           customer_email?: string | null
+          customer_id?: string | null
           customer_name?: string
           customer_phone?: string
           delivery_charge?: number
@@ -2264,6 +2400,13 @@ export type Database = {
           verification_status?: Database["public"]["Enums"]["order_verification_status"]
         }
         Relationships: [
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "orders_fulfillment_location_id_fkey"
             columns: ["fulfillment_location_id"]
@@ -3636,6 +3779,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_customer_note: {
+        Args: { _customer_id: string; _note: string }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          id: string
+          note: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "customer_notes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       add_settlement_item: {
         Args: { _settlement_id: string; _shipment_id: string }
         Returns: {
@@ -3748,6 +3907,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_email: string | null
+          customer_id: string | null
           customer_name: string
           customer_phone: string
           delivery_charge: number
@@ -3894,6 +4054,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_email: string | null
+          customer_id: string | null
           customer_name: string
           customer_phone: string
           delivery_charge: number
@@ -3958,6 +4119,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_email: string | null
+          customer_id: string | null
           customer_name: string
           customer_phone: string
           delivery_charge: number
@@ -4088,6 +4250,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_email: string | null
+          customer_id: string | null
           customer_name: string
           customer_phone: string
           delivery_charge: number
@@ -4333,6 +4496,26 @@ export type Database = {
         Args: { _location_id: string; _notes?: string }
         Returns: string
       }
+      customer_financial_summary: {
+        Args: { _customer_id: string }
+        Returns: Json
+      }
+      customer_list: {
+        Args: {
+          _attention?: boolean
+          _customer_type?: string
+          _limit?: number
+          _offset?: number
+          _search?: string
+          _status?: Database["public"]["Enums"]["customer_status"]
+        }
+        Returns: Json
+      }
+      customer_metrics: { Args: { _customer_id: string }; Returns: Json }
+      customer_timeline: {
+        Args: { _customer_id: string; _limit?: number; _offset?: number }
+        Returns: Json
+      }
       ensure_inventory_level_internal: {
         Args: { _location_id: string; _product_id: string; _variant_id: string }
         Returns: string
@@ -4344,6 +4527,32 @@ export type Database = {
       finalize_stocktake: {
         Args: { _accept_changes?: boolean; _stocktake_id: string }
         Returns: undefined
+      }
+      find_customer_by_phone: {
+        Args: { _phone: string }
+        Returns: {
+          block_reason: string | null
+          blocked_at: string | null
+          blocked_by: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          id: string
+          name: string
+          primary_phone: string
+          primary_phone_normalized: string | null
+          secondary_phone: string | null
+          secondary_phone_normalized: string | null
+          status: Database["public"]["Enums"]["customer_status"]
+          updated_at: string
+          updated_by: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "customers"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       fulfillment_shippable_summary: {
         Args: { _fulfillment_id: string }
@@ -4507,6 +4716,7 @@ export type Database = {
       next_shipment_number: { Args: never; Returns: string }
       next_stocktake_number: { Args: never; Returns: string }
       next_transfer_number: { Args: never; Returns: string }
+      normalize_bd_phone: { Args: { _phone: string }; Returns: string }
       order_financials: { Args: { _order_id: string }; Returns: Json }
       order_fulfillment_summary: {
         Args: { _order_id: string }
@@ -4857,6 +5067,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_email: string | null
+          customer_id: string | null
           customer_name: string
           customer_phone: string
           delivery_charge: number
@@ -4914,6 +5125,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_email: string | null
+          customer_id: string | null
           customer_name: string
           customer_phone: string
           delivery_charge: number
@@ -4960,6 +5172,7 @@ export type Database = {
         }
       }
       remove_settlement_item: { Args: { _item_id: string }; Returns: undefined }
+      repeat_customer_threshold: { Args: never; Returns: number }
       reserve_order_inventory: {
         Args: { _order_id: string }
         Returns: {
@@ -4968,6 +5181,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_email: string | null
+          customer_id: string | null
           customer_name: string
           customer_phone: string
           delivery_charge: number
@@ -5013,6 +5227,15 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      resolve_customer_for_order: {
+        Args: {
+          _customer_id?: string
+          _email: string
+          _name: string
+          _phone: string
+        }
+        Returns: string
+      }
       return_transition_valid: {
         Args: {
           _from: Database["public"]["Enums"]["order_return_status"]
@@ -5050,7 +5273,89 @@ export type Database = {
         Args: { _reason: string; _receipt_id: string }
         Returns: undefined
       }
+      save_customer: {
+        Args: { _payload: Json }
+        Returns: {
+          block_reason: string | null
+          blocked_at: string | null
+          blocked_by: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          id: string
+          name: string
+          primary_phone: string
+          primary_phone_normalized: string | null
+          secondary_phone: string | null
+          secondary_phone_normalized: string | null
+          status: Database["public"]["Enums"]["customer_status"]
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "customers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       save_purchase_order: { Args: { _payload: Json }; Returns: string }
+      set_customer_manual_flag: {
+        Args: {
+          _active: boolean
+          _customer_id: string
+          _flag: Database["public"]["Enums"]["customer_manual_flag_type"]
+          _reason: string
+        }
+        Returns: {
+          cleared_at: string | null
+          cleared_by: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          flag: Database["public"]["Enums"]["customer_manual_flag_type"]
+          id: string
+          is_active: boolean
+          reason: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "customer_manual_flags"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_customer_status: {
+        Args: {
+          _customer_id: string
+          _reason?: string
+          _status: Database["public"]["Enums"]["customer_status"]
+        }
+        Returns: {
+          block_reason: string | null
+          blocked_at: string | null
+          blocked_by: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          id: string
+          name: string
+          primary_phone: string
+          primary_phone_normalized: string | null
+          secondary_phone: string | null
+          secondary_phone_normalized: string | null
+          status: Database["public"]["Enums"]["customer_status"]
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "customers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_default_inventory_location: {
         Args: { _location_id: string }
         Returns: string
@@ -5154,6 +5459,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_email: string | null
+          customer_id: string | null
           customer_name: string
           customer_phone: string
           delivery_charge: number
@@ -5210,6 +5516,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_email: string | null
+          customer_id: string | null
           customer_name: string
           customer_phone: string
           delivery_charge: number
@@ -5269,6 +5576,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_email: string | null
+          customer_id: string | null
           customer_name: string
           customer_phone: string
           delivery_charge: number
@@ -5572,6 +5880,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_email: string | null
+          customer_id: string | null
           customer_name: string
           customer_phone: string
           delivery_charge: number
@@ -5742,6 +6051,13 @@ export type Database = {
         | "settled"
         | "disputed"
         | "cancelled"
+      customer_manual_flag_type:
+        | "manual_attention"
+        | "trusted"
+        | "payment_risk"
+        | "address_risk"
+        | "other"
+      customer_status: "active" | "inactive" | "blocked"
       entity_status: "active" | "inactive" | "archived"
       entity_visibility: "visible" | "hidden"
       financial_adjustment_direction: "income" | "expense"
@@ -6219,6 +6535,14 @@ export const Constants = {
         "disputed",
         "cancelled",
       ],
+      customer_manual_flag_type: [
+        "manual_attention",
+        "trusted",
+        "payment_risk",
+        "address_risk",
+        "other",
+      ],
+      customer_status: ["active", "inactive", "blocked"],
       entity_status: ["active", "inactive", "archived"],
       entity_visibility: ["visible", "hidden"],
       financial_adjustment_direction: ["income", "expense"],
