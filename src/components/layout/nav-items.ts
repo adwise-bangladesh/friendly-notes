@@ -10,6 +10,7 @@ import {
   Users,
   RotateCcw,
   Zap,
+  Plug,
   Settings,
   type LucideIcon,
 } from "lucide-react";
@@ -104,6 +105,15 @@ export const NAV_ITEMS: NavItem[] = [
     children: [
       { label: "Rules", to: "/automation" },
       { label: "History", to: "/automation/executions" },
+    ],
+  },
+  {
+    label: "Integrations",
+    to: "/integrations",
+    icon: Plug,
+    children: [
+      { label: "Overview", to: "/integrations" },
+      { label: "Activity", to: "/integrations/logs" },
     ],
   },
   { label: "Settings", to: "/settings", icon: Settings },

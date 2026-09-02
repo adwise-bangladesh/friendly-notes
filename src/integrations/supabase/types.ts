@@ -5297,6 +5297,65 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      integration_account_health: {
+        Args: { _account_id: string }
+        Returns: {
+          account_id: string
+          failure_count_24h: number
+          has_credentials: boolean
+          has_webhook_secret: boolean
+          last_activity_at: string
+          last_failure_at: string
+          last_failure_message: string
+          last_success_at: string
+          last_token_refresh_at: string
+          last_webhook_at: string
+          token_expires_at: string
+        }[]
+      }
+      integration_activity_feed: {
+        Args: {
+          _account_id?: string
+          _activity_type?: string
+          _from?: string
+          _limit?: number
+          _offset?: number
+          _provider_id?: string
+          _status?: string
+          _to?: string
+        }
+        Returns: {
+          account_id: string
+          account_name: string
+          activity_type: string
+          created_at: string
+          environment: string
+          id: string
+          message: string
+          provider_id: string
+          provider_name: string
+          shipment_id: string
+          status: string
+          total_count: number
+        }[]
+      }
+      integration_webhook_overview: {
+        Args: never
+        Returns: {
+          account_id: string
+          account_name: string
+          applied_count: number
+          duplicate_count: number
+          environment: string
+          ignored_count: number
+          last_received_at: string
+          provider_code: string
+          provider_id: string
+          provider_name: string
+          rejected_count: number
+          webhook_configured: boolean
+        }[]
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_inventory_eligible_item: {
         Args: { _product_id: string; _variant_id: string }
@@ -6040,6 +6099,34 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "automation_rules"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_courier_account_state: {
+        Args: {
+          _account_id: string
+          _status: Database["public"]["Enums"]["courier_provider_status"]
+        }
+        Returns: {
+          base_url: string | null
+          code: string
+          created_at: string
+          created_by: string | null
+          environment: Database["public"]["Enums"]["courier_environment"]
+          external_store_id: string | null
+          id: string
+          is_default: boolean
+          name: string
+          provider_id: string
+          settings: Json
+          status: Database["public"]["Enums"]["entity_status"]
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "courier_accounts"
           isOneToOne: true
           isSetofReturn: false
         }

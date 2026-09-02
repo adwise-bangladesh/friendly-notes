@@ -28,6 +28,8 @@ import { Route as AuthenticatedAutomationExecutionsRouteImport } from './routes/
 import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers.index'
 import { Route as AuthenticatedCustomersIdRouteImport } from './routes/_authenticated/customers_.$id'
 import { Route as AuthenticatedFinanceCourierSettlementsRouteImport } from './routes/_authenticated/finance.courier-settlements'
+import { Route as AuthenticatedIntegrationsIndexRouteImport } from './routes/_authenticated/integrations.index'
+import { Route as AuthenticatedIntegrationsLogsRouteImport } from './routes/_authenticated/integrations.logs'
 import { Route as AuthenticatedInventoryIndexRouteImport } from './routes/_authenticated/inventory.index'
 import { Route as AuthenticatedInventoryLocationsRouteImport } from './routes/_authenticated/inventory.locations'
 import { Route as AuthenticatedInventoryMovementsRouteImport } from './routes/_authenticated/inventory.movements'
@@ -51,6 +53,7 @@ import { Route as AuthenticatedReturnsIdRouteImport } from './routes/_authentica
 import { Route as AuthenticatedSuppliersIndexRouteImport } from './routes/_authenticated/suppliers.index'
 import { Route as AuthenticatedSuppliersIdRouteImport } from './routes/_authenticated/suppliers.$id'
 import { Route as AuthenticatedFinanceCourierSettlementsIdRouteImport } from './routes/_authenticated/finance.courier-settlements_.$id'
+import { Route as AuthenticatedIntegrationsCouriersIdRouteImport } from './routes/_authenticated/integrations.couriers.$id'
 import { Route as AuthenticatedInventoryStocktakesIdRouteImport } from './routes/_authenticated/inventory.stocktakes_.$id'
 import { Route as AuthenticatedInventoryTransfersIdRouteImport } from './routes/_authenticated/inventory.transfers_.$id'
 import { Route as AuthenticatedOrdersFulfillmentsIdRouteImport } from './routes/_authenticated/orders.fulfillments.$id'
@@ -163,6 +166,18 @@ const AuthenticatedFinanceCourierSettlementsRoute =
   AuthenticatedFinanceCourierSettlementsRouteImport.update({
     id: '/finance/courier-settlements',
     path: '/finance/courier-settlements',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedIntegrationsIndexRoute =
+  AuthenticatedIntegrationsIndexRouteImport.update({
+    id: '/integrations/',
+    path: '/integrations/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedIntegrationsLogsRoute =
+  AuthenticatedIntegrationsLogsRouteImport.update({
+    id: '/integrations/logs',
+    path: '/integrations/logs',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedInventoryIndexRoute =
@@ -299,6 +314,12 @@ const AuthenticatedFinanceCourierSettlementsIdRoute =
     path: '/finance/courier-settlements/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedIntegrationsCouriersIdRoute =
+  AuthenticatedIntegrationsCouriersIdRouteImport.update({
+    id: '/integrations/couriers/$id',
+    path: '/integrations/couriers/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedInventoryStocktakesIdRoute =
   AuthenticatedInventoryStocktakesIdRouteImport.update({
     id: '/inventory/stocktakes_/$id',
@@ -364,6 +385,7 @@ export interface FileRoutesByFullPath {
   '/automation/executions': typeof AuthenticatedAutomationExecutionsRoute
   '/customers/$id': typeof AuthenticatedCustomersIdRoute
   '/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
+  '/integrations/logs': typeof AuthenticatedIntegrationsLogsRoute
   '/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
   '/inventory/movements': typeof AuthenticatedInventoryMovementsRoute
   '/inventory/stocktakes': typeof AuthenticatedInventoryStocktakesRoute
@@ -384,12 +406,14 @@ export interface FileRoutesByFullPath {
   '/analytics/': typeof AuthenticatedAnalyticsIndexRoute
   '/automation/': typeof AuthenticatedAutomationIndexRoute
   '/customers/': typeof AuthenticatedCustomersIndexRoute
+  '/integrations/': typeof AuthenticatedIntegrationsIndexRoute
   '/inventory/': typeof AuthenticatedInventoryIndexRoute
   '/operations/': typeof AuthenticatedOperationsIndexRoute
   '/orders/': typeof AuthenticatedOrdersIndexRoute
   '/products/': typeof AuthenticatedProductsIndexRoute
   '/suppliers/': typeof AuthenticatedSuppliersIndexRoute
   '/finance/courier-settlements/$id': typeof AuthenticatedFinanceCourierSettlementsIdRoute
+  '/integrations/couriers/$id': typeof AuthenticatedIntegrationsCouriersIdRoute
   '/inventory/stocktakes/$id': typeof AuthenticatedInventoryStocktakesIdRoute
   '/inventory/transfers/$id': typeof AuthenticatedInventoryTransfersIdRoute
   '/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
@@ -415,6 +439,7 @@ export interface FileRoutesByTo {
   '/automation/executions': typeof AuthenticatedAutomationExecutionsRoute
   '/customers/$id': typeof AuthenticatedCustomersIdRoute
   '/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
+  '/integrations/logs': typeof AuthenticatedIntegrationsLogsRoute
   '/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
   '/inventory/movements': typeof AuthenticatedInventoryMovementsRoute
   '/inventory/stocktakes': typeof AuthenticatedInventoryStocktakesRoute
@@ -435,12 +460,14 @@ export interface FileRoutesByTo {
   '/analytics': typeof AuthenticatedAnalyticsIndexRoute
   '/automation': typeof AuthenticatedAutomationIndexRoute
   '/customers': typeof AuthenticatedCustomersIndexRoute
+  '/integrations': typeof AuthenticatedIntegrationsIndexRoute
   '/inventory': typeof AuthenticatedInventoryIndexRoute
   '/operations': typeof AuthenticatedOperationsIndexRoute
   '/orders': typeof AuthenticatedOrdersIndexRoute
   '/products': typeof AuthenticatedProductsIndexRoute
   '/suppliers': typeof AuthenticatedSuppliersIndexRoute
   '/finance/courier-settlements/$id': typeof AuthenticatedFinanceCourierSettlementsIdRoute
+  '/integrations/couriers/$id': typeof AuthenticatedIntegrationsCouriersIdRoute
   '/inventory/stocktakes/$id': typeof AuthenticatedInventoryStocktakesIdRoute
   '/inventory/transfers/$id': typeof AuthenticatedInventoryTransfersIdRoute
   '/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
@@ -468,6 +495,7 @@ export interface FileRoutesById {
   '/_authenticated/automation/executions': typeof AuthenticatedAutomationExecutionsRoute
   '/_authenticated/customers_/$id': typeof AuthenticatedCustomersIdRoute
   '/_authenticated/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
+  '/_authenticated/integrations/logs': typeof AuthenticatedIntegrationsLogsRoute
   '/_authenticated/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
   '/_authenticated/inventory/movements': typeof AuthenticatedInventoryMovementsRoute
   '/_authenticated/inventory/stocktakes': typeof AuthenticatedInventoryStocktakesRoute
@@ -488,12 +516,14 @@ export interface FileRoutesById {
   '/_authenticated/analytics/': typeof AuthenticatedAnalyticsIndexRoute
   '/_authenticated/automation/': typeof AuthenticatedAutomationIndexRoute
   '/_authenticated/customers/': typeof AuthenticatedCustomersIndexRoute
+  '/_authenticated/integrations/': typeof AuthenticatedIntegrationsIndexRoute
   '/_authenticated/inventory/': typeof AuthenticatedInventoryIndexRoute
   '/_authenticated/operations/': typeof AuthenticatedOperationsIndexRoute
   '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
   '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
   '/_authenticated/suppliers/': typeof AuthenticatedSuppliersIndexRoute
   '/_authenticated/finance/courier-settlements_/$id': typeof AuthenticatedFinanceCourierSettlementsIdRoute
+  '/_authenticated/integrations/couriers/$id': typeof AuthenticatedIntegrationsCouriersIdRoute
   '/_authenticated/inventory/stocktakes_/$id': typeof AuthenticatedInventoryStocktakesIdRoute
   '/_authenticated/inventory/transfers_/$id': typeof AuthenticatedInventoryTransfersIdRoute
   '/_authenticated/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
@@ -521,6 +551,7 @@ export interface FileRouteTypes {
     | '/automation/executions'
     | '/customers/$id'
     | '/finance/courier-settlements'
+    | '/integrations/logs'
     | '/inventory/locations'
     | '/inventory/movements'
     | '/inventory/stocktakes'
@@ -541,12 +572,14 @@ export interface FileRouteTypes {
     | '/analytics/'
     | '/automation/'
     | '/customers/'
+    | '/integrations/'
     | '/inventory/'
     | '/operations/'
     | '/orders/'
     | '/products/'
     | '/suppliers/'
     | '/finance/courier-settlements/$id'
+    | '/integrations/couriers/$id'
     | '/inventory/stocktakes/$id'
     | '/inventory/transfers/$id'
     | '/orders/fulfillments/$id'
@@ -572,6 +605,7 @@ export interface FileRouteTypes {
     | '/automation/executions'
     | '/customers/$id'
     | '/finance/courier-settlements'
+    | '/integrations/logs'
     | '/inventory/locations'
     | '/inventory/movements'
     | '/inventory/stocktakes'
@@ -592,12 +626,14 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/automation'
     | '/customers'
+    | '/integrations'
     | '/inventory'
     | '/operations'
     | '/orders'
     | '/products'
     | '/suppliers'
     | '/finance/courier-settlements/$id'
+    | '/integrations/couriers/$id'
     | '/inventory/stocktakes/$id'
     | '/inventory/transfers/$id'
     | '/orders/fulfillments/$id'
@@ -624,6 +660,7 @@ export interface FileRouteTypes {
     | '/_authenticated/automation/executions'
     | '/_authenticated/customers_/$id'
     | '/_authenticated/finance/courier-settlements'
+    | '/_authenticated/integrations/logs'
     | '/_authenticated/inventory/locations'
     | '/_authenticated/inventory/movements'
     | '/_authenticated/inventory/stocktakes'
@@ -644,12 +681,14 @@ export interface FileRouteTypes {
     | '/_authenticated/analytics/'
     | '/_authenticated/automation/'
     | '/_authenticated/customers/'
+    | '/_authenticated/integrations/'
     | '/_authenticated/inventory/'
     | '/_authenticated/operations/'
     | '/_authenticated/orders/'
     | '/_authenticated/products/'
     | '/_authenticated/suppliers/'
     | '/_authenticated/finance/courier-settlements_/$id'
+    | '/_authenticated/integrations/couriers/$id'
     | '/_authenticated/inventory/stocktakes_/$id'
     | '/_authenticated/inventory/transfers_/$id'
     | '/_authenticated/orders/fulfillments/$id'
@@ -803,6 +842,20 @@ declare module '@tanstack/react-router' {
       path: '/finance/courier-settlements'
       fullPath: '/finance/courier-settlements'
       preLoaderRoute: typeof AuthenticatedFinanceCourierSettlementsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/integrations/': {
+      id: '/_authenticated/integrations/'
+      path: '/integrations'
+      fullPath: '/integrations/'
+      preLoaderRoute: typeof AuthenticatedIntegrationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/integrations/logs': {
+      id: '/_authenticated/integrations/logs'
+      path: '/integrations/logs'
+      fullPath: '/integrations/logs'
+      preLoaderRoute: typeof AuthenticatedIntegrationsLogsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/inventory/': {
@@ -966,6 +1019,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceCourierSettlementsIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/integrations/couriers/$id': {
+      id: '/_authenticated/integrations/couriers/$id'
+      path: '/integrations/couriers/$id'
+      fullPath: '/integrations/couriers/$id'
+      preLoaderRoute: typeof AuthenticatedIntegrationsCouriersIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/inventory/stocktakes_/$id': {
       id: '/_authenticated/inventory/stocktakes_/$id'
       path: '/inventory/stocktakes/$id'
@@ -1036,6 +1096,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAutomationExecutionsRoute: typeof AuthenticatedAutomationExecutionsRoute
   AuthenticatedCustomersIdRoute: typeof AuthenticatedCustomersIdRoute
   AuthenticatedFinanceCourierSettlementsRoute: typeof AuthenticatedFinanceCourierSettlementsRoute
+  AuthenticatedIntegrationsLogsRoute: typeof AuthenticatedIntegrationsLogsRoute
   AuthenticatedInventoryLocationsRoute: typeof AuthenticatedInventoryLocationsRoute
   AuthenticatedInventoryMovementsRoute: typeof AuthenticatedInventoryMovementsRoute
   AuthenticatedInventoryStocktakesRoute: typeof AuthenticatedInventoryStocktakesRoute
@@ -1056,12 +1117,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnalyticsIndexRoute: typeof AuthenticatedAnalyticsIndexRoute
   AuthenticatedAutomationIndexRoute: typeof AuthenticatedAutomationIndexRoute
   AuthenticatedCustomersIndexRoute: typeof AuthenticatedCustomersIndexRoute
+  AuthenticatedIntegrationsIndexRoute: typeof AuthenticatedIntegrationsIndexRoute
   AuthenticatedInventoryIndexRoute: typeof AuthenticatedInventoryIndexRoute
   AuthenticatedOperationsIndexRoute: typeof AuthenticatedOperationsIndexRoute
   AuthenticatedOrdersIndexRoute: typeof AuthenticatedOrdersIndexRoute
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
   AuthenticatedSuppliersIndexRoute: typeof AuthenticatedSuppliersIndexRoute
   AuthenticatedFinanceCourierSettlementsIdRoute: typeof AuthenticatedFinanceCourierSettlementsIdRoute
+  AuthenticatedIntegrationsCouriersIdRoute: typeof AuthenticatedIntegrationsCouriersIdRoute
   AuthenticatedInventoryStocktakesIdRoute: typeof AuthenticatedInventoryStocktakesIdRoute
   AuthenticatedInventoryTransfersIdRoute: typeof AuthenticatedInventoryTransfersIdRoute
   AuthenticatedOrdersFulfillmentsIdRoute: typeof AuthenticatedOrdersFulfillmentsIdRoute
@@ -1085,6 +1148,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCustomersIdRoute: AuthenticatedCustomersIdRoute,
   AuthenticatedFinanceCourierSettlementsRoute:
     AuthenticatedFinanceCourierSettlementsRoute,
+  AuthenticatedIntegrationsLogsRoute: AuthenticatedIntegrationsLogsRoute,
   AuthenticatedInventoryLocationsRoute: AuthenticatedInventoryLocationsRoute,
   AuthenticatedInventoryMovementsRoute: AuthenticatedInventoryMovementsRoute,
   AuthenticatedInventoryStocktakesRoute: AuthenticatedInventoryStocktakesRoute,
@@ -1105,6 +1169,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAnalyticsIndexRoute: AuthenticatedAnalyticsIndexRoute,
   AuthenticatedAutomationIndexRoute: AuthenticatedAutomationIndexRoute,
   AuthenticatedCustomersIndexRoute: AuthenticatedCustomersIndexRoute,
+  AuthenticatedIntegrationsIndexRoute: AuthenticatedIntegrationsIndexRoute,
   AuthenticatedInventoryIndexRoute: AuthenticatedInventoryIndexRoute,
   AuthenticatedOperationsIndexRoute: AuthenticatedOperationsIndexRoute,
   AuthenticatedOrdersIndexRoute: AuthenticatedOrdersIndexRoute,
@@ -1112,6 +1177,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSuppliersIndexRoute: AuthenticatedSuppliersIndexRoute,
   AuthenticatedFinanceCourierSettlementsIdRoute:
     AuthenticatedFinanceCourierSettlementsIdRoute,
+  AuthenticatedIntegrationsCouriersIdRoute:
+    AuthenticatedIntegrationsCouriersIdRoute,
   AuthenticatedInventoryStocktakesIdRoute:
     AuthenticatedInventoryStocktakesIdRoute,
   AuthenticatedInventoryTransfersIdRoute:
