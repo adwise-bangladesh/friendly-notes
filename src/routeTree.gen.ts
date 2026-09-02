@@ -21,6 +21,7 @@ import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.
 import { Route as AuthenticatedAnalyticsIndexRouteImport } from './routes/_authenticated/analytics.index'
 import { Route as AuthenticatedAnalyticsCustomersRouteImport } from './routes/_authenticated/analytics.customers'
 import { Route as AuthenticatedAnalyticsOperationsRouteImport } from './routes/_authenticated/analytics.operations'
+import { Route as AuthenticatedAnalyticsProcurementRouteImport } from './routes/_authenticated/analytics.procurement'
 import { Route as AuthenticatedAnalyticsProductsRouteImport } from './routes/_authenticated/analytics.products'
 import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers.index'
 import { Route as AuthenticatedCustomersIdRouteImport } from './routes/_authenticated/customers_.$id'
@@ -118,6 +119,12 @@ const AuthenticatedAnalyticsOperationsRoute =
   AuthenticatedAnalyticsOperationsRouteImport.update({
     id: '/analytics/operations',
     path: '/analytics/operations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAnalyticsProcurementRoute =
+  AuthenticatedAnalyticsProcurementRouteImport.update({
+    id: '/analytics/procurement',
+    path: '/analytics/procurement',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAnalyticsProductsRoute =
@@ -338,6 +345,7 @@ export interface FileRoutesByFullPath {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/analytics/customers': typeof AuthenticatedAnalyticsCustomersRoute
   '/analytics/operations': typeof AuthenticatedAnalyticsOperationsRoute
+  '/analytics/procurement': typeof AuthenticatedAnalyticsProcurementRoute
   '/analytics/products': typeof AuthenticatedAnalyticsProductsRoute
   '/customers/$id': typeof AuthenticatedCustomersIdRoute
   '/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
@@ -386,6 +394,7 @@ export interface FileRoutesByTo {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/analytics/customers': typeof AuthenticatedAnalyticsCustomersRoute
   '/analytics/operations': typeof AuthenticatedAnalyticsOperationsRoute
+  '/analytics/procurement': typeof AuthenticatedAnalyticsProcurementRoute
   '/analytics/products': typeof AuthenticatedAnalyticsProductsRoute
   '/customers/$id': typeof AuthenticatedCustomersIdRoute
   '/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
@@ -436,6 +445,7 @@ export interface FileRoutesById {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/analytics/customers': typeof AuthenticatedAnalyticsCustomersRoute
   '/_authenticated/analytics/operations': typeof AuthenticatedAnalyticsOperationsRoute
+  '/_authenticated/analytics/procurement': typeof AuthenticatedAnalyticsProcurementRoute
   '/_authenticated/analytics/products': typeof AuthenticatedAnalyticsProductsRoute
   '/_authenticated/customers_/$id': typeof AuthenticatedCustomersIdRoute
   '/_authenticated/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
@@ -486,6 +496,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/analytics/customers'
     | '/analytics/operations'
+    | '/analytics/procurement'
     | '/analytics/products'
     | '/customers/$id'
     | '/finance/courier-settlements'
@@ -534,6 +545,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/analytics/customers'
     | '/analytics/operations'
+    | '/analytics/procurement'
     | '/analytics/products'
     | '/customers/$id'
     | '/finance/courier-settlements'
@@ -583,6 +595,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/_authenticated/analytics/customers'
     | '/_authenticated/analytics/operations'
+    | '/_authenticated/analytics/procurement'
     | '/_authenticated/analytics/products'
     | '/_authenticated/customers_/$id'
     | '/_authenticated/finance/courier-settlements'
@@ -715,6 +728,13 @@ declare module '@tanstack/react-router' {
       path: '/analytics/operations'
       fullPath: '/analytics/operations'
       preLoaderRoute: typeof AuthenticatedAnalyticsOperationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/analytics/procurement': {
+      id: '/_authenticated/analytics/procurement'
+      path: '/analytics/procurement'
+      fullPath: '/analytics/procurement'
+      preLoaderRoute: typeof AuthenticatedAnalyticsProcurementRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/analytics/products': {
@@ -971,6 +991,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedAnalyticsCustomersRoute: typeof AuthenticatedAnalyticsCustomersRoute
   AuthenticatedAnalyticsOperationsRoute: typeof AuthenticatedAnalyticsOperationsRoute
+  AuthenticatedAnalyticsProcurementRoute: typeof AuthenticatedAnalyticsProcurementRoute
   AuthenticatedAnalyticsProductsRoute: typeof AuthenticatedAnalyticsProductsRoute
   AuthenticatedCustomersIdRoute: typeof AuthenticatedCustomersIdRoute
   AuthenticatedFinanceCourierSettlementsRoute: typeof AuthenticatedFinanceCourierSettlementsRoute
@@ -1014,6 +1035,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedAnalyticsCustomersRoute: AuthenticatedAnalyticsCustomersRoute,
   AuthenticatedAnalyticsOperationsRoute: AuthenticatedAnalyticsOperationsRoute,
+  AuthenticatedAnalyticsProcurementRoute:
+    AuthenticatedAnalyticsProcurementRoute,
   AuthenticatedAnalyticsProductsRoute: AuthenticatedAnalyticsProductsRoute,
   AuthenticatedCustomersIdRoute: AuthenticatedCustomersIdRoute,
   AuthenticatedFinanceCourierSettlementsRoute:
