@@ -43,6 +43,8 @@ const ORDER_DETAIL_SELECT = `
 export interface OrderListFilters {
   search?: string;
   status?: OrderStatus | "all";
+  /** Derived order-level delivery projection (see refresh_order_delivery_status). */
+  deliveryStatus?: DeliveryStatus | "all";
   paymentStatus?: PaymentStatus | "all";
   from?: string;
   to?: string;
