@@ -24,6 +24,7 @@ import { Route as AuthenticatedAnalyticsOperationsRouteImport } from './routes/_
 import { Route as AuthenticatedAnalyticsProcurementRouteImport } from './routes/_authenticated/analytics.procurement'
 import { Route as AuthenticatedAnalyticsProductsRouteImport } from './routes/_authenticated/analytics.products'
 import { Route as AuthenticatedAutomationIndexRouteImport } from './routes/_authenticated/automation.index'
+import { Route as AuthenticatedAutomationExecutionsRouteImport } from './routes/_authenticated/automation.executions'
 import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers.index'
 import { Route as AuthenticatedCustomersIdRouteImport } from './routes/_authenticated/customers_.$id'
 import { Route as AuthenticatedFinanceCourierSettlementsRouteImport } from './routes/_authenticated/finance.courier-settlements'
@@ -138,6 +139,12 @@ const AuthenticatedAutomationIndexRoute =
   AuthenticatedAutomationIndexRouteImport.update({
     id: '/automation/',
     path: '/automation/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAutomationExecutionsRoute =
+  AuthenticatedAutomationExecutionsRouteImport.update({
+    id: '/automation/executions',
+    path: '/automation/executions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedCustomersIndexRoute =
@@ -354,6 +361,7 @@ export interface FileRoutesByFullPath {
   '/analytics/operations': typeof AuthenticatedAnalyticsOperationsRoute
   '/analytics/procurement': typeof AuthenticatedAnalyticsProcurementRoute
   '/analytics/products': typeof AuthenticatedAnalyticsProductsRoute
+  '/automation/executions': typeof AuthenticatedAutomationExecutionsRoute
   '/customers/$id': typeof AuthenticatedCustomersIdRoute
   '/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
   '/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
@@ -404,6 +412,7 @@ export interface FileRoutesByTo {
   '/analytics/operations': typeof AuthenticatedAnalyticsOperationsRoute
   '/analytics/procurement': typeof AuthenticatedAnalyticsProcurementRoute
   '/analytics/products': typeof AuthenticatedAnalyticsProductsRoute
+  '/automation/executions': typeof AuthenticatedAutomationExecutionsRoute
   '/customers/$id': typeof AuthenticatedCustomersIdRoute
   '/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
   '/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
@@ -456,6 +465,7 @@ export interface FileRoutesById {
   '/_authenticated/analytics/operations': typeof AuthenticatedAnalyticsOperationsRoute
   '/_authenticated/analytics/procurement': typeof AuthenticatedAnalyticsProcurementRoute
   '/_authenticated/analytics/products': typeof AuthenticatedAnalyticsProductsRoute
+  '/_authenticated/automation/executions': typeof AuthenticatedAutomationExecutionsRoute
   '/_authenticated/customers_/$id': typeof AuthenticatedCustomersIdRoute
   '/_authenticated/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
   '/_authenticated/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
@@ -508,6 +518,7 @@ export interface FileRouteTypes {
     | '/analytics/operations'
     | '/analytics/procurement'
     | '/analytics/products'
+    | '/automation/executions'
     | '/customers/$id'
     | '/finance/courier-settlements'
     | '/inventory/locations'
@@ -558,6 +569,7 @@ export interface FileRouteTypes {
     | '/analytics/operations'
     | '/analytics/procurement'
     | '/analytics/products'
+    | '/automation/executions'
     | '/customers/$id'
     | '/finance/courier-settlements'
     | '/inventory/locations'
@@ -609,6 +621,7 @@ export interface FileRouteTypes {
     | '/_authenticated/analytics/operations'
     | '/_authenticated/analytics/procurement'
     | '/_authenticated/analytics/products'
+    | '/_authenticated/automation/executions'
     | '/_authenticated/customers_/$id'
     | '/_authenticated/finance/courier-settlements'
     | '/_authenticated/inventory/locations'
@@ -762,6 +775,13 @@ declare module '@tanstack/react-router' {
       path: '/automation'
       fullPath: '/automation/'
       preLoaderRoute: typeof AuthenticatedAutomationIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/automation/executions': {
+      id: '/_authenticated/automation/executions'
+      path: '/automation/executions'
+      fullPath: '/automation/executions'
+      preLoaderRoute: typeof AuthenticatedAutomationExecutionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/customers/': {
@@ -1013,6 +1033,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnalyticsOperationsRoute: typeof AuthenticatedAnalyticsOperationsRoute
   AuthenticatedAnalyticsProcurementRoute: typeof AuthenticatedAnalyticsProcurementRoute
   AuthenticatedAnalyticsProductsRoute: typeof AuthenticatedAnalyticsProductsRoute
+  AuthenticatedAutomationExecutionsRoute: typeof AuthenticatedAutomationExecutionsRoute
   AuthenticatedCustomersIdRoute: typeof AuthenticatedCustomersIdRoute
   AuthenticatedFinanceCourierSettlementsRoute: typeof AuthenticatedFinanceCourierSettlementsRoute
   AuthenticatedInventoryLocationsRoute: typeof AuthenticatedInventoryLocationsRoute
@@ -1059,6 +1080,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAnalyticsProcurementRoute:
     AuthenticatedAnalyticsProcurementRoute,
   AuthenticatedAnalyticsProductsRoute: AuthenticatedAnalyticsProductsRoute,
+  AuthenticatedAutomationExecutionsRoute:
+    AuthenticatedAutomationExecutionsRoute,
   AuthenticatedCustomersIdRoute: AuthenticatedCustomersIdRoute,
   AuthenticatedFinanceCourierSettlementsRoute:
     AuthenticatedFinanceCourierSettlementsRoute,
