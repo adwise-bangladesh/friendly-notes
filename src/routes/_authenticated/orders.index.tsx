@@ -122,6 +122,23 @@ function Page() {
           </SelectContent>
         </Select>
         <Select
+          value={deliveryStatus}
+          onValueChange={(v) => setDeliveryStatus(v as DeliveryStatus | "all")}
+        >
+          <SelectTrigger className="h-8 w-44 text-[13px]" aria-label="Delivery status">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All delivery states</SelectItem>
+            {DELIVERY_STATUSES.map((s) => (
+              <SelectItem key={s} value={s}>
+                {DELIVERY_STATUS_LABELS[s]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+
           value={paymentStatus}
           onValueChange={(v) => setPaymentStatus(v as PaymentStatus | "all")}
         >
