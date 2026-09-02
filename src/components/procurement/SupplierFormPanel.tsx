@@ -125,7 +125,7 @@ export function SupplierFormPanel({ state, onClose, onSaved }: Props) {
         email: values.email.trim() || null,
         address: values.address.trim() || null,
         city: values.city.trim() || null,
-        country: values.country.trim() || null,
+        country: values.country.trim() || "Bangladesh",
         default_currency: values.default_currency,
         status: values.status,
         notes: values.notes.trim() || null,
