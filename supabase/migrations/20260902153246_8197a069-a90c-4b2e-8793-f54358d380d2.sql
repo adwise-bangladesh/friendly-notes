@@ -1,0 +1,1 @@
+ALTER TYPE public.inventory_movement_type ADD VALUE IF NOT EXISTS 'damaged_out';

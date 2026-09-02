@@ -42,3 +42,25 @@ export function parseMoney(value: string): number | null {
 }
 
 export const CURRENCY_SYMBOL = ACTIVE_CURRENCY.symbol;
+
+/**
+ * Suppliers may invoice in a foreign currency, so procurement amounts carry
+ * their own currency code. BDT keeps the familiar symbol; anything else is
+ * shown with its ISO code so the number is never mistaken for taka.
+ */
+export function formatCurrencyAmount(
+  amount: number | null | undefined,
+  code: string | null | undefined,
+): string {
+  if (amount === null || amount === undefined || Number.isNaN(amount)) return "—";
+  const currencyCode = (code ?? BDT.code).toUpperCase();
+  if (currencyCode === BDT.code) return formatMoney(amount);
+  const formatted = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+  return `${currencyCode} ${formatted}`;
+}
+
+/** ISO codes offered for supplier purchasing. Bangladesh first. */
+export const PROCUREMENT_CURRENCIES = ["BDT", "USD", "CNY", "EUR", "INR", "GBP"] as const;
