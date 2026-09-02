@@ -20,6 +20,9 @@ import { useCommercePermissions } from "@/hooks/use-permissions";
 import { formatMoney } from "@/lib/currency";
 import { getOrders } from "@/lib/orders";
 import {
+  DELIVERY_STATUSES,
+  DELIVERY_STATUS_LABELS,
+  DELIVERY_STATUS_TONE,
   FULFILLMENT_STATUS_LABELS,
   ORDER_STATUSES,
   ORDER_STATUS_LABELS,
@@ -27,7 +30,7 @@ import {
   PAYMENT_STATUS_LABELS,
   VERIFICATION_STATUS_LABELS,
 } from "@/types/orders";
-import type { OrderStatus, PaymentStatus } from "@/types/orders";
+import type { DeliveryStatus, OrderStatus, PaymentStatus } from "@/types/orders";
 
 const TITLE = "Orders · Commerce Operations";
 const DESCRIPTION = "Create and track customer orders across your Bangladesh operation.";
@@ -63,16 +66,18 @@ function Page() {
   const { canManage } = useCommercePermissions();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<OrderStatus | "all">("all");
+  const [deliveryStatus, setDeliveryStatus] = useState<DeliveryStatus | "all">("all");
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | "all">("all");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
 
   const { data: orders = [], isLoading } = useQuery({
-    queryKey: ["orders", search, status, paymentStatus, from, to],
+    queryKey: ["orders", search, status, deliveryStatus, paymentStatus, from, to],
     queryFn: () =>
       getOrders({
         search,
         status,
+        deliveryStatus,
         paymentStatus,
         ...(from ? { from: new Date(`${from}T00:00:00`).toISOString() } : {}),
         ...(to ? { to: new Date(`${to}T23:59:59`).toISOString() } : {}),
@@ -112,6 +117,22 @@ function Page() {
             {ORDER_STATUSES.map((s) => (
               <SelectItem key={s} value={s}>
                 {ORDER_STATUS_LABELS[s]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={deliveryStatus}
+          onValueChange={(v) => setDeliveryStatus(v as DeliveryStatus | "all")}
+        >
+          <SelectTrigger className="h-8 w-44 text-[13px]" aria-label="Delivery status">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All delivery states</SelectItem>
+            {DELIVERY_STATUSES.map((s) => (
+              <SelectItem key={s} value={s}>
+                {DELIVERY_STATUS_LABELS[s]}
               </SelectItem>
             ))}
           </SelectContent>
@@ -178,6 +199,7 @@ function Page() {
                   <th className="px-3 py-2 text-left font-medium">Status</th>
                   <th className="px-3 py-2 text-left font-medium">Verification</th>
                   <th className="px-3 py-2 text-left font-medium">Fulfillment</th>
+                  <th className="px-3 py-2 text-left font-medium">Delivery</th>
                   <th className="px-3 py-2 text-left font-medium">Created</th>
                 </tr>
               </thead>
@@ -216,6 +238,11 @@ function Page() {
                     </td>
                     <td className="px-3 py-2 text-muted-foreground">
                       {FULFILLMENT_STATUS_LABELS[o.fulfillment_status]}
+                    </td>
+                    <td className="px-3 py-2">
+                      <StatusBadge tone={DELIVERY_STATUS_TONE[o.delivery_status]}>
+                        {DELIVERY_STATUS_LABELS[o.delivery_status]}
+                      </StatusBadge>
                     </td>
                     <td className="px-3 py-2 text-muted-foreground">
                       {new Date(o.created_at).toLocaleDateString()}

@@ -2994,6 +2994,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      refresh_order_delivery_status: {
+        Args: { _order_id: string }
+        Returns: Database["public"]["Enums"]["order_delivery_status"]
+      }
       release_order_reservations: {
         Args: { _order_id: string; _reason: string }
         Returns: {
@@ -3687,7 +3691,17 @@ export type Database = {
         | "reservation"
         | "release_reservation"
         | "fulfillment_out"
-      order_delivery_status: "not_shipped"
+      order_delivery_status:
+        | "not_shipped"
+        | "partially_shipped"
+        | "shipped"
+        | "in_transit"
+        | "on_hold"
+        | "partially_delivered"
+        | "delivered"
+        | "delivery_failed"
+        | "partially_returned"
+        | "returned"
       order_financial_status: "not_applicable"
       order_fulfillment_status:
         | "not_started"
@@ -4042,7 +4056,18 @@ export const Constants = {
         "release_reservation",
         "fulfillment_out",
       ],
-      order_delivery_status: ["not_shipped"],
+      order_delivery_status: [
+        "not_shipped",
+        "partially_shipped",
+        "shipped",
+        "in_transit",
+        "on_hold",
+        "partially_delivered",
+        "delivered",
+        "delivery_failed",
+        "partially_returned",
+        "returned",
+      ],
       order_financial_status: ["not_applicable"],
       order_fulfillment_status: [
         "not_started",
