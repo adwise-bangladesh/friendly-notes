@@ -1001,35 +1001,71 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          damaged_after: number | null
+          damaged_before: number | null
           id: string
+          incoming_after: number | null
+          incoming_before: number | null
           inventory_level_id: string
           movement_type: Database["public"]["Enums"]["inventory_movement_type"]
           note: string | null
+          on_hand_after: number | null
+          on_hand_before: number | null
           quantity: number
+          reason:
+            | Database["public"]["Enums"]["inventory_adjustment_reason"]
+            | null
           reference_id: string | null
           reference_type: string | null
+          reserved_after: number | null
+          reserved_before: number | null
+          seq: number
         }
         Insert: {
           created_at?: string
           created_by?: string | null
+          damaged_after?: number | null
+          damaged_before?: number | null
           id?: string
+          incoming_after?: number | null
+          incoming_before?: number | null
           inventory_level_id: string
           movement_type: Database["public"]["Enums"]["inventory_movement_type"]
           note?: string | null
+          on_hand_after?: number | null
+          on_hand_before?: number | null
           quantity: number
+          reason?:
+            | Database["public"]["Enums"]["inventory_adjustment_reason"]
+            | null
           reference_id?: string | null
           reference_type?: string | null
+          reserved_after?: number | null
+          reserved_before?: number | null
+          seq?: number
         }
         Update: {
           created_at?: string
           created_by?: string | null
+          damaged_after?: number | null
+          damaged_before?: number | null
           id?: string
+          incoming_after?: number | null
+          incoming_before?: number | null
           inventory_level_id?: string
           movement_type?: Database["public"]["Enums"]["inventory_movement_type"]
           note?: string | null
+          on_hand_after?: number | null
+          on_hand_before?: number | null
           quantity?: number
+          reason?:
+            | Database["public"]["Enums"]["inventory_adjustment_reason"]
+            | null
           reference_id?: string | null
           reference_type?: string | null
+          reserved_after?: number | null
+          reserved_before?: number | null
+          seq?: number
         }
         Relationships: [
           {
@@ -1137,6 +1173,148 @@ export type Database = {
             columns: ["variant_id"]
             isOneToOne: false
             referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_transfer_items: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string | null
+          product_name_snapshot: string
+          received_quantity: number
+          requested_quantity: number
+          shipped_quantity: number
+          sku_snapshot: string | null
+          transfer_id: string
+          updated_at: string
+          variant_id: string | null
+          variant_name_snapshot: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          product_name_snapshot: string
+          received_quantity?: number
+          requested_quantity: number
+          shipped_quantity?: number
+          sku_snapshot?: string | null
+          transfer_id: string
+          updated_at?: string
+          variant_id?: string | null
+          variant_name_snapshot?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          product_name_snapshot?: string
+          received_quantity?: number
+          requested_quantity?: number
+          shipped_quantity?: number
+          sku_snapshot?: string | null
+          transfer_id?: string
+          updated_at?: string
+          variant_id?: string | null
+          variant_name_snapshot?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_transfer_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_transfer_items_transfer_id_fkey"
+            columns: ["transfer_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_transfers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_transfer_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_transfers: {
+        Row: {
+          approved_by: string | null
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          created_at: string
+          created_by: string | null
+          dispatched_at: string | null
+          dispatched_by: string | null
+          from_location_id: string
+          id: string
+          notes: string | null
+          received_at: string | null
+          received_by: string | null
+          reference_number: string
+          status: Database["public"]["Enums"]["inventory_transfer_status"]
+          to_location_id: string
+          updated_at: string
+        }
+        Insert: {
+          approved_by?: string | null
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          dispatched_at?: string | null
+          dispatched_by?: string | null
+          from_location_id: string
+          id?: string
+          notes?: string | null
+          received_at?: string | null
+          received_by?: string | null
+          reference_number: string
+          status?: Database["public"]["Enums"]["inventory_transfer_status"]
+          to_location_id: string
+          updated_at?: string
+        }
+        Update: {
+          approved_by?: string | null
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          dispatched_at?: string | null
+          dispatched_by?: string | null
+          from_location_id?: string
+          id?: string
+          notes?: string | null
+          received_at?: string | null
+          received_by?: string | null
+          reference_number?: string
+          status?: Database["public"]["Enums"]["inventory_transfer_status"]
+          to_location_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_transfers_from_location_id_fkey"
+            columns: ["from_location_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_transfers_to_location_id_fkey"
+            columns: ["to_location_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_locations"
             referencedColumns: ["id"]
           },
         ]
@@ -3119,6 +3297,142 @@ export type Database = {
           },
         ]
       }
+      stocktake_items: {
+        Row: {
+          applied_delta: number | null
+          counted_quantity: number | null
+          created_at: string
+          id: string
+          inventory_level_id: string
+          note: string | null
+          product_id: string | null
+          product_name_snapshot: string
+          sku_snapshot: string | null
+          stocktake_id: string
+          system_quantity: number
+          updated_at: string
+          variant_id: string | null
+          variant_name_snapshot: string | null
+        }
+        Insert: {
+          applied_delta?: number | null
+          counted_quantity?: number | null
+          created_at?: string
+          id?: string
+          inventory_level_id: string
+          note?: string | null
+          product_id?: string | null
+          product_name_snapshot: string
+          sku_snapshot?: string | null
+          stocktake_id: string
+          system_quantity: number
+          updated_at?: string
+          variant_id?: string | null
+          variant_name_snapshot?: string | null
+        }
+        Update: {
+          applied_delta?: number | null
+          counted_quantity?: number | null
+          created_at?: string
+          id?: string
+          inventory_level_id?: string
+          note?: string | null
+          product_id?: string | null
+          product_name_snapshot?: string
+          sku_snapshot?: string | null
+          stocktake_id?: string
+          system_quantity?: number
+          updated_at?: string
+          variant_id?: string | null
+          variant_name_snapshot?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stocktake_items_inventory_level_id_fkey"
+            columns: ["inventory_level_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_levels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stocktake_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stocktake_items_stocktake_id_fkey"
+            columns: ["stocktake_id"]
+            isOneToOne: false
+            referencedRelation: "stocktakes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stocktake_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stocktakes: {
+        Row: {
+          cancel_reason: string | null
+          cancelled_by: string | null
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          location_id: string
+          notes: string | null
+          reference_number: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["stocktake_status"]
+          updated_at: string
+        }
+        Insert: {
+          cancel_reason?: string | null
+          cancelled_by?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          location_id: string
+          notes?: string | null
+          reference_number: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["stocktake_status"]
+          updated_at?: string
+        }
+        Update: {
+          cancel_reason?: string | null
+          cancelled_by?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          location_id?: string
+          notes?: string | null
+          reference_number?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["stocktake_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stocktakes_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       supplier_contacts: {
         Row: {
           created_at: string
@@ -3350,6 +3664,16 @@ export type Database = {
         Args: { _campaign_id: string; _quantity: number }
         Returns: number
       }
+      adjust_inventory: {
+        Args: {
+          _inventory_level_id: string
+          _movement_type: Database["public"]["Enums"]["inventory_movement_type"]
+          _note?: string
+          _quantity: number
+          _reason: Database["public"]["Enums"]["inventory_adjustment_reason"]
+        }
+        Returns: undefined
+      }
       apply_catalog_cost_update: {
         Args: {
           _new_cost: number
@@ -3377,6 +3701,7 @@ export type Database = {
           _movement_type: Database["public"]["Enums"]["inventory_movement_type"]
           _note?: string
           _quantity: number
+          _reason?: Database["public"]["Enums"]["inventory_adjustment_reason"]
           _reference_id?: string
           _reference_type?: string
         }
@@ -3551,6 +3876,10 @@ export type Database = {
           product_count: number
         }[]
       }
+      bundle_availability: {
+        Args: { _bundle_product_id: string; _location_id?: string }
+        Returns: number
+      }
       can_manage_commerce: { Args: { _user_id: string }; Returns: boolean }
       can_read_commerce: { Args: { _user_id: string }; Returns: boolean }
       cancel_goods_receipt: {
@@ -3609,6 +3938,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      cancel_stocktake: {
+        Args: { _reason: string; _stocktake_id: string }
+        Returns: undefined
       }
       category_product_counts: {
         Args: never
@@ -3737,6 +4070,14 @@ export type Database = {
       }
       create_goods_receipt: {
         Args: { _location_id: string; _notes?: string; _po_id: string }
+        Returns: string
+      }
+      create_inventory_transfer: {
+        Args: {
+          _from_location_id: string
+          _notes?: string
+          _to_location_id: string
+        }
         Returns: string
       }
       create_order: {
@@ -3988,8 +4329,20 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      create_stocktake: {
+        Args: { _location_id: string; _notes?: string }
+        Returns: string
+      }
+      ensure_inventory_level_internal: {
+        Args: { _location_id: string; _product_id: string; _variant_id: string }
+        Returns: string
+      }
       finalize_goods_receipt: {
         Args: { _receipt_id: string }
+        Returns: undefined
+      }
+      finalize_stocktake: {
+        Args: { _accept_changes?: boolean; _stocktake_id: string }
         Returns: undefined
       }
       fulfillment_shippable_summary: {
@@ -4152,6 +4505,8 @@ export type Database = {
       next_purchase_order_number: { Args: never; Returns: string }
       next_return_number: { Args: never; Returns: string }
       next_shipment_number: { Args: never; Returns: string }
+      next_stocktake_number: { Args: never; Returns: string }
+      next_transfer_number: { Args: never; Returns: string }
       order_financials: { Args: { _order_id: string }; Returns: Json }
       order_fulfillment_summary: {
         Args: { _order_id: string }
@@ -5183,6 +5538,22 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      set_stocktake_counts: {
+        Args: { _lines: Json; _stocktake_id: string }
+        Returns: undefined
+      }
+      set_transfer_items: {
+        Args: { _lines: Json; _transfer_id: string }
+        Returns: undefined
+      }
+      set_transfer_status: {
+        Args: {
+          _reason?: string
+          _status: Database["public"]["Enums"]["inventory_transfer_status"]
+          _transfer_id: string
+        }
+        Returns: undefined
+      }
       shipment_transition_valid: {
         Args: {
           _from: Database["public"]["Enums"]["shipment_status"]
@@ -5246,6 +5617,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      start_stocktake: { Args: { _stocktake_id: string }; Returns: undefined }
       supplier_summaries: {
         Args: never
         Returns: {
@@ -5428,6 +5800,13 @@ export type Database = {
         | "fulfillment"
         | "completed"
         | "cancelled"
+      inventory_adjustment_reason:
+        | "stock_found"
+        | "stock_missing"
+        | "counting_error"
+        | "damage"
+        | "correction"
+        | "other"
       inventory_movement_type:
         | "initial"
         | "adjustment_in"
@@ -5440,6 +5819,18 @@ export type Database = {
         | "purchase_in"
         | "purchase_damaged_in"
         | "damaged_out"
+        | "transfer_out"
+        | "transfer_in"
+        | "transfer_incoming_in"
+        | "transfer_incoming_out"
+        | "stocktake_in"
+        | "stocktake_out"
+      inventory_transfer_status:
+        | "draft"
+        | "pending"
+        | "in_transit"
+        | "received"
+        | "cancelled"
       item_cost_type: "base_cost" | "additional_cost"
       order_delivery_status:
         | "not_shipped"
@@ -5634,6 +6025,7 @@ export type Database = {
         | "return_received"
         | "lost"
         | "cancelled"
+      stocktake_status: "draft" | "in_progress" | "completed" | "cancelled"
       supply_model: "in_stock" | "local_sourcing" | "preorder" | "group_buy"
       variant_status: "active" | "inactive"
       verification_attempt_outcome:
@@ -5890,6 +6282,14 @@ export const Constants = {
         "completed",
         "cancelled",
       ],
+      inventory_adjustment_reason: [
+        "stock_found",
+        "stock_missing",
+        "counting_error",
+        "damage",
+        "correction",
+        "other",
+      ],
       inventory_movement_type: [
         "initial",
         "adjustment_in",
@@ -5902,6 +6302,19 @@ export const Constants = {
         "purchase_in",
         "purchase_damaged_in",
         "damaged_out",
+        "transfer_out",
+        "transfer_in",
+        "transfer_incoming_in",
+        "transfer_incoming_out",
+        "stocktake_in",
+        "stocktake_out",
+      ],
+      inventory_transfer_status: [
+        "draft",
+        "pending",
+        "in_transit",
+        "received",
+        "cancelled",
       ],
       item_cost_type: ["base_cost", "additional_cost"],
       order_delivery_status: [
@@ -6115,6 +6528,7 @@ export const Constants = {
         "lost",
         "cancelled",
       ],
+      stocktake_status: ["draft", "in_progress", "completed", "cancelled"],
       supply_model: ["in_stock", "local_sourcing", "preorder", "group_buy"],
       variant_status: ["active", "inactive"],
       verification_attempt_outcome: [

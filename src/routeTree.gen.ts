@@ -22,6 +22,9 @@ import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.
 import { Route as AuthenticatedFinanceCourierSettlementsRouteImport } from './routes/_authenticated/finance.courier-settlements'
 import { Route as AuthenticatedInventoryIndexRouteImport } from './routes/_authenticated/inventory.index'
 import { Route as AuthenticatedInventoryLocationsRouteImport } from './routes/_authenticated/inventory.locations'
+import { Route as AuthenticatedInventoryMovementsRouteImport } from './routes/_authenticated/inventory.movements'
+import { Route as AuthenticatedInventoryStocktakesRouteImport } from './routes/_authenticated/inventory.stocktakes'
+import { Route as AuthenticatedInventoryTransfersRouteImport } from './routes/_authenticated/inventory.transfers'
 import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenticated/orders.index'
 import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders.$id'
 import { Route as AuthenticatedOrdersExceptionsRouteImport } from './routes/_authenticated/orders.exceptions'
@@ -38,6 +41,8 @@ import { Route as AuthenticatedReturnsIdRouteImport } from './routes/_authentica
 import { Route as AuthenticatedSuppliersIndexRouteImport } from './routes/_authenticated/suppliers.index'
 import { Route as AuthenticatedSuppliersIdRouteImport } from './routes/_authenticated/suppliers.$id'
 import { Route as AuthenticatedFinanceCourierSettlementsIdRouteImport } from './routes/_authenticated/finance.courier-settlements_.$id'
+import { Route as AuthenticatedInventoryStocktakesIdRouteImport } from './routes/_authenticated/inventory.stocktakes_.$id'
+import { Route as AuthenticatedInventoryTransfersIdRouteImport } from './routes/_authenticated/inventory.transfers_.$id'
 import { Route as AuthenticatedOrdersFulfillmentsIdRouteImport } from './routes/_authenticated/orders.fulfillments.$id'
 import { Route as AuthenticatedOrdersShipmentsIdRouteImport } from './routes/_authenticated/orders.shipments_.$id'
 import { Route as AuthenticatedProcurementPurchaseOrdersIndexRouteImport } from './routes/_authenticated/procurement.purchase-orders.index'
@@ -111,6 +116,24 @@ const AuthenticatedInventoryLocationsRoute =
   AuthenticatedInventoryLocationsRouteImport.update({
     id: '/inventory/locations',
     path: '/inventory/locations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedInventoryMovementsRoute =
+  AuthenticatedInventoryMovementsRouteImport.update({
+    id: '/inventory/movements',
+    path: '/inventory/movements',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedInventoryStocktakesRoute =
+  AuthenticatedInventoryStocktakesRouteImport.update({
+    id: '/inventory/stocktakes',
+    path: '/inventory/stocktakes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedInventoryTransfersRoute =
+  AuthenticatedInventoryTransfersRouteImport.update({
+    id: '/inventory/transfers',
+    path: '/inventory/transfers',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedOrdersIndexRoute =
@@ -205,6 +228,18 @@ const AuthenticatedFinanceCourierSettlementsIdRoute =
     path: '/finance/courier-settlements/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedInventoryStocktakesIdRoute =
+  AuthenticatedInventoryStocktakesIdRouteImport.update({
+    id: '/inventory/stocktakes_/$id',
+    path: '/inventory/stocktakes/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedInventoryTransfersIdRoute =
+  AuthenticatedInventoryTransfersIdRouteImport.update({
+    id: '/inventory/transfers_/$id',
+    path: '/inventory/transfers/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOrdersFulfillmentsIdRoute =
   AuthenticatedOrdersFulfillmentsIdRouteImport.update({
     id: '/orders/fulfillments/$id',
@@ -254,6 +289,9 @@ export interface FileRoutesByFullPath {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
   '/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
+  '/inventory/movements': typeof AuthenticatedInventoryMovementsRoute
+  '/inventory/stocktakes': typeof AuthenticatedInventoryStocktakesRoute
+  '/inventory/transfers': typeof AuthenticatedInventoryTransfersRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders/exceptions': typeof AuthenticatedOrdersExceptionsRoute
   '/orders/fulfillment': typeof AuthenticatedOrdersFulfillmentRoute
@@ -271,6 +309,8 @@ export interface FileRoutesByFullPath {
   '/products/': typeof AuthenticatedProductsIndexRoute
   '/suppliers/': typeof AuthenticatedSuppliersIndexRoute
   '/finance/courier-settlements/$id': typeof AuthenticatedFinanceCourierSettlementsIdRoute
+  '/inventory/stocktakes/$id': typeof AuthenticatedInventoryStocktakesIdRoute
+  '/inventory/transfers/$id': typeof AuthenticatedInventoryTransfersIdRoute
   '/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
   '/orders/shipments/$id': typeof AuthenticatedOrdersShipmentsIdRoute
   '/procurement/purchase-orders/$id': typeof AuthenticatedProcurementPurchaseOrdersIdRoute
@@ -290,6 +330,9 @@ export interface FileRoutesByTo {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
   '/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
+  '/inventory/movements': typeof AuthenticatedInventoryMovementsRoute
+  '/inventory/stocktakes': typeof AuthenticatedInventoryStocktakesRoute
+  '/inventory/transfers': typeof AuthenticatedInventoryTransfersRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders/exceptions': typeof AuthenticatedOrdersExceptionsRoute
   '/orders/fulfillment': typeof AuthenticatedOrdersFulfillmentRoute
@@ -307,6 +350,8 @@ export interface FileRoutesByTo {
   '/products': typeof AuthenticatedProductsIndexRoute
   '/suppliers': typeof AuthenticatedSuppliersIndexRoute
   '/finance/courier-settlements/$id': typeof AuthenticatedFinanceCourierSettlementsIdRoute
+  '/inventory/stocktakes/$id': typeof AuthenticatedInventoryStocktakesIdRoute
+  '/inventory/transfers/$id': typeof AuthenticatedInventoryTransfersIdRoute
   '/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
   '/orders/shipments/$id': typeof AuthenticatedOrdersShipmentsIdRoute
   '/procurement/purchase-orders/$id': typeof AuthenticatedProcurementPurchaseOrdersIdRoute
@@ -328,6 +373,9 @@ export interface FileRoutesById {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
   '/_authenticated/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
+  '/_authenticated/inventory/movements': typeof AuthenticatedInventoryMovementsRoute
+  '/_authenticated/inventory/stocktakes': typeof AuthenticatedInventoryStocktakesRoute
+  '/_authenticated/inventory/transfers': typeof AuthenticatedInventoryTransfersRoute
   '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/_authenticated/orders/exceptions': typeof AuthenticatedOrdersExceptionsRoute
   '/_authenticated/orders/fulfillment': typeof AuthenticatedOrdersFulfillmentRoute
@@ -345,6 +393,8 @@ export interface FileRoutesById {
   '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
   '/_authenticated/suppliers/': typeof AuthenticatedSuppliersIndexRoute
   '/_authenticated/finance/courier-settlements_/$id': typeof AuthenticatedFinanceCourierSettlementsIdRoute
+  '/_authenticated/inventory/stocktakes_/$id': typeof AuthenticatedInventoryStocktakesIdRoute
+  '/_authenticated/inventory/transfers_/$id': typeof AuthenticatedInventoryTransfersIdRoute
   '/_authenticated/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
   '/_authenticated/orders/shipments_/$id': typeof AuthenticatedOrdersShipmentsIdRoute
   '/_authenticated/procurement/purchase-orders/$id': typeof AuthenticatedProcurementPurchaseOrdersIdRoute
@@ -366,6 +416,9 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/finance/courier-settlements'
     | '/inventory/locations'
+    | '/inventory/movements'
+    | '/inventory/stocktakes'
+    | '/inventory/transfers'
     | '/orders/$id'
     | '/orders/exceptions'
     | '/orders/fulfillment'
@@ -383,6 +436,8 @@ export interface FileRouteTypes {
     | '/products/'
     | '/suppliers/'
     | '/finance/courier-settlements/$id'
+    | '/inventory/stocktakes/$id'
+    | '/inventory/transfers/$id'
     | '/orders/fulfillments/$id'
     | '/orders/shipments/$id'
     | '/procurement/purchase-orders/$id'
@@ -402,6 +457,9 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/finance/courier-settlements'
     | '/inventory/locations'
+    | '/inventory/movements'
+    | '/inventory/stocktakes'
+    | '/inventory/transfers'
     | '/orders/$id'
     | '/orders/exceptions'
     | '/orders/fulfillment'
@@ -419,6 +477,8 @@ export interface FileRouteTypes {
     | '/products'
     | '/suppliers'
     | '/finance/courier-settlements/$id'
+    | '/inventory/stocktakes/$id'
+    | '/inventory/transfers/$id'
     | '/orders/fulfillments/$id'
     | '/orders/shipments/$id'
     | '/procurement/purchase-orders/$id'
@@ -439,6 +499,9 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/_authenticated/finance/courier-settlements'
     | '/_authenticated/inventory/locations'
+    | '/_authenticated/inventory/movements'
+    | '/_authenticated/inventory/stocktakes'
+    | '/_authenticated/inventory/transfers'
     | '/_authenticated/orders/$id'
     | '/_authenticated/orders/exceptions'
     | '/_authenticated/orders/fulfillment'
@@ -456,6 +519,8 @@ export interface FileRouteTypes {
     | '/_authenticated/products/'
     | '/_authenticated/suppliers/'
     | '/_authenticated/finance/courier-settlements_/$id'
+    | '/_authenticated/inventory/stocktakes_/$id'
+    | '/_authenticated/inventory/transfers_/$id'
     | '/_authenticated/orders/fulfillments/$id'
     | '/_authenticated/orders/shipments_/$id'
     | '/_authenticated/procurement/purchase-orders/$id'
@@ -565,6 +630,27 @@ declare module '@tanstack/react-router' {
       path: '/inventory/locations'
       fullPath: '/inventory/locations'
       preLoaderRoute: typeof AuthenticatedInventoryLocationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/inventory/movements': {
+      id: '/_authenticated/inventory/movements'
+      path: '/inventory/movements'
+      fullPath: '/inventory/movements'
+      preLoaderRoute: typeof AuthenticatedInventoryMovementsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/inventory/stocktakes': {
+      id: '/_authenticated/inventory/stocktakes'
+      path: '/inventory/stocktakes'
+      fullPath: '/inventory/stocktakes'
+      preLoaderRoute: typeof AuthenticatedInventoryStocktakesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/inventory/transfers': {
+      id: '/_authenticated/inventory/transfers'
+      path: '/inventory/transfers'
+      fullPath: '/inventory/transfers'
+      preLoaderRoute: typeof AuthenticatedInventoryTransfersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/orders/': {
@@ -679,6 +765,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceCourierSettlementsIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/inventory/stocktakes_/$id': {
+      id: '/_authenticated/inventory/stocktakes_/$id'
+      path: '/inventory/stocktakes/$id'
+      fullPath: '/inventory/stocktakes/$id'
+      preLoaderRoute: typeof AuthenticatedInventoryStocktakesIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/inventory/transfers_/$id': {
+      id: '/_authenticated/inventory/transfers_/$id'
+      path: '/inventory/transfers/$id'
+      fullPath: '/inventory/transfers/$id'
+      preLoaderRoute: typeof AuthenticatedInventoryTransfersIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/orders/fulfillments/$id': {
       id: '/_authenticated/orders/fulfillments/$id'
       path: '/orders/fulfillments/$id'
@@ -731,6 +831,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedFinanceCourierSettlementsRoute: typeof AuthenticatedFinanceCourierSettlementsRoute
   AuthenticatedInventoryLocationsRoute: typeof AuthenticatedInventoryLocationsRoute
+  AuthenticatedInventoryMovementsRoute: typeof AuthenticatedInventoryMovementsRoute
+  AuthenticatedInventoryStocktakesRoute: typeof AuthenticatedInventoryStocktakesRoute
+  AuthenticatedInventoryTransfersRoute: typeof AuthenticatedInventoryTransfersRoute
   AuthenticatedOrdersIdRoute: typeof AuthenticatedOrdersIdRoute
   AuthenticatedOrdersExceptionsRoute: typeof AuthenticatedOrdersExceptionsRoute
   AuthenticatedOrdersFulfillmentRoute: typeof AuthenticatedOrdersFulfillmentRoute
@@ -748,6 +851,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
   AuthenticatedSuppliersIndexRoute: typeof AuthenticatedSuppliersIndexRoute
   AuthenticatedFinanceCourierSettlementsIdRoute: typeof AuthenticatedFinanceCourierSettlementsIdRoute
+  AuthenticatedInventoryStocktakesIdRoute: typeof AuthenticatedInventoryStocktakesIdRoute
+  AuthenticatedInventoryTransfersIdRoute: typeof AuthenticatedInventoryTransfersIdRoute
   AuthenticatedOrdersFulfillmentsIdRoute: typeof AuthenticatedOrdersFulfillmentsIdRoute
   AuthenticatedOrdersShipmentsIdRoute: typeof AuthenticatedOrdersShipmentsIdRoute
   AuthenticatedProcurementPurchaseOrdersIdRoute: typeof AuthenticatedProcurementPurchaseOrdersIdRoute
@@ -763,6 +868,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFinanceCourierSettlementsRoute:
     AuthenticatedFinanceCourierSettlementsRoute,
   AuthenticatedInventoryLocationsRoute: AuthenticatedInventoryLocationsRoute,
+  AuthenticatedInventoryMovementsRoute: AuthenticatedInventoryMovementsRoute,
+  AuthenticatedInventoryStocktakesRoute: AuthenticatedInventoryStocktakesRoute,
+  AuthenticatedInventoryTransfersRoute: AuthenticatedInventoryTransfersRoute,
   AuthenticatedOrdersIdRoute: AuthenticatedOrdersIdRoute,
   AuthenticatedOrdersExceptionsRoute: AuthenticatedOrdersExceptionsRoute,
   AuthenticatedOrdersFulfillmentRoute: AuthenticatedOrdersFulfillmentRoute,
@@ -781,6 +889,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSuppliersIndexRoute: AuthenticatedSuppliersIndexRoute,
   AuthenticatedFinanceCourierSettlementsIdRoute:
     AuthenticatedFinanceCourierSettlementsIdRoute,
+  AuthenticatedInventoryStocktakesIdRoute:
+    AuthenticatedInventoryStocktakesIdRoute,
+  AuthenticatedInventoryTransfersIdRoute:
+    AuthenticatedInventoryTransfersIdRoute,
   AuthenticatedOrdersFulfillmentsIdRoute:
     AuthenticatedOrdersFulfillmentsIdRoute,
   AuthenticatedOrdersShipmentsIdRoute: AuthenticatedOrdersShipmentsIdRoute,

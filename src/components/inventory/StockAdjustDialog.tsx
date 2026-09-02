@@ -21,29 +21,34 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { StatusBadge } from "@/components/shared/StatusBadge";
+import { getLevelSnapshot, getMovements, setLowStockThreshold } from "@/lib/inventory";
+import { adjustInventory } from "@/lib/inventory-ops";
 import {
-  applyMovement,
-  getLevelSnapshot,
-  getMovements,
-  setLowStockThreshold,
-} from "@/lib/inventory";
-import {
-  MOVEMENT_TYPES,
+  ADJUSTMENT_REASONS,
+  ADJUSTMENT_REASON_LABELS,
+  ADMIN_ONLY_MOVEMENT_TYPES,
+  MANUAL_MOVEMENT_TYPES,
   MOVEMENT_TYPE_HELP,
   MOVEMENT_TYPE_LABELS,
   movementDirection,
 } from "@/types/inventory";
-import type { InventoryItem, InventoryMovementType } from "@/types/inventory";
+import type {
+  InventoryAdjustmentReason,
+  InventoryItem,
+  ManualMovementType,
+} from "@/types/inventory";
 
 interface Props {
   item: InventoryItem | null;
   onClose: () => void;
   canManage: boolean;
+  isAdmin?: boolean;
 }
 
-export function StockAdjustDialog({ item, onClose, canManage }: Props) {
+export function StockAdjustDialog({ item, onClose, canManage, isAdmin = false }: Props) {
   const qc = useQueryClient();
-  const [type, setType] = useState<InventoryMovementType>("adjustment_in");
+  const [type, setType] = useState<ManualMovementType>("adjustment_in");
+  const [reason, setReason] = useState<InventoryAdjustmentReason>("correction");
   const [quantity, setQuantity] = useState("1");
   const [note, setNote] = useState("");
   const [threshold, setThreshold] = useState("");
@@ -52,6 +57,7 @@ export function StockAdjustDialog({ item, onClose, canManage }: Props) {
   useEffect(() => {
     if (!item) return;
     setType(item.onHand === 0 && item.damaged === 0 ? "initial" : "adjustment_in");
+    setReason("correction");
     setQuantity("1");
     setNote("");
     setThreshold(item.lowStockThreshold === null ? "" : String(item.lowStockThreshold));
@@ -92,20 +98,31 @@ export function StockAdjustDialog({ item, onClose, canManage }: Props) {
       onHand -= qty;
       damaged += qty;
     }
-    if (type === "reservation") reserved += qty;
-    if (type === "release_reservation") reserved -= qty;
+    if (type === "damaged_out") damaged -= qty;
     return { onHand, reserved, damaged, available: onHand - reserved };
   }, [current, qty, type]);
 
   const invalidPreview =
     preview !== null &&
-    (preview.onHand < 0 || preview.reserved < 0 || preview.reserved > preview.onHand);
+    (preview.onHand < 0 ||
+      preview.reserved < 0 ||
+      preview.damaged < 0 ||
+      preview.reserved > preview.onHand);
 
   const applyMutation = useMutation({
     mutationFn: async () => {
       if (!item) return;
       if (!Number.isFinite(qty) || qty <= 0) throw new Error("Enter a quantity greater than zero.");
-      await applyMovement({ levelId: item.levelId, type, quantity: qty, note: note.trim() || null });
+      if (reason === "other" && !note.trim()) {
+        throw new Error('Add a note explaining the change when the reason is "other".');
+      }
+      await adjustInventory({
+        levelId: item.levelId,
+        type,
+        quantity: qty,
+        reason,
+        note: note.trim() || null,
+      });
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["inventory"] });
@@ -180,13 +197,15 @@ export function StockAdjustDialog({ item, onClose, canManage }: Props) {
                     <Label className="text-[12px]">Movement type</Label>
                     <Select
                       value={type}
-                      onValueChange={(v) => setType(v as InventoryMovementType)}
+                      onValueChange={(v) => setType(v as ManualMovementType)}
                     >
                       <SelectTrigger className="h-8 text-[13px]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {MOVEMENT_TYPES.map((t) => (
+                        {MANUAL_MOVEMENT_TYPES.filter(
+                          (t) => isAdmin || !ADMIN_ONLY_MOVEMENT_TYPES.includes(t),
+                        ).map((t) => (
                           <SelectItem key={t} value={t}>
                             {MOVEMENT_TYPE_LABELS[t]}
                           </SelectItem>
@@ -211,8 +230,27 @@ export function StockAdjustDialog({ item, onClose, canManage }: Props) {
                 <p className="text-[11.5px] text-muted-foreground">{MOVEMENT_TYPE_HELP[type]}</p>
 
                 <div className="space-y-1.5">
+                  <Label className="text-[12px]">Reason</Label>
+                  <Select
+                    value={reason}
+                    onValueChange={(v) => setReason(v as InventoryAdjustmentReason)}
+                  >
+                    <SelectTrigger className="h-8 text-[13px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ADJUSTMENT_REASONS.map((r) => (
+                        <SelectItem key={r} value={r}>
+                          {ADJUSTMENT_REASON_LABELS[r]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1.5">
                   <Label htmlFor="note" className="text-[12px]">
-                    Reason / note
+                    Note{reason === "other" ? " (required)" : ""}
                   </Label>
                   <Textarea
                     id="note"
@@ -316,8 +354,17 @@ export function StockAdjustDialog({ item, onClose, canManage }: Props) {
                           <div className="text-[12.5px] font-medium">
                             {MOVEMENT_TYPE_LABELS[m.movement_type]}
                           </div>
-                          {m.note && (
-                            <div className="text-[11.5px] text-muted-foreground">{m.note}</div>
+                          {(m.reason ?? m.note) && (
+                            <div className="text-[11.5px] text-muted-foreground">
+                              {m.reason ? ADJUSTMENT_REASON_LABELS[m.reason] : ""}
+                              {m.reason && m.note ? " · " : ""}
+                              {m.note ?? ""}
+                            </div>
+                          )}
+                          {m.on_hand_before !== null && m.on_hand_after !== null && (
+                            <div className="text-[11px] tabular-nums text-muted-foreground">
+                              On hand {m.on_hand_before} → {m.on_hand_after}
+                            </div>
                           )}
                           <div className="text-[11px] text-muted-foreground">
                             {new Date(m.created_at).toLocaleString()}

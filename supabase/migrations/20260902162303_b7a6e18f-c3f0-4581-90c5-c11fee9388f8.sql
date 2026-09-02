@@ -1,0 +1,28 @@
+REVOKE EXECUTE ON FUNCTION public.create_inventory_transfer(uuid, uuid, text) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.set_transfer_items(uuid, jsonb) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.set_transfer_status(uuid, public.inventory_transfer_status, text) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.create_stocktake(uuid, text) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.start_stocktake(uuid) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.set_stocktake_counts(uuid, jsonb) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.finalize_stocktake(uuid, boolean) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.cancel_stocktake(uuid, text) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.adjust_inventory(uuid, public.inventory_movement_type, integer, public.inventory_adjustment_reason, text) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.bundle_availability(uuid, uuid) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.ensure_inventory_level_internal(uuid, uuid, uuid) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.apply_inventory_movement(uuid, public.inventory_movement_type, integer, text, text, uuid, public.inventory_adjustment_reason) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.next_transfer_number() FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.next_stocktake_number() FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.guard_inventory_movements_append_only() FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.guard_inventory_ops_write() FROM anon, public;
+
+GRANT EXECUTE ON FUNCTION public.create_inventory_transfer(uuid, uuid, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.set_transfer_items(uuid, jsonb) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.set_transfer_status(uuid, public.inventory_transfer_status, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.create_stocktake(uuid, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.start_stocktake(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.set_stocktake_counts(uuid, jsonb) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.finalize_stocktake(uuid, boolean) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.cancel_stocktake(uuid, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.adjust_inventory(uuid, public.inventory_movement_type, integer, public.inventory_adjustment_reason, text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.bundle_availability(uuid, uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.apply_inventory_movement(uuid, public.inventory_movement_type, integer, text, text, uuid, public.inventory_adjustment_reason) TO authenticated;
