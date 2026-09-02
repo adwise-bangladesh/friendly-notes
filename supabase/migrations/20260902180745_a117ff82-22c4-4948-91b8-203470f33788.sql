@@ -1,0 +1,2 @@
+revoke all on function public.guard_operational_assignment_write() from public, anon, authenticated;
+revoke all on function public.guard_operational_assignment_events() from public, anon, authenticated;
