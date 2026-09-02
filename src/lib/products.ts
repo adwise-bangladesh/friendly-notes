@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toSlug } from "./commerce";
+import { variantFromPrice } from "@/types/commerce";
 import type {
   ProductDraft,
   ProductEditorRecord,
@@ -292,7 +293,8 @@ export async function saveProduct(draft: ProductDraft, id?: string): Promise<str
     status: draft.status,
     visibility: draft.visibility,
     featured: draft.featured,
-    is_purchasable: draft.status === "archived" ? false : draft.is_purchasable,
+    // Only ACTIVE products may be purchasable (mirrors the DB trigger).
+    is_purchasable: draft.status === "active" ? draft.is_purchasable : false,
     price: draft.price,
     compare_at_price: draft.compare_at_price,
     base_cost: draft.base_cost,
@@ -346,15 +348,20 @@ export const archiveProducts = (ids: string[]) => setProductsStatus(ids, "archiv
 /** Restored products come back as inactive — never straight to public. */
 export const restoreProduct = (id: string) => setProductsStatus([id], "inactive");
 
-/** Resolves the price shown in lists: parent price, or the variant range low. */
+/**
+ * Price shown in lists.
+ * Variable products use the lowest VALID variant price ("from ৳X"). When no
+ * variant is priced this returns null — the parent price is deliberately NOT
+ * used as a transactional fallback (Step 4.2). Callers render an unpriced state.
+ */
 export function displayPrice(row: ProductListRow): number | null {
-  if (row.product_type === "variable") {
-    const prices = row.product_variants
-      .map((v) => v.price)
-      .filter((p): p is number => p !== null && p !== undefined);
-    if (prices.length) return Math.min(...prices);
-  }
+  if (row.product_type === "variable") return variantFromPrice(row.product_variants);
   return row.price ?? null;
+}
+
+/** Variants of a variable product that cannot be sold because they have no price. */
+export function unpricedVariantCount(variants: { price: number | null }[]): number {
+  return variants.filter((v) => v.price === null || v.price === undefined).length;
 }
 
 export function primaryMedia(media: { url: string; is_primary: boolean }[]): string | null {

@@ -93,12 +93,20 @@ export async function deleteCampaign(id: string): Promise<void> {
   if (error) throw error;
 }
 
-/** Admin-only manual correction until orders drive the confirmed quantity. */
-export async function adjustCampaignQuantity(id: string, quantity: number): Promise<void> {
-  if (quantity < 0) throw new Error("Quantity cannot be negative.");
-  const { error } = await supabase
-    .from("group_buy_campaigns")
-    .update({ current_quantity: quantity })
-    .eq("id", id);
+/**
+ * Admin-only manual correction until orders drive the confirmed quantity.
+ * Direct Data API writes to `current_quantity` are rejected by the
+ * `group_buy_campaigns_guard_quantity` trigger, so this must go through the
+ * controlled `adjust_group_buy_campaign_quantity` database function, which
+ * re-checks the admin/owner role server side.
+ */
+export async function adjustCampaignQuantity(id: string, quantity: number): Promise<number> {
+  if (!Number.isInteger(quantity) || quantity < 0)
+    throw new Error("Quantity must be a whole number of zero or more.");
+  const { data, error } = await supabase.rpc("adjust_group_buy_campaign_quantity", {
+    _campaign_id: id,
+    _quantity: quantity,
+  });
   if (error) throw error;
+  return data ?? quantity;
 }

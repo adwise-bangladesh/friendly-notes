@@ -318,15 +318,43 @@ export function landedCost(base: number | null, additional: number | null): numb
   return (base ?? 0) + (additional ?? 0);
 }
 
-/** Variant costs fall back to the parent product when not overridden. */
+/**
+ * Variant costs inherit from the parent product PER FIELD.
+ * `null` means "not overridden" — 0 is a valid explicit override.
+ * Never use truthiness here: an explicit 0 must stay 0.
+ */
 export function effectiveCost(
   variant: { base_cost: number | null; additional_cost: number | null },
   product: { base_cost: number; additional_cost: number },
-): CostBreakdown & { overridden: boolean } {
-  const overridden = variant.base_cost !== null || variant.additional_cost !== null;
-  const base = overridden ? (variant.base_cost ?? 0) : product.base_cost;
-  const additional = overridden ? (variant.additional_cost ?? 0) : product.additional_cost;
-  return { base, additional, landed: base + additional, overridden };
+): CostBreakdown & {
+  overridden: boolean;
+  baseOverridden: boolean;
+  additionalOverridden: boolean;
+} {
+  const baseOverridden = variant.base_cost !== null && variant.base_cost !== undefined;
+  const additionalOverridden =
+    variant.additional_cost !== null && variant.additional_cost !== undefined;
+  const base = baseOverridden ? (variant.base_cost as number) : product.base_cost;
+  const additional = additionalOverridden
+    ? (variant.additional_cost as number)
+    : product.additional_cost;
+  return {
+    base,
+    additional,
+    landed: base + additional,
+    overridden: baseOverridden || additionalOverridden,
+    baseOverridden,
+    additionalOverridden,
+  };
+}
+
+/** Physical values inherit per field too — null means "inherit". */
+export function effectivePhysical(
+  variantValue: number | null | undefined,
+  productValue: number | null,
+): { value: number | null; overridden: boolean } {
+  const overridden = variantValue !== null && variantValue !== undefined;
+  return { value: overridden ? (variantValue as number) : productValue, overridden };
 }
 
 export interface MarginResult {
@@ -340,6 +368,8 @@ export function estimatedMargin(sellingPrice: number, landed: number): MarginRes
   return { margin, percentage: sellingPrice > 0 ? (margin / sellingPrice) * 100 : null };
 }
 
+/* ---------- Step 4.2: internal vs public product contracts ---------- */
+
 /**
  * Fields that must never reach a customer-facing surface. Kept explicit so a
  * future storefront/mobile API can project public columns only.
@@ -350,7 +380,42 @@ export const INTERNAL_PRODUCT_FIELDS = [
   "estimated_landed_cost",
 ] as const;
 
-/** Shape a future public API may safely expose. */
+export type InternalProductField = (typeof INTERNAL_PRODUCT_FIELDS)[number];
+
+/**
+ * INTERNAL contract — admin / operations only. Contains cost data and must
+ * stay behind an authenticated staff session.
+ */
+export type InternalProduct = Product;
+
+export interface InternalProductWithRelations extends InternalProduct {
+  brand: Brand | null;
+  product_categories: (ProductCategory & { category: Category | null })[];
+  product_variants: ProductVariant[];
+  product_media: ProductMedia[];
+}
+
+/**
+ * PUBLIC contract — storefront / mobile safe. Structurally excludes every
+ * internal cost field, for both the product and its variants.
+ */
+export interface PublicProductVariant {
+  id: string;
+  title: string;
+  sku: string | null;
+  price: number | null;
+  compare_at_price: number | null;
+  status: VariantStatus;
+  sort_order: number;
+}
+
+export interface PublicProductMedia {
+  url: string;
+  alt_text: string | null;
+  is_primary: boolean;
+  sort_order: number;
+}
+
 export interface PublicProduct {
   id: string;
   name: string;
@@ -360,7 +425,45 @@ export interface PublicProduct {
   price: number;
   compare_at_price: number | null;
   is_purchasable: boolean;
+  status: ProductStatus;
+  visibility: EntityVisibility;
   product_type: ProductType;
   supply_model: SupplyModel;
+  requires_shipping: boolean;
+  brand: { id: string; name: string; slug: string } | null;
+  product_categories: {
+    is_primary: boolean;
+    category: { id: string; name: string; slug: string } | null;
+  }[];
+  product_variants: PublicProductVariant[];
+  product_media: PublicProductMedia[];
 }
+
+/* ---------- Purchasability + variable pricing rules (Step 4.2) ---------- */
+
+/** A product is eligible for purchase only when active AND flagged purchasable. */
+export function isProductPurchasable(p: {
+  status: ProductStatus;
+  is_purchasable: boolean;
+}): boolean {
+  return p.status === "active" && p.is_purchasable;
+}
+
+/** A variant needs its own valid price — the parent price is never a fallback. */
+export function isVariantPurchasable(v: { status: VariantStatus; price: number | null }): boolean {
+  return v.status === "active" && v.price !== null && v.price >= 0;
+}
+
+/**
+ * Catalog "from" price for a variable product: the lowest valid variant price.
+ * Returns null when no variant is priced — callers must render an unpriced
+ * state rather than falling back to the parent product price.
+ */
+export function variantFromPrice(variants: { price: number | null }[]): number | null {
+  const prices = variants
+    .map((v) => v.price)
+    .filter((p): p is number => p !== null && p !== undefined);
+  return prices.length ? Math.min(...prices) : null;
+}
+
 

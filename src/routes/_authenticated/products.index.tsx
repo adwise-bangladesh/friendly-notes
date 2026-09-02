@@ -393,11 +393,20 @@ function Row({
         {SUPPLY_MODEL_LABELS[row.supply_model]}
       </td>
       <td className="px-3 py-2 text-right tabular-nums">
-        {formatMoney(price)}
-        {row.compare_at_price && price !== null && row.compare_at_price > price && (
-          <span className="ml-1 text-[11px] text-muted-foreground line-through">
-            {formatMoney(row.compare_at_price)}
-          </span>
+        {price === null ? (
+          <span className="text-[11.5px] text-muted-foreground">Unpriced</span>
+        ) : (
+          <>
+            {row.product_type === "variable" && (
+              <span className="mr-1 text-[11px] text-muted-foreground">from</span>
+            )}
+            {formatMoney(price)}
+            {row.compare_at_price && row.compare_at_price > price && (
+              <span className="ml-1 text-[11px] text-muted-foreground line-through">
+                {formatMoney(row.compare_at_price)}
+              </span>
+            )}
+          </>
         )}
       </td>
       <td className="px-3 py-2">
