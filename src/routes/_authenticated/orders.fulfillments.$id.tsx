@@ -397,6 +397,50 @@ function Page() {
               <p className="text-[13px]">{fulfillment.notes}</p>
             </FormSection>
           )}
+
+          <FormSection
+            title="Shipping"
+            description="A shipment can be created once this fulfillment is ready for handover."
+          >
+            {shipments.length > 0 && (
+              <div className="mb-3 space-y-2">
+                {shipments.map((s) => (
+                  <Link
+                    key={s.id}
+                    to="/orders/shipments/$id"
+                    params={{ id: s.id }}
+                    className="flex items-center justify-between gap-3 rounded border border-border px-3 py-2 hover:bg-accent/50"
+                  >
+                    <span className="text-[13px] font-medium">{s.shipment_number}</span>
+                    <StatusBadge tone={SHIPMENT_STATUS_TONE[s.status]}>
+                      {SHIPMENT_STATUS_LABELS[s.status]}
+                    </StatusBadge>
+                  </Link>
+                ))}
+              </div>
+            )}
+            {canManage && fulfillment.status === "ready_for_handover" ? (
+              <Button size="sm" variant="outline" onClick={() => setShippingOpen(true)}>
+                Create shipment
+              </Button>
+            ) : (
+              shipments.length === 0 && (
+                <p className="text-[12px] text-muted-foreground">
+                  No shipment yet for this fulfillment.
+                </p>
+              )
+            )}
+          </FormSection>
+
+          {fulfillment.order && (
+            <ShipmentCreateDialog
+              fulfillmentId={fulfillment.id}
+              orderId={fulfillment.order.id}
+              open={shippingOpen}
+              onOpenChange={setShippingOpen}
+            />
+          )}
+
         </div>
 
         <div className="rounded border border-border bg-card p-4">
