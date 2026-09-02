@@ -10,6 +10,7 @@ import {
   Boxes,
   ListChecks,
   ShoppingCart,
+  Truck,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
