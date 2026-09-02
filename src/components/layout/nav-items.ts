@@ -48,6 +48,9 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Boxes,
     children: [
       { label: "Stock Overview", to: "/inventory" },
+      { label: "Movements", to: "/inventory/movements" },
+      { label: "Transfers", to: "/inventory/transfers" },
+      { label: "Stocktakes", to: "/inventory/stocktakes" },
       { label: "Locations", to: "/inventory/locations" },
     ],
   },

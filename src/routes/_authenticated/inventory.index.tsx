@@ -243,6 +243,7 @@ function Page() {
         item={selected}
         onClose={() => setSelected(null)}
         canManage={perms.canManage}
+        isAdmin={perms.canDelete}
       />
     </>
   );
