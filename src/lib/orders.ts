@@ -57,6 +57,9 @@ export async function getOrders(filters: OrderListFilters = {}): Promise<OrderLi
     .limit(filters.limit ?? 200);
 
   if (filters.status && filters.status !== "all") query = query.eq("status", filters.status);
+  if (filters.deliveryStatus && filters.deliveryStatus !== "all") {
+    query = query.eq("delivery_status", filters.deliveryStatus);
+  }
   if (filters.paymentStatus && filters.paymentStatus !== "all") {
     query = query.eq("payment_status", filters.paymentStatus);
   }
