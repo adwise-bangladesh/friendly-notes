@@ -210,3 +210,108 @@ export function toInventoryItem(row: InventoryLevelRow): InventoryItem {
     updatedAt: row.updated_at,
   };
 }
+
+/* ---------- Step 8: adjustments, transfers, stocktakes ---------- */
+
+export type InventoryAdjustmentReason = Enums["inventory_adjustment_reason"];
+export type InventoryTransferStatus = Enums["inventory_transfer_status"];
+export type StocktakeStatus = Enums["stocktake_status"];
+
+export type InventoryTransfer = Tables["inventory_transfers"]["Row"];
+export type InventoryTransferItem = Tables["inventory_transfer_items"]["Row"];
+export type Stocktake = Tables["stocktakes"]["Row"];
+export type StocktakeItem = Tables["stocktake_items"]["Row"];
+
+/** Movement types an operator may record by hand. Everything else is system generated. */
+export const MANUAL_MOVEMENT_TYPES = [
+  "initial",
+  "adjustment_in",
+  "adjustment_out",
+  "damage",
+  "return_in",
+  "damaged_out",
+] as const satisfies readonly InventoryMovementType[];
+
+export type ManualMovementType = (typeof MANUAL_MOVEMENT_TYPES)[number];
+
+/** `damaged_out` writes off damaged stock and is restricted to administrators. */
+export const ADMIN_ONLY_MOVEMENT_TYPES: InventoryMovementType[] = ["damaged_out"];
+
+export const ADJUSTMENT_REASONS: InventoryAdjustmentReason[] = [
+  "stock_found",
+  "stock_missing",
+  "counting_error",
+  "damage",
+  "correction",
+  "other",
+];
+
+export const ADJUSTMENT_REASON_LABELS: Record<InventoryAdjustmentReason, string> = {
+  stock_found: "Stock found",
+  stock_missing: "Stock missing",
+  counting_error: "Counting error",
+  damage: "Damage",
+  correction: "Correction",
+  other: "Other (explain in the note)",
+};
+
+export const TRANSFER_STATUS_LABELS: Record<InventoryTransferStatus, string> = {
+  draft: "Draft",
+  pending: "Pending dispatch",
+  in_transit: "In transit",
+  received: "Received",
+  cancelled: "Cancelled",
+};
+
+export const TRANSFER_STATUS_TONE: Record<
+  InventoryTransferStatus,
+  "neutral" | "info" | "warning" | "success" | "danger"
+> = {
+  draft: "neutral",
+  pending: "warning",
+  in_transit: "info",
+  received: "success",
+  cancelled: "danger",
+};
+
+export const STOCKTAKE_STATUS_LABELS: Record<StocktakeStatus, string> = {
+  draft: "Draft",
+  in_progress: "Counting",
+  completed: "Completed",
+  cancelled: "Cancelled",
+};
+
+export const STOCKTAKE_STATUS_TONE: Record<
+  StocktakeStatus,
+  "neutral" | "info" | "warning" | "success" | "danger"
+> = {
+  draft: "neutral",
+  in_progress: "info",
+  completed: "success",
+  cancelled: "danger",
+};
+
+export interface TransferItemInput {
+  productId: string | null;
+  variantId: string | null;
+  requestedQuantity: number;
+}
+
+export interface TransferWithLocations extends InventoryTransfer {
+  from_location: Pick<InventoryLocation, "id" | "name" | "code"> | null;
+  to_location: Pick<InventoryLocation, "id" | "name" | "code"> | null;
+  item_count?: number;
+}
+
+export interface StocktakeWithLocation extends Stocktake {
+  location: Pick<InventoryLocation, "id" | "name" | "code"> | null;
+}
+
+/** Rows shown in the global movement ledger. */
+export interface MovementLedgerRow extends InventoryMovement {
+  itemName: string;
+  variantTitle: string | null;
+  sku: string | null;
+  locationName: string;
+  actorName: string | null;
+}
