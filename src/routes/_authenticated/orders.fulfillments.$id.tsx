@@ -87,6 +87,7 @@ function Page() {
   const [reason, setReason] = useState("");
   const [qcItemId, setQcItemId] = useState<string | null>(null);
   const [qcNote, setQcNote] = useState("");
+  const [shippingOpen, setShippingOpen] = useState(false);
 
   const { data: fulfillment, isLoading } = useQuery({
     queryKey: ["fulfillment", id],
@@ -95,6 +96,10 @@ function Page() {
   const { data: events = [] } = useQuery({
     queryKey: ["fulfillment-events", id],
     queryFn: () => getFulfillmentEvents(id),
+  });
+  const { data: shipments = [] } = useQuery({
+    queryKey: ["fulfillment-shipments", id],
+    queryFn: () => getFulfillmentShipments(id),
   });
 
   useEffect(() => {
