@@ -1,7 +1,11 @@
 import { supabase } from "@/integrations/supabase/client";
 import type {
   Brand,
+  BrandStatus,
   Category,
+  CategoryStatus,
+  EntityVisibility,
+  ProductStatus,
   Product,
   ProductWithRelations,
 } from "@/types/commerce";
@@ -24,16 +28,16 @@ const PRODUCT_WITH_RELATIONS = `
   product_media(*)
 `;
 
-export interface ListOptions {
-  status?: string;
-  visibility?: string;
+export interface ListOptions<TStatus extends string = string> {
+  status?: TStatus;
+  visibility?: EntityVisibility;
   search?: string;
   limit?: number;
 }
 
 /* ---------- Categories ---------- */
 
-export async function getCategories(options: ListOptions = {}): Promise<Category[]> {
+export async function getCategories(options: ListOptions<CategoryStatus> = {}): Promise<Category[]> {
   let query = supabase
     .from("categories")
     .select(CATEGORY_FIELDS)
@@ -72,7 +76,7 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
 
 /* ---------- Brands ---------- */
 
-export async function getBrands(options: ListOptions = {}): Promise<Brand[]> {
+export async function getBrands(options: ListOptions<BrandStatus> = {}): Promise<Brand[]> {
   let query = supabase
     .from("brands")
     .select(BRAND_FIELDS)
@@ -111,7 +115,7 @@ export async function getBrandBySlug(slug: string): Promise<Brand | null> {
 
 /* ---------- Products ---------- */
 
-export async function getProducts(options: ListOptions = {}): Promise<Product[]> {
+export async function getProducts(options: ListOptions<ProductStatus> = {}): Promise<Product[]> {
   let query = supabase
     .from("products")
     .select(PRODUCT_FIELDS)
