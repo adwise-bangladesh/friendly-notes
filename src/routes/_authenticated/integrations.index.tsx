@@ -13,7 +13,7 @@ import {
   formatDateTime,
   webhookEndpointPath,
 } from "@/lib/integrations";
-import { getIntegrationProvider, listIntegrationProviders, PLANNED_PROVIDERS } from "@/lib/integrations-registry";
+import { listIntegrationProviders, PLANNED_PROVIDERS } from "@/lib/integrations-registry";
 import {
   INTEGRATION_CAPABILITY_LABELS,
   INTEGRATION_CATEGORY_LABELS,
@@ -222,4 +222,3 @@ function IntegrationsPage() {
   );
 }
 
-export { getIntegrationProvider };
