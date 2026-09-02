@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getVerificationQueue } from "@/lib/verification";
 import { getFulfillmentStatusCounts } from "@/lib/fulfillment-records";
+import { getShipmentStatusCounts } from "@/lib/shipping";
 import {
   AlertTriangle,
   Activity,
