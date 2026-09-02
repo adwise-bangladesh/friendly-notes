@@ -27,6 +27,9 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { FormSection } from "@/components/commerce/FormSection";
 import { MediaImage } from "@/components/commerce/MediaImage";
+import { ShipmentCreateDialog } from "@/components/orders/ShipmentCreateDialog";
+import { getFulfillmentShipments } from "@/lib/shipping";
+import { SHIPMENT_STATUS_LABELS, SHIPMENT_STATUS_TONE } from "@/types/shipping";
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import {
   getFulfillmentById,
