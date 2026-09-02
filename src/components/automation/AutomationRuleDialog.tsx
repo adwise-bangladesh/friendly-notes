@@ -126,6 +126,10 @@ export function AutomationRuleDialog({
     return (triggerDef?.fields[field] ?? "text") as AutomationFieldType;
   }
 
+  function defaultValueFor(field: string): string {
+    return fieldType(field) === "boolean" ? "true" : "";
+  }
+
   function operatorsFor(field: string): string[] {
     return registry?.operators[fieldType(field)] ?? [];
   }
@@ -286,7 +290,11 @@ export function AutomationRuleDialog({
                 onClick={() =>
                   setConditions((prev) => [
                     ...prev,
-                    { field: fields[0] ?? "", operator: operatorsFor(fields[0] ?? "")[0] ?? "", value: "" },
+                    {
+                      field: fields[0] ?? "",
+                      operator: operatorsFor(fields[0] ?? "")[0] ?? "",
+                      value: defaultValueFor(fields[0] ?? ""),
+                    },
                   ])
                 }
               >
@@ -306,7 +314,11 @@ export function AutomationRuleDialog({
                     setConditions((prev) =>
                       prev.map((c, i) =>
                         i === index
-                          ? { field, operator: operatorsFor(field)[0] ?? "", value: "" }
+                          ? {
+                              field,
+                              operator: operatorsFor(field)[0] ?? "",
+                              value: defaultValueFor(field),
+                            }
                           : c,
                       ),
                     )
