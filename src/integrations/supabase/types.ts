@@ -188,6 +188,296 @@ export type Database = {
           },
         ]
       }
+      courier_account_credentials: {
+        Row: {
+          access_token: string | null
+          account_id: string
+          client_id: string | null
+          client_secret: string | null
+          created_at: string
+          password: string | null
+          refresh_token: string | null
+          token_expires_at: string | null
+          token_refreshed_at: string | null
+          updated_at: string
+          username: string | null
+          webhook_secret: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          account_id: string
+          client_id?: string | null
+          client_secret?: string | null
+          created_at?: string
+          password?: string | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          token_refreshed_at?: string | null
+          updated_at?: string
+          username?: string | null
+          webhook_secret?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          account_id?: string
+          client_id?: string | null
+          client_secret?: string | null
+          created_at?: string
+          password?: string | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          token_refreshed_at?: string | null
+          updated_at?: string
+          username?: string | null
+          webhook_secret?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_account_credentials_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: true
+            referencedRelation: "courier_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courier_accounts: {
+        Row: {
+          base_url: string | null
+          code: string
+          created_at: string
+          created_by: string | null
+          environment: Database["public"]["Enums"]["courier_environment"]
+          external_store_id: string | null
+          id: string
+          is_default: boolean
+          name: string
+          provider_id: string
+          settings: Json
+          status: Database["public"]["Enums"]["entity_status"]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          base_url?: string | null
+          code: string
+          created_at?: string
+          created_by?: string | null
+          environment?: Database["public"]["Enums"]["courier_environment"]
+          external_store_id?: string | null
+          id?: string
+          is_default?: boolean
+          name: string
+          provider_id: string
+          settings?: Json
+          status?: Database["public"]["Enums"]["entity_status"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          base_url?: string | null
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          environment?: Database["public"]["Enums"]["courier_environment"]
+          external_store_id?: string | null
+          id?: string
+          is_default?: boolean
+          name?: string
+          provider_id?: string
+          settings?: Json
+          status?: Database["public"]["Enums"]["entity_status"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_accounts_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "courier_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courier_api_logs: {
+        Row: {
+          account_id: string | null
+          created_at: string
+          error_category: string | null
+          id: string
+          operation: string
+          provider_id: string | null
+          retryable: boolean
+          safe_message: string | null
+          shipment_id: string | null
+          status_code: number | null
+          succeeded: boolean
+        }
+        Insert: {
+          account_id?: string | null
+          created_at?: string
+          error_category?: string | null
+          id?: string
+          operation: string
+          provider_id?: string | null
+          retryable?: boolean
+          safe_message?: string | null
+          shipment_id?: string | null
+          status_code?: number | null
+          succeeded: boolean
+        }
+        Update: {
+          account_id?: string | null
+          created_at?: string
+          error_category?: string | null
+          id?: string
+          operation?: string
+          provider_id?: string | null
+          retryable?: boolean
+          safe_message?: string | null
+          shipment_id?: string | null
+          status_code?: number | null
+          succeeded?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_api_logs_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "courier_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_api_logs_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "courier_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_api_logs_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courier_locations: {
+        Row: {
+          external_id: string
+          id: string
+          kind: string
+          name: string
+          parent_external_id: string | null
+          provider_id: string
+          refreshed_at: string
+        }
+        Insert: {
+          external_id: string
+          id?: string
+          kind: string
+          name: string
+          parent_external_id?: string | null
+          provider_id: string
+          refreshed_at?: string
+        }
+        Update: {
+          external_id?: string
+          id?: string
+          kind?: string
+          name?: string
+          parent_external_id?: string | null
+          provider_id?: string
+          refreshed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_locations_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "courier_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courier_provider_events: {
+        Row: {
+          account_id: string | null
+          consignment_id: string | null
+          fingerprint: string
+          id: string
+          merchant_order_id: string | null
+          payload: Json | null
+          processing_note: string | null
+          processing_status: Database["public"]["Enums"]["courier_event_processing_status"]
+          provider_event: string | null
+          provider_event_at: string | null
+          provider_id: string | null
+          provider_status: string | null
+          received_at: string
+          shipment_id: string | null
+          source: string
+        }
+        Insert: {
+          account_id?: string | null
+          consignment_id?: string | null
+          fingerprint: string
+          id?: string
+          merchant_order_id?: string | null
+          payload?: Json | null
+          processing_note?: string | null
+          processing_status: Database["public"]["Enums"]["courier_event_processing_status"]
+          provider_event?: string | null
+          provider_event_at?: string | null
+          provider_id?: string | null
+          provider_status?: string | null
+          received_at?: string
+          shipment_id?: string | null
+          source?: string
+        }
+        Update: {
+          account_id?: string | null
+          consignment_id?: string | null
+          fingerprint?: string
+          id?: string
+          merchant_order_id?: string | null
+          payload?: Json | null
+          processing_note?: string | null
+          processing_status?: Database["public"]["Enums"]["courier_event_processing_status"]
+          provider_event?: string | null
+          provider_event_at?: string | null
+          provider_id?: string | null
+          provider_status?: string | null
+          received_at?: string
+          shipment_id?: string | null
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_provider_events_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "courier_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_provider_events_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "courier_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_provider_events_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courier_providers: {
         Row: {
           code: string
@@ -238,6 +528,51 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      courier_status_map: {
+        Row: {
+          created_at: string
+          description: string | null
+          event_type: Database["public"]["Enums"]["shipment_event_type"]
+          id: string
+          provider_event: string
+          provider_id: string
+          shipment_status: Database["public"]["Enums"]["shipment_status"] | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          event_type?: Database["public"]["Enums"]["shipment_event_type"]
+          id?: string
+          provider_event: string
+          provider_id: string
+          shipment_status?:
+            | Database["public"]["Enums"]["shipment_status"]
+            | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          event_type?: Database["public"]["Enums"]["shipment_event_type"]
+          id?: string
+          provider_event?: string
+          provider_id?: string
+          shipment_status?:
+            | Database["public"]["Enums"]["shipment_status"]
+            | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_status_map_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "courier_providers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       group_buy_campaigns: {
         Row: {
@@ -1657,8 +1992,11 @@ export type Database = {
       shipments: {
         Row: {
           booked_at: string | null
+          booked_delivery_fee: number | null
+          booking_idempotency_key: string
           cancelled_at: string | null
           cash_on_delivery_amount: number
+          courier_account_id: string | null
           created_at: string
           created_by: string | null
           declared_value: number | null
@@ -1677,15 +2015,26 @@ export type Database = {
             | null
           id: string
           internal_notes: string | null
+          last_synced_at: string | null
           notes: string | null
           order_id: string
           package_count: number
+          partial_delivery_note: string | null
           picked_up_at: string | null
           postal_code: string | null
           provider_id: string | null
+          provider_recipient_area_id: string | null
+          provider_recipient_city_id: string | null
+          provider_recipient_zone_id: string | null
           provider_reference: string | null
+          provider_status: string | null
+          provider_status_at: string | null
+          provider_status_slug: string | null
+          quoted_delivery_fee: number | null
           recipient_name: string
           recipient_phone: string
+          return_reason: string | null
+          return_tracking_number: string | null
           service_type:
             | Database["public"]["Enums"]["courier_service_type"]
             | null
@@ -1698,8 +2047,11 @@ export type Database = {
         }
         Insert: {
           booked_at?: string | null
+          booked_delivery_fee?: number | null
+          booking_idempotency_key?: string
           cancelled_at?: string | null
           cash_on_delivery_amount?: number
+          courier_account_id?: string | null
           created_at?: string
           created_by?: string | null
           declared_value?: number | null
@@ -1718,15 +2070,26 @@ export type Database = {
             | null
           id?: string
           internal_notes?: string | null
+          last_synced_at?: string | null
           notes?: string | null
           order_id: string
           package_count?: number
+          partial_delivery_note?: string | null
           picked_up_at?: string | null
           postal_code?: string | null
           provider_id?: string | null
+          provider_recipient_area_id?: string | null
+          provider_recipient_city_id?: string | null
+          provider_recipient_zone_id?: string | null
           provider_reference?: string | null
+          provider_status?: string | null
+          provider_status_at?: string | null
+          provider_status_slug?: string | null
+          quoted_delivery_fee?: number | null
           recipient_name: string
           recipient_phone: string
+          return_reason?: string | null
+          return_tracking_number?: string | null
           service_type?:
             | Database["public"]["Enums"]["courier_service_type"]
             | null
@@ -1739,8 +2102,11 @@ export type Database = {
         }
         Update: {
           booked_at?: string | null
+          booked_delivery_fee?: number | null
+          booking_idempotency_key?: string
           cancelled_at?: string | null
           cash_on_delivery_amount?: number
+          courier_account_id?: string | null
           created_at?: string
           created_by?: string | null
           declared_value?: number | null
@@ -1759,15 +2125,26 @@ export type Database = {
             | null
           id?: string
           internal_notes?: string | null
+          last_synced_at?: string | null
           notes?: string | null
           order_id?: string
           package_count?: number
+          partial_delivery_note?: string | null
           picked_up_at?: string | null
           postal_code?: string | null
           provider_id?: string | null
+          provider_recipient_area_id?: string | null
+          provider_recipient_city_id?: string | null
+          provider_recipient_zone_id?: string | null
           provider_reference?: string | null
+          provider_status?: string | null
+          provider_status_at?: string | null
+          provider_status_slug?: string | null
+          quoted_delivery_fee?: number | null
           recipient_name?: string
           recipient_phone?: string
+          return_reason?: string | null
+          return_tracking_number?: string | null
           service_type?:
             | Database["public"]["Enums"]["courier_service_type"]
             | null
@@ -1779,6 +2156,13 @@ export type Database = {
           weight?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "shipments_courier_account_id_fkey"
+            columns: ["courier_account_id"]
+            isOneToOne: false
+            referencedRelation: "courier_accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "shipments_fulfillment_id_fkey"
             columns: ["fulfillment_id"]
@@ -1931,14 +2315,18 @@ export type Database = {
       }
       assign_shipment_courier: {
         Args: {
+          _account_id?: string
           _provider_id: string
           _service_type?: Database["public"]["Enums"]["courier_service_type"]
           _shipment_id: string
         }
         Returns: {
           booked_at: string | null
+          booked_delivery_fee: number | null
+          booking_idempotency_key: string
           cancelled_at: string | null
           cash_on_delivery_amount: number
+          courier_account_id: string | null
           created_at: string
           created_by: string | null
           declared_value: number | null
@@ -1957,15 +2345,26 @@ export type Database = {
             | null
           id: string
           internal_notes: string | null
+          last_synced_at: string | null
           notes: string | null
           order_id: string
           package_count: number
+          partial_delivery_note: string | null
           picked_up_at: string | null
           postal_code: string | null
           provider_id: string | null
+          provider_recipient_area_id: string | null
+          provider_recipient_city_id: string | null
+          provider_recipient_zone_id: string | null
           provider_reference: string | null
+          provider_status: string | null
+          provider_status_at: string | null
+          provider_status_slug: string | null
+          quoted_delivery_fee: number | null
           recipient_name: string
           recipient_phone: string
+          return_reason: string | null
+          return_tracking_number: string | null
           service_type:
             | Database["public"]["Enums"]["courier_service_type"]
             | null
@@ -2205,8 +2604,11 @@ export type Database = {
         }
         Returns: {
           booked_at: string | null
+          booked_delivery_fee: number | null
+          booking_idempotency_key: string
           cancelled_at: string | null
           cash_on_delivery_amount: number
+          courier_account_id: string | null
           created_at: string
           created_by: string | null
           declared_value: number | null
@@ -2225,15 +2627,26 @@ export type Database = {
             | null
           id: string
           internal_notes: string | null
+          last_synced_at: string | null
           notes: string | null
           order_id: string
           package_count: number
+          partial_delivery_note: string | null
           picked_up_at: string | null
           postal_code: string | null
           provider_id: string | null
+          provider_recipient_area_id: string | null
+          provider_recipient_city_id: string | null
+          provider_recipient_zone_id: string | null
           provider_reference: string | null
+          provider_status: string | null
+          provider_status_at: string | null
+          provider_status_slug: string | null
+          quoted_delivery_fee: number | null
           recipient_name: string
           recipient_phone: string
+          return_reason: string | null
+          return_tracking_number: string | null
           service_type:
             | Database["public"]["Enums"]["courier_service_type"]
             | null
@@ -2286,6 +2699,41 @@ export type Database = {
         }
         Returns: boolean
       }
+      ingest_courier_event: {
+        Args: {
+          _consignment_id?: string
+          _merchant_order_id?: string
+          _payload?: Json
+          _provider_code: string
+          _provider_event: string
+          _provider_event_at?: string
+          _provider_event_id?: string
+          _source?: string
+        }
+        Returns: {
+          account_id: string | null
+          consignment_id: string | null
+          fingerprint: string
+          id: string
+          merchant_order_id: string | null
+          payload: Json | null
+          processing_note: string | null
+          processing_status: Database["public"]["Enums"]["courier_event_processing_status"]
+          provider_event: string | null
+          provider_event_at: string | null
+          provider_id: string | null
+          provider_status: string | null
+          received_at: string
+          shipment_id: string | null
+          source: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "courier_provider_events"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       log_fulfillment_event: {
         Args: {
@@ -2321,6 +2769,140 @@ export type Database = {
           ordered: number
           remaining: number
         }[]
+      }
+      record_courier_booking: {
+        Args: {
+          _consignment_id: string
+          _delivery_fee?: number
+          _provider_status?: string
+          _shipment_id: string
+          _tracking_number?: string
+        }
+        Returns: {
+          booked_at: string | null
+          booked_delivery_fee: number | null
+          booking_idempotency_key: string
+          cancelled_at: string | null
+          cash_on_delivery_amount: number
+          courier_account_id: string | null
+          created_at: string
+          created_by: string | null
+          declared_value: number | null
+          delivered_at: string | null
+          delivery_address: string
+          delivery_area: string | null
+          delivery_city: string | null
+          delivery_zone: string | null
+          external_consignment_id: string | null
+          failure_reason:
+            | Database["public"]["Enums"]["shipment_failure_reason"]
+            | null
+          fulfillment_id: string | null
+          hold_reason:
+            | Database["public"]["Enums"]["shipment_hold_reason"]
+            | null
+          id: string
+          internal_notes: string | null
+          last_synced_at: string | null
+          notes: string | null
+          order_id: string
+          package_count: number
+          partial_delivery_note: string | null
+          picked_up_at: string | null
+          postal_code: string | null
+          provider_id: string | null
+          provider_recipient_area_id: string | null
+          provider_recipient_city_id: string | null
+          provider_recipient_zone_id: string | null
+          provider_reference: string | null
+          provider_status: string | null
+          provider_status_at: string | null
+          provider_status_slug: string | null
+          quoted_delivery_fee: number | null
+          recipient_name: string
+          recipient_phone: string
+          return_reason: string | null
+          return_tracking_number: string | null
+          service_type:
+            | Database["public"]["Enums"]["courier_service_type"]
+            | null
+          shipment_number: string
+          status: Database["public"]["Enums"]["shipment_status"]
+          tracking_number: string | null
+          updated_at: string
+          updated_by: string | null
+          weight: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shipments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      record_courier_quote: {
+        Args: { _quoted_fee: number; _shipment_id: string }
+        Returns: {
+          booked_at: string | null
+          booked_delivery_fee: number | null
+          booking_idempotency_key: string
+          cancelled_at: string | null
+          cash_on_delivery_amount: number
+          courier_account_id: string | null
+          created_at: string
+          created_by: string | null
+          declared_value: number | null
+          delivered_at: string | null
+          delivery_address: string
+          delivery_area: string | null
+          delivery_city: string | null
+          delivery_zone: string | null
+          external_consignment_id: string | null
+          failure_reason:
+            | Database["public"]["Enums"]["shipment_failure_reason"]
+            | null
+          fulfillment_id: string | null
+          hold_reason:
+            | Database["public"]["Enums"]["shipment_hold_reason"]
+            | null
+          id: string
+          internal_notes: string | null
+          last_synced_at: string | null
+          notes: string | null
+          order_id: string
+          package_count: number
+          partial_delivery_note: string | null
+          picked_up_at: string | null
+          postal_code: string | null
+          provider_id: string | null
+          provider_recipient_area_id: string | null
+          provider_recipient_city_id: string | null
+          provider_recipient_zone_id: string | null
+          provider_reference: string | null
+          provider_status: string | null
+          provider_status_at: string | null
+          provider_status_slug: string | null
+          quoted_delivery_fee: number | null
+          recipient_name: string
+          recipient_phone: string
+          return_reason: string | null
+          return_tracking_number: string | null
+          service_type:
+            | Database["public"]["Enums"]["courier_service_type"]
+            | null
+          shipment_number: string
+          status: Database["public"]["Enums"]["shipment_status"]
+          tracking_number: string | null
+          updated_at: string
+          updated_by: string | null
+          weight: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shipments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       record_fulfillment_picks: {
         Args: { _fulfillment_id: string; _items: Json }
@@ -2748,20 +3330,19 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      set_shipment_state: {
+      set_shipment_return_tracking: {
         Args: {
-          _action: string
-          _external_consignment_id?: string
-          _failure_reason?: Database["public"]["Enums"]["shipment_failure_reason"]
-          _hold_reason?: Database["public"]["Enums"]["shipment_hold_reason"]
-          _reason?: string
+          _return_reason?: string
+          _return_tracking_number: string
           _shipment_id: string
-          _tracking_number?: string
         }
         Returns: {
           booked_at: string | null
+          booked_delivery_fee: number | null
+          booking_idempotency_key: string
           cancelled_at: string | null
           cash_on_delivery_amount: number
+          courier_account_id: string | null
           created_at: string
           created_by: string | null
           declared_value: number | null
@@ -2780,15 +3361,98 @@ export type Database = {
             | null
           id: string
           internal_notes: string | null
+          last_synced_at: string | null
           notes: string | null
           order_id: string
           package_count: number
+          partial_delivery_note: string | null
           picked_up_at: string | null
           postal_code: string | null
           provider_id: string | null
+          provider_recipient_area_id: string | null
+          provider_recipient_city_id: string | null
+          provider_recipient_zone_id: string | null
           provider_reference: string | null
+          provider_status: string | null
+          provider_status_at: string | null
+          provider_status_slug: string | null
+          quoted_delivery_fee: number | null
           recipient_name: string
           recipient_phone: string
+          return_reason: string | null
+          return_tracking_number: string | null
+          service_type:
+            | Database["public"]["Enums"]["courier_service_type"]
+            | null
+          shipment_number: string
+          status: Database["public"]["Enums"]["shipment_status"]
+          tracking_number: string | null
+          updated_at: string
+          updated_by: string | null
+          weight: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shipments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_shipment_state: {
+        Args: {
+          _action: string
+          _external_consignment_id?: string
+          _failure_reason?: Database["public"]["Enums"]["shipment_failure_reason"]
+          _hold_reason?: Database["public"]["Enums"]["shipment_hold_reason"]
+          _reason?: string
+          _shipment_id: string
+          _tracking_number?: string
+        }
+        Returns: {
+          booked_at: string | null
+          booked_delivery_fee: number | null
+          booking_idempotency_key: string
+          cancelled_at: string | null
+          cash_on_delivery_amount: number
+          courier_account_id: string | null
+          created_at: string
+          created_by: string | null
+          declared_value: number | null
+          delivered_at: string | null
+          delivery_address: string
+          delivery_area: string | null
+          delivery_city: string | null
+          delivery_zone: string | null
+          external_consignment_id: string | null
+          failure_reason:
+            | Database["public"]["Enums"]["shipment_failure_reason"]
+            | null
+          fulfillment_id: string | null
+          hold_reason:
+            | Database["public"]["Enums"]["shipment_hold_reason"]
+            | null
+          id: string
+          internal_notes: string | null
+          last_synced_at: string | null
+          notes: string | null
+          order_id: string
+          package_count: number
+          partial_delivery_note: string | null
+          picked_up_at: string | null
+          postal_code: string | null
+          provider_id: string | null
+          provider_recipient_area_id: string | null
+          provider_recipient_city_id: string | null
+          provider_recipient_zone_id: string | null
+          provider_reference: string | null
+          provider_status: string | null
+          provider_status_at: string | null
+          provider_status_slug: string | null
+          quoted_delivery_fee: number | null
+          recipient_name: string
+          recipient_phone: string
+          return_reason: string | null
+          return_tracking_number: string | null
           service_type:
             | Database["public"]["Enums"]["courier_service_type"]
             | null
@@ -2881,8 +3545,11 @@ export type Database = {
         }
         Returns: {
           booked_at: string | null
+          booked_delivery_fee: number | null
+          booking_idempotency_key: string
           cancelled_at: string | null
           cash_on_delivery_amount: number
+          courier_account_id: string | null
           created_at: string
           created_by: string | null
           declared_value: number | null
@@ -2901,15 +3568,26 @@ export type Database = {
             | null
           id: string
           internal_notes: string | null
+          last_synced_at: string | null
           notes: string | null
           order_id: string
           package_count: number
+          partial_delivery_note: string | null
           picked_up_at: string | null
           postal_code: string | null
           provider_id: string | null
+          provider_recipient_area_id: string | null
+          provider_recipient_city_id: string | null
+          provider_recipient_zone_id: string | null
           provider_reference: string | null
+          provider_status: string | null
+          provider_status_at: string | null
+          provider_status_slug: string | null
+          quoted_delivery_fee: number | null
           recipient_name: string
           recipient_phone: string
+          return_reason: string | null
+          return_tracking_number: string | null
           service_type:
             | Database["public"]["Enums"]["courier_service_type"]
             | null
@@ -2939,6 +3617,14 @@ export type Database = {
     Enums: {
       app_role: "owner" | "admin" | "staff" | "viewer"
       brand_type: "standard" | "own_brand" | "generic"
+      courier_environment: "sandbox" | "production"
+      courier_event_processing_status:
+        | "applied"
+        | "recorded"
+        | "duplicate"
+        | "stale"
+        | "unmatched"
+        | "rejected"
       courier_provider_status: "active" | "inactive" | "disabled"
       courier_service_type:
         | "standard"
@@ -3071,6 +3757,12 @@ export type Database = {
         | "shipment_lost"
         | "shipment_cancelled"
         | "courier_assigned"
+        | "provider_event"
+        | "status_refreshed"
+        | "booking_failed"
+        | "partial_delivery"
+        | "pickup_failed"
+        | "return_created"
       shipment_failure_reason:
         | "customer_unreachable"
         | "customer_refused"
@@ -3090,13 +3782,16 @@ export type Database = {
         | "draft"
         | "ready_for_booking"
         | "booking_requested"
+        | "booking_failed"
         | "booked"
         | "pickup_requested"
+        | "pickup_failed"
         | "picked_up"
         | "in_transit"
         | "out_for_delivery"
         | "delivery_on_hold"
         | "delivered"
+        | "partial_delivered"
         | "delivery_failed"
         | "return_requested"
         | "return_in_transit"
@@ -3270,6 +3965,15 @@ export const Constants = {
     Enums: {
       app_role: ["owner", "admin", "staff", "viewer"],
       brand_type: ["standard", "own_brand", "generic"],
+      courier_environment: ["sandbox", "production"],
+      courier_event_processing_status: [
+        "applied",
+        "recorded",
+        "duplicate",
+        "stale",
+        "unmatched",
+        "rejected",
+      ],
       courier_provider_status: ["active", "inactive", "disabled"],
       courier_service_type: [
         "standard",
@@ -3413,6 +4117,12 @@ export const Constants = {
         "shipment_lost",
         "shipment_cancelled",
         "courier_assigned",
+        "provider_event",
+        "status_refreshed",
+        "booking_failed",
+        "partial_delivery",
+        "pickup_failed",
+        "return_created",
       ],
       shipment_failure_reason: [
         "customer_unreachable",
@@ -3435,13 +4145,16 @@ export const Constants = {
         "draft",
         "ready_for_booking",
         "booking_requested",
+        "booking_failed",
         "booked",
         "pickup_requested",
+        "pickup_failed",
         "picked_up",
         "in_transit",
         "out_for_delivery",
         "delivery_on_hold",
         "delivered",
+        "partial_delivered",
         "delivery_failed",
         "return_requested",
         "return_in_transit",

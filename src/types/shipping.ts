@@ -10,6 +10,10 @@ export type Shipment = Tables["shipments"]["Row"];
 export type ShipmentItem = Tables["shipment_items"]["Row"];
 export type ShipmentEvent = Tables["shipment_events"]["Row"];
 export type CourierProvider = Tables["courier_providers"]["Row"];
+export type CourierAccount = Tables["courier_accounts"]["Row"];
+export type CourierProviderEvent = Tables["courier_provider_events"]["Row"];
+export type CourierApiLog = Tables["courier_api_logs"]["Row"];
+export type CourierEnvironment = Enums["courier_environment"];
 
 /* ---------- Enums ---------- */
 
@@ -26,13 +30,16 @@ export const SHIPMENT_STATUSES: ShipmentStatus[] = [
   "draft",
   "ready_for_booking",
   "booking_requested",
+  "booking_failed",
   "booked",
   "pickup_requested",
+  "pickup_failed",
   "picked_up",
   "in_transit",
   "out_for_delivery",
   "delivery_on_hold",
   "delivered",
+  "partial_delivered",
   "delivery_failed",
   "return_requested",
   "return_in_transit",
@@ -46,8 +53,10 @@ export const ACTIVE_SHIPMENT_STATUSES: ShipmentStatus[] = [
   "draft",
   "ready_for_booking",
   "booking_requested",
+  "booking_failed",
   "booked",
   "pickup_requested",
+  "pickup_failed",
   "picked_up",
   "in_transit",
   "out_for_delivery",
@@ -79,6 +88,9 @@ export const SHIPMENT_STATUS_LABELS: Record<ShipmentStatus, string> = {
   return_requested: "Return requested",
   return_in_transit: "Return in transit",
   return_received: "Return received",
+  partial_delivered: "Partially delivered",
+  pickup_failed: "Pickup failed",
+  booking_failed: "Booking failed",
   lost: "Lost",
   cancelled: "Cancelled",
 };
@@ -98,6 +110,10 @@ export const SHIPMENT_STATUS_MEANINGS: Record<ShipmentStatus, string> = {
   return_requested: "The shipment is entering the return-to-sender process.",
   return_in_transit: "The package is moving back toward the merchant.",
   return_received: "The merchant physically received the returned shipment. No restocking yet.",
+  partial_delivered:
+    "The customer accepted part of the shipment. The rejected part still needs return handling.",
+  pickup_failed: "The courier did not collect the package. The shipment stays operationally active.",
+  booking_failed: "The courier booking attempt failed. Nothing was handed over.",
   lost: "The courier reports the shipment as lost. History is preserved.",
   cancelled: "The shipment workflow was cancelled before pickup.",
 };
@@ -117,6 +133,9 @@ export const SHIPMENT_STATUS_TONE: Record<ShipmentStatus, StatusTone> = {
   return_requested: "warning",
   return_in_transit: "warning",
   return_received: "neutral",
+  partial_delivered: "warning",
+  pickup_failed: "warning",
+  booking_failed: "danger",
   lost: "danger",
   cancelled: "neutral",
 };
@@ -204,6 +223,12 @@ export const SHIPMENT_EVENT_LABELS: Record<ShipmentEventType, string> = {
   return_received: "Return received",
   shipment_lost: "Reported lost",
   shipment_cancelled: "Shipment cancelled",
+  provider_event: "Courier event",
+  status_refreshed: "Courier status refreshed",
+  booking_failed: "Booking failed",
+  partial_delivery: "Partial delivery",
+  pickup_failed: "Pickup failed",
+  return_created: "Return created",
 };
 
 /* ---------- Actions (UI affordance only; the database is the authority) ---------- */
@@ -212,13 +237,17 @@ export type ShipmentAction =
   | "mark_ready_for_booking"
   | "request_booking"
   | "revert_booking_request"
+  | "mark_booking_failed"
+  | "retry_booking"
   | "confirm_booking"
   | "request_pickup"
+  | "mark_pickup_failed"
   | "mark_picked_up"
   | "mark_in_transit"
   | "mark_out_for_delivery"
   | "hold_delivery"
   | "mark_delivered"
+  | "mark_partial_delivered"
   | "mark_delivery_failed"
   | "start_return"
   | "mark_return_in_transit"
@@ -230,13 +259,17 @@ export const SHIPMENT_ACTION_LABELS: Record<ShipmentAction, string> = {
   mark_ready_for_booking: "Mark ready for booking",
   request_booking: "Request booking",
   revert_booking_request: "Withdraw booking request",
+  mark_booking_failed: "Mark booking failed",
+  retry_booking: "Reset for another booking attempt",
   confirm_booking: "Confirm booking",
   request_pickup: "Request pickup",
+  mark_pickup_failed: "Mark pickup failed",
   mark_picked_up: "Mark picked up",
   mark_in_transit: "Mark in transit",
   mark_out_for_delivery: "Mark out for delivery",
   hold_delivery: "Put delivery on hold",
   mark_delivered: "Mark delivered",
+  mark_partial_delivered: "Mark partially delivered",
   mark_delivery_failed: "Mark delivery failed",
   start_return: "Start return",
   mark_return_in_transit: "Mark return in transit",
@@ -251,29 +284,43 @@ export function availableShipmentActions(status: ShipmentStatus): ShipmentAction
     case "draft":
       return ["mark_ready_for_booking", "cancel"];
     case "ready_for_booking":
-      return ["request_booking", "cancel"];
+      return ["request_booking", "confirm_booking", "mark_booking_failed", "cancel"];
     case "booking_requested":
-      return ["confirm_booking", "revert_booking_request", "cancel"];
+      return ["confirm_booking", "mark_booking_failed", "revert_booking_request", "cancel"];
+    case "booking_failed":
+      return ["retry_booking", "cancel"];
     case "booked":
-      return ["request_pickup", "mark_picked_up", "cancel"];
+      return ["request_pickup", "mark_picked_up", "mark_pickup_failed", "cancel"];
     case "pickup_requested":
-      return ["mark_picked_up", "cancel"];
+      return ["mark_picked_up", "mark_pickup_failed", "cancel"];
+    case "pickup_failed":
+      return ["request_pickup", "mark_picked_up", "cancel"];
     case "picked_up":
-      return ["mark_in_transit", "mark_lost"];
+      return ["mark_in_transit", "mark_out_for_delivery", "hold_delivery", "mark_lost"];
     case "in_transit":
       return ["mark_out_for_delivery", "hold_delivery", "start_return", "mark_lost"];
     case "out_for_delivery":
       return [
         "mark_delivered",
+        "mark_partial_delivered",
         "hold_delivery",
         "mark_delivery_failed",
         "start_return",
         "mark_lost",
       ];
     case "delivery_on_hold":
-      return ["mark_out_for_delivery", "mark_delivery_failed", "start_return", "mark_lost"];
+      return [
+        "mark_out_for_delivery",
+        "mark_delivered",
+        "mark_partial_delivered",
+        "mark_delivery_failed",
+        "start_return",
+        "mark_lost",
+      ];
     case "delivery_failed":
-      return ["mark_out_for_delivery", "start_return", "mark_lost"];
+      return ["mark_out_for_delivery", "hold_delivery", "start_return", "mark_lost"];
+    case "partial_delivered":
+      return ["start_return", "mark_return_in_transit", "mark_return_received", "mark_lost"];
     case "return_requested":
       return ["mark_return_in_transit", "mark_lost"];
     case "return_in_transit":
@@ -285,7 +332,12 @@ export function availableShipmentActions(status: ShipmentStatus): ShipmentAction
 
 export const HOLD_REASON_ACTIONS: ShipmentAction[] = ["hold_delivery"];
 export const FAILURE_REASON_ACTIONS: ShipmentAction[] = ["mark_delivery_failed"];
-export const FREE_TEXT_REASON_ACTIONS: ShipmentAction[] = ["mark_lost"];
+export const FREE_TEXT_REASON_ACTIONS: ShipmentAction[] = [
+  "mark_lost",
+  "mark_booking_failed",
+  "mark_pickup_failed",
+  "mark_partial_delivered",
+];
 
 /* ---------- Composed read shapes ---------- */
 
@@ -308,6 +360,7 @@ export interface ShipmentSummary {
 
 export interface ShipmentWithDetails extends Shipment {
   provider: { id: string; name: string; code: string; status: CourierProviderStatus } | null;
+  account: { id: string; name: string; code: string; environment: CourierEnvironment } | null;
   order: {
     id: string;
     order_number: string;

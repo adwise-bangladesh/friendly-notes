@@ -30,12 +30,20 @@ import { useCommercePermissions } from "@/hooks/use-permissions";
 import { formatMoney } from "@/lib/currency";
 import {
   assignShipmentCourier,
+  getCourierAccounts,
   getCourierProviders,
+  getShipmentCourierEvents,
   getShipmentById,
   getShipmentEvents,
   setShipmentState,
   updateShipmentDetails,
 } from "@/lib/shipping";
+import {
+  bookShipmentWithCourier,
+  quoteShipmentDeliveryFee,
+  refreshShipmentCourierStatus,
+} from "@/lib/couriers.functions";
+import { useServerFn } from "@tanstack/react-start";
 import {
   COURIER_SERVICE_TYPE_LABELS,
   FAILURE_REASON_ACTIONS,
@@ -89,6 +97,7 @@ function Page() {
   const [consignment, setConsignment] = useState("");
 
   const [providerId, setProviderId] = useState("");
+  const [accountId, setAccountId] = useState("");
   const [serviceType, setServiceType] = useState<CourierServiceType | "">("");
   const [cod, setCod] = useState("");
   const [declaredValue, setDeclaredValue] = useState("");
@@ -112,9 +121,21 @@ function Page() {
     queryFn: () => getCourierProviders(true),
   });
 
+  const { data: accounts = [] } = useQuery({
+    queryKey: ["courier-accounts", providerId],
+    queryFn: () => getCourierAccounts(providerId),
+    enabled: Boolean(providerId),
+  });
+
+  const { data: courierEvents = [] } = useQuery({
+    queryKey: ["shipment-courier-events", id],
+    queryFn: () => getShipmentCourierEvents(id),
+  });
+
   useEffect(() => {
     if (!shipment) return;
     setProviderId(shipment.provider_id ?? "");
+    setAccountId(shipment.courier_account_id ?? "");
     setServiceType(shipment.service_type ?? "");
     setCod(String(shipment.cash_on_delivery_amount ?? 0));
     setDeclaredValue(shipment.declared_value == null ? "" : String(shipment.declared_value));
@@ -128,6 +149,7 @@ function Page() {
     queryClient.invalidateQueries({ queryKey: ["shipment", id] });
     queryClient.invalidateQueries({ queryKey: ["shipment-events", id] });
     queryClient.invalidateQueries({ queryKey: ["shipment-queue"] });
+    queryClient.invalidateQueries({ queryKey: ["shipment-courier-events", id] });
     if (shipment?.order_id) {
       queryClient.invalidateQueries({ queryKey: ["order-shipments", shipment.order_id] });
     }
@@ -163,9 +185,32 @@ function Page() {
         shipmentId: id,
         providerId,
         serviceType: serviceType || null,
+        accountId: accountId || null,
       }),
     onSuccess: () => {
       toast.success("Courier assigned");
+      invalidate();
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const bookFn = useServerFn(bookShipmentWithCourier);
+  const refreshFn = useServerFn(refreshShipmentCourierStatus);
+  const quoteFn = useServerFn(quoteShipmentDeliveryFee);
+
+  /**
+   * Courier API actions. Each one is safe to press twice: booking is guarded by
+   * an existing consignment, status refresh runs through the same idempotent
+   * ingestion path as a webhook.
+   */
+  const apiMutation = useMutation({
+    mutationFn: async (kind: "book" | "refresh" | "quote") => {
+      if (kind === "book") return bookFn({ data: { shipmentId: id } });
+      if (kind === "refresh") return refreshFn({ data: { shipmentId: id } });
+      return quoteFn({ data: { shipmentId: id } });
+    },
+    onSuccess: (result) => {
+      toast.success(result.message);
       invalidate();
     },
     onError: (error: Error) => toast.error(error.message),
@@ -301,7 +346,7 @@ function Page() {
 
           <FormSection
             title="Courier"
-            description="Provider choice is operational only. No credentials are stored and no courier API is called."
+            description="Pick the courier and the account that will carry this shipment. Credentials stay on the server; the browser never sees them."
           >
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-1">
@@ -346,6 +391,35 @@ function Page() {
                 </Select>
               </div>
             </div>
+            <div className="mt-3 space-y-1">
+              <label className="text-[11px] font-medium text-muted-foreground">Account</label>
+              <Select
+                value={accountId}
+                onValueChange={setAccountId}
+                disabled={!canManage || !providerId || accounts.length === 0}
+              >
+                <SelectTrigger className="h-8 text-[13px]">
+                  <SelectValue
+                    placeholder={
+                      providerId && accounts.length === 0
+                        ? "No account configured — manual courier"
+                        : "Not assigned"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {accounts.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.name} · {a.environment}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-muted-foreground">
+                Without an account this courier is handled manually: the workflow is identical, only
+                the automated actions are unavailable.
+              </p>
+            </div>
             {canManage && (
               <Button
                 size="sm"
@@ -356,6 +430,101 @@ function Page() {
                 <Save className="mr-1 h-3.5 w-3.5" />
                 Save courier
               </Button>
+            )}
+          </FormSection>
+
+          <FormSection
+            title="Courier integration"
+            description="What the courier last told us. The internal status above always stays the source of truth."
+          >
+            <dl className="grid gap-3 text-[13px] sm:grid-cols-2">
+              <div>
+                <dt className="text-[11px] text-muted-foreground">Consignment</dt>
+                <dd className="tabular-nums">{shipment.external_consignment_id ?? "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-[11px] text-muted-foreground">Courier status</dt>
+                <dd>{shipment.provider_status ?? "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-[11px] text-muted-foreground">Last synced</dt>
+                <dd>
+                  {shipment.last_synced_at
+                    ? new Date(shipment.last_synced_at).toLocaleString()
+                    : "Never"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-[11px] text-muted-foreground">Delivery fee</dt>
+                <dd className="tabular-nums">
+                  {shipment.booked_delivery_fee != null
+                    ? `${formatMoney(shipment.booked_delivery_fee)} booked`
+                    : shipment.quoted_delivery_fee != null
+                      ? `${formatMoney(shipment.quoted_delivery_fee)} quoted`
+                      : "—"}
+                </dd>
+              </div>
+              {shipment.return_tracking_number && (
+                <div>
+                  <dt className="text-[11px] text-muted-foreground">Return tracking</dt>
+                  <dd className="tabular-nums">{shipment.return_tracking_number}</dd>
+                </div>
+              )}
+            </dl>
+
+            {canManage && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => apiMutation.mutate("quote")}
+                  disabled={apiMutation.isPending || !shipment.courier_account_id}
+                >
+                  Get quote
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => apiMutation.mutate("book")}
+                  disabled={
+                    apiMutation.isPending ||
+                    !shipment.courier_account_id ||
+                    Boolean(shipment.external_consignment_id)
+                  }
+                >
+                  Book with courier
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => apiMutation.mutate("refresh")}
+                  disabled={apiMutation.isPending || !shipment.external_consignment_id}
+                >
+                  Refresh status
+                </Button>
+              </div>
+            )}
+
+            {courierEvents.length > 0 && (
+              <div className="mt-4 space-y-1">
+                <p className="text-[11px] font-medium text-muted-foreground">
+                  Courier messages received
+                </p>
+                {courierEvents.map((event) => (
+                  <div
+                    key={event.id}
+                    className="flex items-center justify-between gap-3 rounded border border-border px-3 py-1.5 text-[12px]"
+                  >
+                    <span className="truncate">
+                      {event.provider_event}
+                      <span className="ml-2 text-muted-foreground">{event.processing_status}</span>
+                    </span>
+                    <span className="shrink-0 text-[11px] text-muted-foreground">
+                      {new Date(event.received_at).toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
             )}
           </FormSection>
 
