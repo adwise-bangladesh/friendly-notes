@@ -2,6 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
 import type { ProductType } from "@/types/commerce";
 import type {
+  DeliveryStatus,
   Order,
   OrderListRow,
   OrderNote,
