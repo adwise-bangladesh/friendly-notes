@@ -18,5 +18,14 @@ export default defineMcp({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated",
   }),
-  tools: [listProducts, getProduct, listOrders, getOrder, addOrderNote, inventoryOverview],
+  // Cast: the SDK's tool type requires `outputSchema` under
+  // exactOptionalPropertyTypes; these tools intentionally omit it.
+  tools: [
+    listProducts,
+    getProduct,
+    listOrders,
+    getOrder,
+    addOrderNote,
+    inventoryOverview,
+  ] as unknown as Parameters<typeof defineMcp>[0]["tools"],
 });
