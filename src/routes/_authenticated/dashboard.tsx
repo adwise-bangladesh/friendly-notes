@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getVerificationQueue } from "@/lib/verification";
 import { getFulfillmentStatusCounts } from "@/lib/fulfillment-records";
+import { getShipmentStatusCounts } from "@/lib/shipping";
 import {
   AlertTriangle,
   Activity,
@@ -9,6 +10,7 @@ import {
   Boxes,
   ListChecks,
   ShoppingCart,
+  Truck,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -143,6 +145,62 @@ function ProcessingQueue() {
   );
 }
 
+/** Live shipping desk counts from real shipment records. */
+function ShippingQueue() {
+  const { data: counts, isLoading } = useQuery({
+    queryKey: ["shipment-status-counts", "dashboard"],
+    queryFn: () => getShipmentStatusCounts(),
+  });
+
+  if (isLoading) {
+    return <p className="px-3 py-3 text-[12.5px] text-muted-foreground">Loading…</p>;
+  }
+  const total = Object.values(counts ?? {}).reduce<number>((sum, n) => sum + (n ?? 0), 0);
+  if (total === 0) {
+    return (
+      <EmptyState
+        compact
+        title="Nothing shipping"
+        description="Shipments appear here once a packed fulfillment is handed to a courier."
+      />
+    );
+  }
+
+  const stats = [
+    {
+      label: "Awaiting booking",
+      value: (counts?.draft ?? 0) + (counts?.ready_for_booking ?? 0) + (counts?.booking_requested ?? 0),
+    },
+    { label: "Awaiting pickup", value: (counts?.booked ?? 0) + (counts?.pickup_requested ?? 0) },
+    {
+      label: "In transit",
+      value: (counts?.picked_up ?? 0) + (counts?.in_transit ?? 0) + (counts?.out_for_delivery ?? 0),
+    },
+    {
+      label: "Delivery problems",
+      value: (counts?.delivery_on_hold ?? 0) + (counts?.delivery_failed ?? 0),
+    },
+    {
+      label: "Returning",
+      value: (counts?.return_requested ?? 0) + (counts?.return_in_transit ?? 0),
+    },
+  ];
+
+  return (
+    <ul className="divide-y divide-border">
+      {stats.map((s) => (
+        <li key={s.label} className="flex items-center justify-between px-3 py-2 text-[13px]">
+          <Link to="/orders/shipments" className="text-muted-foreground hover:text-foreground">
+            {s.label}
+          </Link>
+          <span className="font-semibold tabular-nums">{s.value}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+
 
 function DashboardPage() {
   const { data: profile } = useProfile();
@@ -171,6 +229,9 @@ function DashboardPage() {
         </Panel>
         <Panel title="Processing Queue" icon={ListChecks}>
           <ProcessingQueue />
+        </Panel>
+        <Panel title="Shipping Desk" icon={Truck}>
+          <ShippingQueue />
         </Panel>
         <Panel title="Low Stock" icon={Boxes}>
           <EmptyState

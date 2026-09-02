@@ -27,6 +27,9 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { FormSection } from "@/components/commerce/FormSection";
 import { MediaImage } from "@/components/commerce/MediaImage";
+import { ShipmentCreateDialog } from "@/components/orders/ShipmentCreateDialog";
+import { getFulfillmentShipments } from "@/lib/shipping";
+import { SHIPMENT_STATUS_LABELS, SHIPMENT_STATUS_TONE } from "@/types/shipping";
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import {
   getFulfillmentById,
@@ -87,6 +90,7 @@ function Page() {
   const [reason, setReason] = useState("");
   const [qcItemId, setQcItemId] = useState<string | null>(null);
   const [qcNote, setQcNote] = useState("");
+  const [shippingOpen, setShippingOpen] = useState(false);
 
   const { data: fulfillment, isLoading } = useQuery({
     queryKey: ["fulfillment", id],
@@ -95,6 +99,10 @@ function Page() {
   const { data: events = [] } = useQuery({
     queryKey: ["fulfillment-events", id],
     queryFn: () => getFulfillmentEvents(id),
+  });
+  const { data: shipments = [] } = useQuery({
+    queryKey: ["fulfillment-shipments", id],
+    queryFn: () => getFulfillmentShipments(id),
   });
 
   useEffect(() => {
@@ -397,6 +405,50 @@ function Page() {
               <p className="text-[13px]">{fulfillment.notes}</p>
             </FormSection>
           )}
+
+          <FormSection
+            title="Shipping"
+            description="A shipment can be created once this fulfillment is ready for handover."
+          >
+            {shipments.length > 0 && (
+              <div className="mb-3 space-y-2">
+                {shipments.map((s) => (
+                  <Link
+                    key={s.id}
+                    to="/orders/shipments/$id"
+                    params={{ id: s.id }}
+                    className="flex items-center justify-between gap-3 rounded border border-border px-3 py-2 hover:bg-accent/50"
+                  >
+                    <span className="text-[13px] font-medium">{s.shipment_number}</span>
+                    <StatusBadge tone={SHIPMENT_STATUS_TONE[s.status]}>
+                      {SHIPMENT_STATUS_LABELS[s.status]}
+                    </StatusBadge>
+                  </Link>
+                ))}
+              </div>
+            )}
+            {canManage && fulfillment.status === "ready_for_handover" ? (
+              <Button size="sm" variant="outline" onClick={() => setShippingOpen(true)}>
+                Create shipment
+              </Button>
+            ) : (
+              shipments.length === 0 && (
+                <p className="text-[12px] text-muted-foreground">
+                  No shipment yet for this fulfillment.
+                </p>
+              )
+            )}
+          </FormSection>
+
+          {fulfillment.order && (
+            <ShipmentCreateDialog
+              fulfillmentId={fulfillment.id}
+              orderId={fulfillment.order.id}
+              open={shippingOpen}
+              onOpenChange={setShippingOpen}
+            />
+          )}
+
         </div>
 
         <div className="rounded border border-border bg-card p-4">
