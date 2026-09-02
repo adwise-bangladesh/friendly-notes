@@ -31,6 +31,7 @@ import { Route as AuthenticatedProductsIdRouteImport } from './routes/_authentic
 import { Route as AuthenticatedProductsBrandsRouteImport } from './routes/_authenticated/products.brands'
 import { Route as AuthenticatedProductsCategoriesRouteImport } from './routes/_authenticated/products.categories'
 import { Route as AuthenticatedProductsNewRouteImport } from './routes/_authenticated/products.new'
+import { Route as AuthenticatedOrdersFulfillmentsIdRouteImport } from './routes/_authenticated/orders.fulfillments.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -151,6 +152,12 @@ const AuthenticatedProductsNewRoute =
     path: '/products/new',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedOrdersFulfillmentsIdRoute =
+  AuthenticatedOrdersFulfillmentsIdRouteImport.update({
+    id: '/orders/fulfillments/$id',
+    path: '/orders/fulfillments/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -174,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/inventory/': typeof AuthenticatedInventoryIndexRoute
   '/orders/': typeof AuthenticatedOrdersIndexRoute
   '/products/': typeof AuthenticatedProductsIndexRoute
+  '/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -197,6 +205,7 @@ export interface FileRoutesByTo {
   '/inventory': typeof AuthenticatedInventoryIndexRoute
   '/orders': typeof AuthenticatedOrdersIndexRoute
   '/products': typeof AuthenticatedProductsIndexRoute
+  '/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -222,6 +231,7 @@ export interface FileRoutesById {
   '/_authenticated/inventory/': typeof AuthenticatedInventoryIndexRoute
   '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
   '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
+  '/_authenticated/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -247,6 +257,7 @@ export interface FileRouteTypes {
     | '/inventory/'
     | '/orders/'
     | '/products/'
+    | '/orders/fulfillments/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -270,6 +281,7 @@ export interface FileRouteTypes {
     | '/inventory'
     | '/orders'
     | '/products'
+    | '/orders/fulfillments/$id'
   id:
     | '__root__'
     | '/'
@@ -294,6 +306,7 @@ export interface FileRouteTypes {
     | '/_authenticated/inventory/'
     | '/_authenticated/orders/'
     | '/_authenticated/products/'
+    | '/_authenticated/orders/fulfillments/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -461,6 +474,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProductsNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/orders/fulfillments/$id': {
+      id: '/_authenticated/orders/fulfillments/$id'
+      path: '/orders/fulfillments/$id'
+      fullPath: '/orders/fulfillments/$id'
+      preLoaderRoute: typeof AuthenticatedOrdersFulfillmentsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -481,6 +501,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInventoryIndexRoute: typeof AuthenticatedInventoryIndexRoute
   AuthenticatedOrdersIndexRoute: typeof AuthenticatedOrdersIndexRoute
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
+  AuthenticatedOrdersFulfillmentsIdRoute: typeof AuthenticatedOrdersFulfillmentsIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -500,6 +521,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedInventoryIndexRoute: AuthenticatedInventoryIndexRoute,
   AuthenticatedOrdersIndexRoute: AuthenticatedOrdersIndexRoute,
   AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
+  AuthenticatedOrdersFulfillmentsIdRoute:
+    AuthenticatedOrdersFulfillmentsIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

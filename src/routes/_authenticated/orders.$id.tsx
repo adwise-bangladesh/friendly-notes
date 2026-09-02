@@ -14,6 +14,8 @@ import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { FormSection } from "@/components/commerce/FormSection";
 import { VerificationPanel } from "@/components/orders/VerificationPanel";
 import { FulfillmentPanel } from "@/components/orders/FulfillmentPanel";
+import { OrderFulfillmentsPanel } from "@/components/orders/OrderFulfillmentsPanel";
+
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import { formatMoney } from "@/lib/currency";
 import { addOrderNote, cancelOrder, getOrderById } from "@/lib/orders";
@@ -248,6 +250,9 @@ function Page() {
           <VerificationPanel order={order} canManage={canManage} />
 
           <FulfillmentPanel order={order} canManage={canManage} />
+
+          <OrderFulfillmentsPanel order={order} canManage={canManage} />
+
 
           <FormSection title="Notes" description="Append-only timeline.">
             <ol className="space-y-2">

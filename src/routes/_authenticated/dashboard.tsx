@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getVerificationQueue } from "@/lib/verification";
-import { getFulfillmentQueue } from "@/lib/fulfillment";
-import { FULFILLMENT_STATUS_LABELS } from "@/types/fulfillment";
+import { getFulfillmentStatusCounts } from "@/lib/fulfillment-records";
 import {
   AlertTriangle,
   Activity,
@@ -101,30 +100,34 @@ function VerificationAttention() {
   );
 }
 
-/** Live warehouse counts — pick / pack / hold work waiting right now. */
+/** Live warehouse counts from real fulfillment records. */
 function ProcessingQueue() {
-  const { data: rows, isLoading } = useQuery({
-    queryKey: ["fulfillment-queue", "dashboard"],
-    queryFn: () => getFulfillmentQueue({ limit: 500 }),
+  const { data: counts, isLoading } = useQuery({
+    queryKey: ["fulfillment-status-counts", "dashboard"],
+    queryFn: () => getFulfillmentStatusCounts(),
   });
 
   if (isLoading) {
     return <p className="px-3 py-3 text-[12.5px] text-muted-foreground">Loading…</p>;
   }
-  if (!rows || rows.length === 0) {
+  const total = Object.values(counts ?? {}).reduce<number>((sum, n) => sum + (n ?? 0), 0);
+  if (total === 0) {
     return (
       <EmptyState
         compact
         title="Queue empty"
-        description="Confirmed orders with stock held appear here for picking and packing."
+        description="Fulfillments created from confirmed orders appear here for picking and packing."
       />
     );
   }
 
-  const stats = (["ready", "picking", "packing", "packed", "on_hold"] as const).map((s) => ({
-    label: FULFILLMENT_STATUS_LABELS[s],
-    value: rows.filter((r) => r.fulfillment_status === s).length,
-  }));
+  const stats = [
+    { label: "Ready to pick", value: counts?.ready_to_pick ?? 0 },
+    { label: "Currently picking", value: counts?.picking ?? 0 },
+    { label: "QC attention", value: (counts?.qc_pending ?? 0) + (counts?.qc_failed ?? 0) },
+    { label: "Ready for handover", value: counts?.packed ?? 0 },
+    { label: "On hold", value: counts?.on_hold ?? 0 },
+  ];
 
   return (
     <ul className="divide-y divide-border">
@@ -139,6 +142,7 @@ function ProcessingQueue() {
     </ul>
   );
 }
+
 
 function DashboardPage() {
   const { data: profile } = useProfile();
