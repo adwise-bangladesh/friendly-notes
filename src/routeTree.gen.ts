@@ -26,6 +26,7 @@ import { Route as AuthenticatedInventoryLocationsRouteImport } from './routes/_a
 import { Route as AuthenticatedInventoryMovementsRouteImport } from './routes/_authenticated/inventory.movements'
 import { Route as AuthenticatedInventoryStocktakesRouteImport } from './routes/_authenticated/inventory.stocktakes'
 import { Route as AuthenticatedInventoryTransfersRouteImport } from './routes/_authenticated/inventory.transfers'
+import { Route as AuthenticatedOperationsIndexRouteImport } from './routes/_authenticated/operations.index'
 import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenticated/orders.index'
 import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders.$id'
 import { Route as AuthenticatedOrdersExceptionsRouteImport } from './routes/_authenticated/orders.exceptions'
@@ -142,6 +143,12 @@ const AuthenticatedInventoryTransfersRoute =
   AuthenticatedInventoryTransfersRouteImport.update({
     id: '/inventory/transfers',
     path: '/inventory/transfers',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedOperationsIndexRoute =
+  AuthenticatedOperationsIndexRouteImport.update({
+    id: '/operations/',
+    path: '/operations/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedOrdersIndexRoute =
@@ -314,6 +321,7 @@ export interface FileRoutesByFullPath {
   '/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
   '/customers/': typeof AuthenticatedCustomersIndexRoute
   '/inventory/': typeof AuthenticatedInventoryIndexRoute
+  '/operations/': typeof AuthenticatedOperationsIndexRoute
   '/orders/': typeof AuthenticatedOrdersIndexRoute
   '/products/': typeof AuthenticatedProductsIndexRoute
   '/suppliers/': typeof AuthenticatedSuppliersIndexRoute
@@ -356,6 +364,7 @@ export interface FileRoutesByTo {
   '/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
   '/customers': typeof AuthenticatedCustomersIndexRoute
   '/inventory': typeof AuthenticatedInventoryIndexRoute
+  '/operations': typeof AuthenticatedOperationsIndexRoute
   '/orders': typeof AuthenticatedOrdersIndexRoute
   '/products': typeof AuthenticatedProductsIndexRoute
   '/suppliers': typeof AuthenticatedSuppliersIndexRoute
@@ -400,6 +409,7 @@ export interface FileRoutesById {
   '/_authenticated/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
   '/_authenticated/customers/': typeof AuthenticatedCustomersIndexRoute
   '/_authenticated/inventory/': typeof AuthenticatedInventoryIndexRoute
+  '/_authenticated/operations/': typeof AuthenticatedOperationsIndexRoute
   '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
   '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
   '/_authenticated/suppliers/': typeof AuthenticatedSuppliersIndexRoute
@@ -444,6 +454,7 @@ export interface FileRouteTypes {
     | '/suppliers/$id'
     | '/customers/'
     | '/inventory/'
+    | '/operations/'
     | '/orders/'
     | '/products/'
     | '/suppliers/'
@@ -486,6 +497,7 @@ export interface FileRouteTypes {
     | '/suppliers/$id'
     | '/customers'
     | '/inventory'
+    | '/operations'
     | '/orders'
     | '/products'
     | '/suppliers'
@@ -529,6 +541,7 @@ export interface FileRouteTypes {
     | '/_authenticated/suppliers/$id'
     | '/_authenticated/customers/'
     | '/_authenticated/inventory/'
+    | '/_authenticated/operations/'
     | '/_authenticated/orders/'
     | '/_authenticated/products/'
     | '/_authenticated/suppliers/'
@@ -672,6 +685,13 @@ declare module '@tanstack/react-router' {
       path: '/inventory/transfers'
       fullPath: '/inventory/transfers'
       preLoaderRoute: typeof AuthenticatedInventoryTransfersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/operations/': {
+      id: '/_authenticated/operations/'
+      path: '/operations'
+      fullPath: '/operations/'
+      preLoaderRoute: typeof AuthenticatedOperationsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/orders/': {
@@ -869,6 +889,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSuppliersIdRoute: typeof AuthenticatedSuppliersIdRoute
   AuthenticatedCustomersIndexRoute: typeof AuthenticatedCustomersIndexRoute
   AuthenticatedInventoryIndexRoute: typeof AuthenticatedInventoryIndexRoute
+  AuthenticatedOperationsIndexRoute: typeof AuthenticatedOperationsIndexRoute
   AuthenticatedOrdersIndexRoute: typeof AuthenticatedOrdersIndexRoute
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
   AuthenticatedSuppliersIndexRoute: typeof AuthenticatedSuppliersIndexRoute
@@ -907,6 +928,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSuppliersIdRoute: AuthenticatedSuppliersIdRoute,
   AuthenticatedCustomersIndexRoute: AuthenticatedCustomersIndexRoute,
   AuthenticatedInventoryIndexRoute: AuthenticatedInventoryIndexRoute,
+  AuthenticatedOperationsIndexRoute: AuthenticatedOperationsIndexRoute,
   AuthenticatedOrdersIndexRoute: AuthenticatedOrdersIndexRoute,
   AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
   AuthenticatedSuppliersIndexRoute: AuthenticatedSuppliersIndexRoute,
