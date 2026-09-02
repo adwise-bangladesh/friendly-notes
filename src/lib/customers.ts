@@ -115,8 +115,18 @@ export async function saveCustomer(input: CustomerInput): Promise<Customer> {
       email: input.email ?? null,
     },
   });
-  if (error) throw error;
+  if (error) {
+    // The database guarantees one identity per normalized phone; translate the
+    // raw constraint violation into something an operator can act on.
+    if (error.message.includes("customers_primary_phone_norm_key")) {
+      throw new Error(
+        "Another customer already uses this phone number. Open that customer instead of creating a duplicate.",
+      );
+    }
+    throw error;
+  }
   return data as unknown as Customer;
+
 }
 
 /** Blocking and unblocking are admin-only and always recorded as a note. */
