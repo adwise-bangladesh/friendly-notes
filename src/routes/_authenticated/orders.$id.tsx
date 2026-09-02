@@ -249,6 +249,9 @@ function Page() {
 
           <FulfillmentPanel order={order} canManage={canManage} />
 
+          <OrderFulfillmentsPanel order={order} canManage={canManage} />
+
+
           <FormSection title="Notes" description="Append-only timeline.">
             <ol className="space-y-2">
               {order.notes.length === 0 && (
