@@ -3,6 +3,7 @@ import {
   ShoppingCart,
   Package,
   Boxes,
+  Radar,
   Banknote,
   Truck,
   Users,
