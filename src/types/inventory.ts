@@ -34,6 +34,9 @@ export const MOVEMENT_TYPE_LABELS: Record<InventoryMovementType, string> = {
   reservation: "Reservation",
   release_reservation: "Release Reservation",
   fulfillment_out: "Fulfilled / Packed Out",
+  purchase_in: "Purchase Received",
+  purchase_damaged_in: "Purchase Damaged",
+  damaged_out: "Damaged Removed",
 };
 
 export const MOVEMENT_TYPE_HELP: Record<InventoryMovementType, string> = {
@@ -45,6 +48,11 @@ export const MOVEMENT_TYPE_HELP: Record<InventoryMovementType, string> = {
   reservation: "Holds stock for an order. Reduces available, not on hand.",
   release_reservation: "Frees previously reserved stock back to available.",
   fulfillment_out: "Packed for a customer order — reserved stock leaves on hand permanently.",
+  purchase_in: "Accepted goods from a supplier delivery. Created by finalising a goods receipt.",
+  purchase_damaged_in:
+    "Goods that arrived damaged from a supplier. Recorded as damaged, never as sellable stock.",
+  damaged_out:
+    "Damaged stock removed — written off, returned to the supplier, or a reversed damage record.",
 };
 
 /** Movements that increase on hand. */
@@ -52,10 +60,12 @@ export const INBOUND_MOVEMENTS: InventoryMovementType[] = [
   "initial",
   "adjustment_in",
   "return_in",
+  "purchase_in",
 ];
 
 export function movementDirection(type: InventoryMovementType): "in" | "out" | "hold" {
   if (INBOUND_MOVEMENTS.includes(type)) return "in";
+  if (type === "purchase_damaged_in") return "hold";
   if (type === "reservation") return "hold";
   if (type === "release_reservation") return "hold";
   return "out";
