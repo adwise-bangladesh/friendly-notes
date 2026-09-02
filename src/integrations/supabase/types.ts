@@ -529,6 +529,135 @@ export type Database = {
         }
         Relationships: []
       }
+      courier_settlement_items: {
+        Row: {
+          actual_collected_amount: number | null
+          cod_charge: number | null
+          created_at: string
+          delivery_charge: number | null
+          expected_collected_amount: number
+          id: string
+          net_settlement_amount: number | null
+          order_id: string
+          other_charge: number | null
+          return_charge: number | null
+          settlement_id: string
+          shipment_id: string
+          updated_at: string
+        }
+        Insert: {
+          actual_collected_amount?: number | null
+          cod_charge?: number | null
+          created_at?: string
+          delivery_charge?: number | null
+          expected_collected_amount?: number
+          id?: string
+          net_settlement_amount?: number | null
+          order_id: string
+          other_charge?: number | null
+          return_charge?: number | null
+          settlement_id: string
+          shipment_id: string
+          updated_at?: string
+        }
+        Update: {
+          actual_collected_amount?: number | null
+          cod_charge?: number | null
+          created_at?: string
+          delivery_charge?: number | null
+          expected_collected_amount?: number
+          id?: string
+          net_settlement_amount?: number | null
+          order_id?: string
+          other_charge?: number | null
+          return_charge?: number | null
+          settlement_id?: string
+          shipment_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_settlement_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_settlement_items_settlement_id_fkey"
+            columns: ["settlement_id"]
+            isOneToOne: false
+            referencedRelation: "courier_settlements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_settlement_items_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courier_settlements: {
+        Row: {
+          actual_amount: number | null
+          courier_account_id: string
+          created_at: string
+          created_by: string | null
+          expected_amount: number
+          finalized_at: string | null
+          finalized_by: string | null
+          id: string
+          notes: string | null
+          settlement_date: string | null
+          settlement_reference: string
+          status: Database["public"]["Enums"]["courier_settlement_status"]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          actual_amount?: number | null
+          courier_account_id: string
+          created_at?: string
+          created_by?: string | null
+          expected_amount?: number
+          finalized_at?: string | null
+          finalized_by?: string | null
+          id?: string
+          notes?: string | null
+          settlement_date?: string | null
+          settlement_reference: string
+          status?: Database["public"]["Enums"]["courier_settlement_status"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          actual_amount?: number | null
+          courier_account_id?: string
+          created_at?: string
+          created_by?: string | null
+          expected_amount?: number
+          finalized_at?: string | null
+          finalized_by?: string | null
+          id?: string
+          notes?: string | null
+          settlement_date?: string | null
+          settlement_reference?: string
+          status?: Database["public"]["Enums"]["courier_settlement_status"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_settlements_courier_account_id_fkey"
+            columns: ["courier_account_id"]
+            isOneToOne: false
+            referencedRelation: "courier_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courier_status_map: {
         Row: {
           created_at: string
@@ -951,6 +1080,89 @@ export type Database = {
           },
         ]
       }
+      order_financial_adjustments: {
+        Row: {
+          adjustment_type: Database["public"]["Enums"]["financial_adjustment_type"]
+          amount: number
+          created_at: string
+          created_by: string | null
+          direction: Database["public"]["Enums"]["financial_adjustment_direction"]
+          id: string
+          order_id: string
+          reason: string | null
+          reference: string | null
+          return_id: string | null
+          reversal_of: string | null
+          reversed_at: string | null
+          reversed_by: string | null
+          settlement_id: string | null
+          shipment_id: string | null
+        }
+        Insert: {
+          adjustment_type: Database["public"]["Enums"]["financial_adjustment_type"]
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          direction: Database["public"]["Enums"]["financial_adjustment_direction"]
+          id?: string
+          order_id: string
+          reason?: string | null
+          reference?: string | null
+          return_id?: string | null
+          reversal_of?: string | null
+          reversed_at?: string | null
+          reversed_by?: string | null
+          settlement_id?: string | null
+          shipment_id?: string | null
+        }
+        Update: {
+          adjustment_type?: Database["public"]["Enums"]["financial_adjustment_type"]
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          direction?: Database["public"]["Enums"]["financial_adjustment_direction"]
+          id?: string
+          order_id?: string
+          reason?: string | null
+          reference?: string | null
+          return_id?: string | null
+          reversal_of?: string | null
+          reversed_at?: string | null
+          reversed_by?: string | null
+          settlement_id?: string | null
+          shipment_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_financial_adjustments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_financial_adjustments_return_id_fkey"
+            columns: ["return_id"]
+            isOneToOne: false
+            referencedRelation: "order_returns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_financial_adjustments_reversal_of_fkey"
+            columns: ["reversal_of"]
+            isOneToOne: false
+            referencedRelation: "order_financial_adjustments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_financial_adjustments_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_fulfillment_events: {
         Row: {
           created_at: string
@@ -1155,6 +1367,7 @@ export type Database = {
       order_items: {
         Row: {
           compare_at_price: number | null
+          cost_source: string | null
           created_at: string
           discount_amount: number
           id: string
@@ -1166,12 +1379,16 @@ export type Database = {
           quantity: number
           sku: string | null
           sort_order: number
+          unit_additional_cost: number | null
+          unit_base_cost: number | null
+          unit_cost: number | null
           unit_price: number
           variant_id: string | null
           variant_name: string | null
         }
         Insert: {
           compare_at_price?: number | null
+          cost_source?: string | null
           created_at?: string
           discount_amount?: number
           id?: string
@@ -1183,12 +1400,16 @@ export type Database = {
           quantity: number
           sku?: string | null
           sort_order?: number
+          unit_additional_cost?: number | null
+          unit_base_cost?: number | null
+          unit_cost?: number | null
           unit_price: number
           variant_id?: string | null
           variant_name?: string | null
         }
         Update: {
           compare_at_price?: number | null
+          cost_source?: string | null
           created_at?: string
           discount_amount?: number
           id?: string
@@ -1200,6 +1421,9 @@ export type Database = {
           quantity?: number
           sku?: string | null
           sort_order?: number
+          unit_additional_cost?: number | null
+          unit_base_cost?: number | null
+          unit_cost?: number | null
           unit_price?: number
           variant_id?: string | null
           variant_name?: string | null
@@ -2274,11 +2498,14 @@ export type Database = {
       }
       shipments: {
         Row: {
+          actual_delivery_fee: number | null
           booked_at: string | null
           booked_delivery_fee: number | null
           booking_idempotency_key: string
           cancelled_at: string | null
           cash_on_delivery_amount: number
+          cod_fee: number | null
+          collected_amount: number | null
           courier_account_id: string | null
           created_at: string
           created_by: string | null
@@ -2292,6 +2519,8 @@ export type Database = {
           failure_reason:
             | Database["public"]["Enums"]["shipment_failure_reason"]
             | null
+          financials_recorded_at: string | null
+          financials_recorded_by: string | null
           fulfillment_id: string | null
           hold_reason:
             | Database["public"]["Enums"]["shipment_hold_reason"]
@@ -2301,6 +2530,7 @@ export type Database = {
           last_synced_at: string | null
           notes: string | null
           order_id: string
+          other_courier_charge: number | null
           package_count: number
           partial_delivery_note: string | null
           picked_up_at: string | null
@@ -2316,6 +2546,7 @@ export type Database = {
           quoted_delivery_fee: number | null
           recipient_name: string
           recipient_phone: string
+          return_charge: number | null
           return_reason: string | null
           return_tracking_number: string | null
           service_type:
@@ -2329,11 +2560,14 @@ export type Database = {
           weight: number | null
         }
         Insert: {
+          actual_delivery_fee?: number | null
           booked_at?: string | null
           booked_delivery_fee?: number | null
           booking_idempotency_key?: string
           cancelled_at?: string | null
           cash_on_delivery_amount?: number
+          cod_fee?: number | null
+          collected_amount?: number | null
           courier_account_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -2347,6 +2581,8 @@ export type Database = {
           failure_reason?:
             | Database["public"]["Enums"]["shipment_failure_reason"]
             | null
+          financials_recorded_at?: string | null
+          financials_recorded_by?: string | null
           fulfillment_id?: string | null
           hold_reason?:
             | Database["public"]["Enums"]["shipment_hold_reason"]
@@ -2356,6 +2592,7 @@ export type Database = {
           last_synced_at?: string | null
           notes?: string | null
           order_id: string
+          other_courier_charge?: number | null
           package_count?: number
           partial_delivery_note?: string | null
           picked_up_at?: string | null
@@ -2371,6 +2608,7 @@ export type Database = {
           quoted_delivery_fee?: number | null
           recipient_name: string
           recipient_phone: string
+          return_charge?: number | null
           return_reason?: string | null
           return_tracking_number?: string | null
           service_type?:
@@ -2384,11 +2622,14 @@ export type Database = {
           weight?: number | null
         }
         Update: {
+          actual_delivery_fee?: number | null
           booked_at?: string | null
           booked_delivery_fee?: number | null
           booking_idempotency_key?: string
           cancelled_at?: string | null
           cash_on_delivery_amount?: number
+          cod_fee?: number | null
+          collected_amount?: number | null
           courier_account_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -2402,6 +2643,8 @@ export type Database = {
           failure_reason?:
             | Database["public"]["Enums"]["shipment_failure_reason"]
             | null
+          financials_recorded_at?: string | null
+          financials_recorded_by?: string | null
           fulfillment_id?: string | null
           hold_reason?:
             | Database["public"]["Enums"]["shipment_hold_reason"]
@@ -2411,6 +2654,7 @@ export type Database = {
           last_synced_at?: string | null
           notes?: string | null
           order_id?: string
+          other_courier_charge?: number | null
           package_count?: number
           partial_delivery_note?: string | null
           picked_up_at?: string | null
@@ -2426,6 +2670,7 @@ export type Database = {
           quoted_delivery_fee?: number | null
           recipient_name?: string
           recipient_phone?: string
+          return_charge?: number | null
           return_reason?: string | null
           return_tracking_number?: string | null
           service_type?:
@@ -2495,6 +2740,30 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_settlement_item: {
+        Args: { _settlement_id: string; _shipment_id: string }
+        Returns: {
+          actual_collected_amount: number | null
+          cod_charge: number | null
+          created_at: string
+          delivery_charge: number | null
+          expected_collected_amount: number
+          id: string
+          net_settlement_amount: number | null
+          order_id: string
+          other_charge: number | null
+          return_charge: number | null
+          settlement_id: string
+          shipment_id: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "courier_settlement_items"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       adjust_group_buy_campaign_quantity: {
         Args: { _campaign_id: string; _quantity: number }
         Returns: number
@@ -2614,11 +2883,14 @@ export type Database = {
           _shipment_id: string
         }
         Returns: {
+          actual_delivery_fee: number | null
           booked_at: string | null
           booked_delivery_fee: number | null
           booking_idempotency_key: string
           cancelled_at: string | null
           cash_on_delivery_amount: number
+          cod_fee: number | null
+          collected_amount: number | null
           courier_account_id: string | null
           created_at: string
           created_by: string | null
@@ -2632,6 +2904,8 @@ export type Database = {
           failure_reason:
             | Database["public"]["Enums"]["shipment_failure_reason"]
             | null
+          financials_recorded_at: string | null
+          financials_recorded_by: string | null
           fulfillment_id: string | null
           hold_reason:
             | Database["public"]["Enums"]["shipment_hold_reason"]
@@ -2641,6 +2915,7 @@ export type Database = {
           last_synced_at: string | null
           notes: string | null
           order_id: string
+          other_courier_charge: number | null
           package_count: number
           partial_delivery_note: string | null
           picked_up_at: string | null
@@ -2656,6 +2931,7 @@ export type Database = {
           quoted_delivery_fee: number | null
           recipient_name: string
           recipient_phone: string
+          return_charge: number | null
           return_reason: string | null
           return_tracking_number: string | null
           service_type:
@@ -2793,6 +3069,71 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      create_courier_settlement: {
+        Args: {
+          _courier_account_id: string
+          _notes?: string
+          _settlement_date?: string
+          _settlement_reference: string
+        }
+        Returns: {
+          actual_amount: number | null
+          courier_account_id: string
+          created_at: string
+          created_by: string | null
+          expected_amount: number
+          finalized_at: string | null
+          finalized_by: string | null
+          id: string
+          notes: string | null
+          settlement_date: string | null
+          settlement_reference: string
+          status: Database["public"]["Enums"]["courier_settlement_status"]
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "courier_settlements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      create_financial_adjustment: {
+        Args: {
+          _adjustment_type: Database["public"]["Enums"]["financial_adjustment_type"]
+          _amount: number
+          _direction: Database["public"]["Enums"]["financial_adjustment_direction"]
+          _order_id: string
+          _reason?: string
+          _reference?: string
+          _return_id?: string
+          _shipment_id?: string
+        }
+        Returns: {
+          adjustment_type: Database["public"]["Enums"]["financial_adjustment_type"]
+          amount: number
+          created_at: string
+          created_by: string | null
+          direction: Database["public"]["Enums"]["financial_adjustment_direction"]
+          id: string
+          order_id: string
+          reason: string | null
+          reference: string | null
+          return_id: string | null
+          reversal_of: string | null
+          reversed_at: string | null
+          reversed_by: string | null
+          settlement_id: string | null
+          shipment_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_financial_adjustments"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -2939,11 +3280,14 @@ export type Database = {
           _weight?: number
         }
         Returns: {
+          actual_delivery_fee: number | null
           booked_at: string | null
           booked_delivery_fee: number | null
           booking_idempotency_key: string
           cancelled_at: string | null
           cash_on_delivery_amount: number
+          cod_fee: number | null
+          collected_amount: number | null
           courier_account_id: string | null
           created_at: string
           created_by: string | null
@@ -2957,6 +3301,8 @@ export type Database = {
           failure_reason:
             | Database["public"]["Enums"]["shipment_failure_reason"]
             | null
+          financials_recorded_at: string | null
+          financials_recorded_by: string | null
           fulfillment_id: string | null
           hold_reason:
             | Database["public"]["Enums"]["shipment_hold_reason"]
@@ -2966,6 +3312,7 @@ export type Database = {
           last_synced_at: string | null
           notes: string | null
           order_id: string
+          other_courier_charge: number | null
           package_count: number
           partial_delivery_note: string | null
           picked_up_at: string | null
@@ -2981,6 +3328,7 @@ export type Database = {
           quoted_delivery_fee: number | null
           recipient_name: string
           recipient_phone: string
+          return_charge: number | null
           return_reason: string | null
           return_tracking_number: string | null
           service_type:
@@ -3182,6 +3530,7 @@ export type Database = {
       next_order_number: { Args: never; Returns: string }
       next_return_number: { Args: never; Returns: string }
       next_shipment_number: { Args: never; Returns: string }
+      order_financials: { Args: { _order_id: string }; Returns: Json }
       order_fulfillment_summary: {
         Args: { _order_id: string }
         Returns: {
@@ -3200,11 +3549,14 @@ export type Database = {
           _tracking_number?: string
         }
         Returns: {
+          actual_delivery_fee: number | null
           booked_at: string | null
           booked_delivery_fee: number | null
           booking_idempotency_key: string
           cancelled_at: string | null
           cash_on_delivery_amount: number
+          cod_fee: number | null
+          collected_amount: number | null
           courier_account_id: string | null
           created_at: string
           created_by: string | null
@@ -3218,6 +3570,8 @@ export type Database = {
           failure_reason:
             | Database["public"]["Enums"]["shipment_failure_reason"]
             | null
+          financials_recorded_at: string | null
+          financials_recorded_by: string | null
           fulfillment_id: string | null
           hold_reason:
             | Database["public"]["Enums"]["shipment_hold_reason"]
@@ -3227,6 +3581,7 @@ export type Database = {
           last_synced_at: string | null
           notes: string | null
           order_id: string
+          other_courier_charge: number | null
           package_count: number
           partial_delivery_note: string | null
           picked_up_at: string | null
@@ -3242,6 +3597,7 @@ export type Database = {
           quoted_delivery_fee: number | null
           recipient_name: string
           recipient_phone: string
+          return_charge: number | null
           return_reason: string | null
           return_tracking_number: string | null
           service_type:
@@ -3264,11 +3620,14 @@ export type Database = {
       record_courier_quote: {
         Args: { _quoted_fee: number; _shipment_id: string }
         Returns: {
+          actual_delivery_fee: number | null
           booked_at: string | null
           booked_delivery_fee: number | null
           booking_idempotency_key: string
           cancelled_at: string | null
           cash_on_delivery_amount: number
+          cod_fee: number | null
+          collected_amount: number | null
           courier_account_id: string | null
           created_at: string
           created_by: string | null
@@ -3282,6 +3641,8 @@ export type Database = {
           failure_reason:
             | Database["public"]["Enums"]["shipment_failure_reason"]
             | null
+          financials_recorded_at: string | null
+          financials_recorded_by: string | null
           fulfillment_id: string | null
           hold_reason:
             | Database["public"]["Enums"]["shipment_hold_reason"]
@@ -3291,6 +3652,7 @@ export type Database = {
           last_synced_at: string | null
           notes: string | null
           order_id: string
+          other_courier_charge: number | null
           package_count: number
           partial_delivery_note: string | null
           picked_up_at: string | null
@@ -3306,6 +3668,7 @@ export type Database = {
           quoted_delivery_fee: number | null
           recipient_name: string
           recipient_phone: string
+          return_charge: number | null
           return_reason: string | null
           return_tracking_number: string | null
           service_type:
@@ -3381,6 +3744,116 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "order_returns"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      record_settlement_actuals: {
+        Args: {
+          _actual_collected_amount?: number
+          _cod_charge?: number
+          _delivery_charge?: number
+          _item_id: string
+          _other_charge?: number
+          _return_charge?: number
+        }
+        Returns: {
+          actual_collected_amount: number | null
+          cod_charge: number | null
+          created_at: string
+          delivery_charge: number | null
+          expected_collected_amount: number
+          id: string
+          net_settlement_amount: number | null
+          order_id: string
+          other_charge: number | null
+          return_charge: number | null
+          settlement_id: string
+          shipment_id: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "courier_settlement_items"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      record_shipment_financials: {
+        Args: {
+          _actual_delivery_fee?: number
+          _cod_fee?: number
+          _collected_amount?: number
+          _note?: string
+          _other_courier_charge?: number
+          _return_charge?: number
+          _shipment_id: string
+        }
+        Returns: {
+          actual_delivery_fee: number | null
+          booked_at: string | null
+          booked_delivery_fee: number | null
+          booking_idempotency_key: string
+          cancelled_at: string | null
+          cash_on_delivery_amount: number
+          cod_fee: number | null
+          collected_amount: number | null
+          courier_account_id: string | null
+          created_at: string
+          created_by: string | null
+          declared_value: number | null
+          delivered_at: string | null
+          delivery_address: string
+          delivery_area: string | null
+          delivery_city: string | null
+          delivery_zone: string | null
+          external_consignment_id: string | null
+          failure_reason:
+            | Database["public"]["Enums"]["shipment_failure_reason"]
+            | null
+          financials_recorded_at: string | null
+          financials_recorded_by: string | null
+          fulfillment_id: string | null
+          hold_reason:
+            | Database["public"]["Enums"]["shipment_hold_reason"]
+            | null
+          id: string
+          internal_notes: string | null
+          last_synced_at: string | null
+          notes: string | null
+          order_id: string
+          other_courier_charge: number | null
+          package_count: number
+          partial_delivery_note: string | null
+          picked_up_at: string | null
+          postal_code: string | null
+          provider_id: string | null
+          provider_recipient_area_id: string | null
+          provider_recipient_city_id: string | null
+          provider_recipient_zone_id: string | null
+          provider_reference: string | null
+          provider_status: string | null
+          provider_status_at: string | null
+          provider_status_slug: string | null
+          quoted_delivery_fee: number | null
+          recipient_name: string
+          recipient_phone: string
+          return_charge: number | null
+          return_reason: string | null
+          return_tracking_number: string | null
+          service_type:
+            | Database["public"]["Enums"]["courier_service_type"]
+            | null
+          shipment_number: string
+          status: Database["public"]["Enums"]["shipment_status"]
+          tracking_number: string | null
+          updated_at: string
+          updated_by: string | null
+          weight: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shipments"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -3505,6 +3978,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      remove_settlement_item: { Args: { _item_id: string }; Returns: undefined }
       reserve_order_inventory: {
         Args: { _order_id: string }
         Returns: {
@@ -3564,6 +4038,32 @@ export type Database = {
           _to: Database["public"]["Enums"]["order_return_status"]
         }
         Returns: boolean
+      }
+      reverse_financial_adjustment: {
+        Args: { _adjustment_id: string; _reason?: string }
+        Returns: {
+          adjustment_type: Database["public"]["Enums"]["financial_adjustment_type"]
+          amount: number
+          created_at: string
+          created_by: string | null
+          direction: Database["public"]["Enums"]["financial_adjustment_direction"]
+          id: string
+          order_id: string
+          reason: string | null
+          reference: string | null
+          return_id: string | null
+          reversal_of: string | null
+          reversed_at: string | null
+          reversed_by: string | null
+          settlement_id: string | null
+          shipment_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_financial_adjustments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       set_default_inventory_location: {
         Args: { _location_id: string }
@@ -3857,6 +4357,35 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      set_settlement_status: {
+        Args: {
+          _note?: string
+          _settlement_id: string
+          _status: Database["public"]["Enums"]["courier_settlement_status"]
+        }
+        Returns: {
+          actual_amount: number | null
+          courier_account_id: string
+          created_at: string
+          created_by: string | null
+          expected_amount: number
+          finalized_at: string | null
+          finalized_by: string | null
+          id: string
+          notes: string | null
+          settlement_date: string | null
+          settlement_reference: string
+          status: Database["public"]["Enums"]["courier_settlement_status"]
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "courier_settlements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_shipment_return_tracking: {
         Args: {
           _return_reason?: string
@@ -3864,11 +4393,14 @@ export type Database = {
           _shipment_id: string
         }
         Returns: {
+          actual_delivery_fee: number | null
           booked_at: string | null
           booked_delivery_fee: number | null
           booking_idempotency_key: string
           cancelled_at: string | null
           cash_on_delivery_amount: number
+          cod_fee: number | null
+          collected_amount: number | null
           courier_account_id: string | null
           created_at: string
           created_by: string | null
@@ -3882,6 +4414,8 @@ export type Database = {
           failure_reason:
             | Database["public"]["Enums"]["shipment_failure_reason"]
             | null
+          financials_recorded_at: string | null
+          financials_recorded_by: string | null
           fulfillment_id: string | null
           hold_reason:
             | Database["public"]["Enums"]["shipment_hold_reason"]
@@ -3891,6 +4425,7 @@ export type Database = {
           last_synced_at: string | null
           notes: string | null
           order_id: string
+          other_courier_charge: number | null
           package_count: number
           partial_delivery_note: string | null
           picked_up_at: string | null
@@ -3906,6 +4441,7 @@ export type Database = {
           quoted_delivery_fee: number | null
           recipient_name: string
           recipient_phone: string
+          return_charge: number | null
           return_reason: string | null
           return_tracking_number: string | null
           service_type:
@@ -3936,11 +4472,14 @@ export type Database = {
           _tracking_number?: string
         }
         Returns: {
+          actual_delivery_fee: number | null
           booked_at: string | null
           booked_delivery_fee: number | null
           booking_idempotency_key: string
           cancelled_at: string | null
           cash_on_delivery_amount: number
+          cod_fee: number | null
+          collected_amount: number | null
           courier_account_id: string | null
           created_at: string
           created_by: string | null
@@ -3954,6 +4493,8 @@ export type Database = {
           failure_reason:
             | Database["public"]["Enums"]["shipment_failure_reason"]
             | null
+          financials_recorded_at: string | null
+          financials_recorded_by: string | null
           fulfillment_id: string | null
           hold_reason:
             | Database["public"]["Enums"]["shipment_hold_reason"]
@@ -3963,6 +4504,7 @@ export type Database = {
           last_synced_at: string | null
           notes: string | null
           order_id: string
+          other_courier_charge: number | null
           package_count: number
           partial_delivery_note: string | null
           picked_up_at: string | null
@@ -3978,6 +4520,7 @@ export type Database = {
           quoted_delivery_fee: number | null
           recipient_name: string
           recipient_phone: string
+          return_charge: number | null
           return_reason: string | null
           return_tracking_number: string | null
           service_type:
@@ -4071,11 +4614,14 @@ export type Database = {
           _weight?: number
         }
         Returns: {
+          actual_delivery_fee: number | null
           booked_at: string | null
           booked_delivery_fee: number | null
           booking_idempotency_key: string
           cancelled_at: string | null
           cash_on_delivery_amount: number
+          cod_fee: number | null
+          collected_amount: number | null
           courier_account_id: string | null
           created_at: string
           created_by: string | null
@@ -4089,6 +4635,8 @@ export type Database = {
           failure_reason:
             | Database["public"]["Enums"]["shipment_failure_reason"]
             | null
+          financials_recorded_at: string | null
+          financials_recorded_by: string | null
           fulfillment_id: string | null
           hold_reason:
             | Database["public"]["Enums"]["shipment_hold_reason"]
@@ -4098,6 +4646,7 @@ export type Database = {
           last_synced_at: string | null
           notes: string | null
           order_id: string
+          other_courier_charge: number | null
           package_count: number
           partial_delivery_note: string | null
           picked_up_at: string | null
@@ -4113,6 +4662,7 @@ export type Database = {
           quoted_delivery_fee: number | null
           recipient_name: string
           recipient_phone: string
+          return_charge: number | null
           return_reason: string | null
           return_tracking_number: string | null
           service_type:
@@ -4159,8 +4709,26 @@ export type Database = {
         | "same_day"
         | "next_day"
         | "other"
+      courier_settlement_status:
+        | "draft"
+        | "pending"
+        | "partial"
+        | "settled"
+        | "disputed"
+        | "cancelled"
       entity_status: "active" | "inactive" | "archived"
       entity_visibility: "visible" | "hidden"
+      financial_adjustment_direction: "income" | "expense"
+      financial_adjustment_type:
+        | "packing_cost"
+        | "courier_charge"
+        | "cod_fee"
+        | "return_charge"
+        | "damage_loss"
+        | "manual_expense"
+        | "manual_income"
+        | "settlement_adjustment"
+        | "other"
       fulfillment_event_type:
         | "fulfillment_created"
         | "picking_started"
@@ -4567,8 +5135,28 @@ export const Constants = {
         "next_day",
         "other",
       ],
+      courier_settlement_status: [
+        "draft",
+        "pending",
+        "partial",
+        "settled",
+        "disputed",
+        "cancelled",
+      ],
       entity_status: ["active", "inactive", "archived"],
       entity_visibility: ["visible", "hidden"],
+      financial_adjustment_direction: ["income", "expense"],
+      financial_adjustment_type: [
+        "packing_cost",
+        "courier_charge",
+        "cod_fee",
+        "return_charge",
+        "damage_loss",
+        "manual_expense",
+        "manual_income",
+        "settlement_adjustment",
+        "other",
+      ],
       fulfillment_event_type: [
         "fulfillment_created",
         "picking_started",
