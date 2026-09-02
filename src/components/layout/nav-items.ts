@@ -5,7 +5,6 @@ import {
   Boxes,
   Banknote,
   Truck,
-  Factory,
   Users,
   RotateCcw,
   Settings,
