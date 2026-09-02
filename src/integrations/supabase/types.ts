@@ -613,6 +613,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      adjust_group_buy_campaign_quantity: {
+        Args: { _campaign_id: string; _quantity: number }
+        Returns: number
+      }
       brand_product_counts: {
         Args: never
         Returns: {

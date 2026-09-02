@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.adjust_group_buy_campaign_quantity(uuid, integer) FROM anon;

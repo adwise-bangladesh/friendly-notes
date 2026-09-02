@@ -23,7 +23,7 @@ import { ProductRelationshipsEditor } from "./ProductRelationshipsEditor";
 import { BundleContentsEditor } from "./BundleContentsEditor";
 import { GroupBuyCampaigns } from "./GroupBuyCampaigns";
 import { getBrands, getCategories, toSlug } from "@/lib/commerce";
-import { saveProduct, primaryMedia } from "@/lib/products";
+import { saveProduct, primaryMedia, unpricedVariantCount } from "@/lib/products";
 import { CURRENCY_SYMBOL, formatMoney, parseMoney } from "@/lib/currency";
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import {
@@ -202,12 +202,12 @@ export function ProductEditor({ record }: Props) {
     setDirty(true);
   };
 
-  // Archived products can never stay purchasable (mirrors the DB rule).
+  // Only ACTIVE products may be purchasable (mirrors the DB trigger).
   const setStatus = (s: ProductStatus) => {
     setDraft((d) => ({
       ...d,
       status: s,
-      is_purchasable: s === "archived" ? false : d.is_purchasable,
+      is_purchasable: s === "active" ? d.is_purchasable : false,
     }));
     setDirty(true);
   };
@@ -244,6 +244,12 @@ export function ProductEditor({ record }: Props) {
     if (!prices.length) return null;
     return { min: Math.min(...prices), max: Math.max(...prices) };
   }, [draft.variants]);
+
+  // Variants with no price cannot be sold — surfaced as a non-blocking warning.
+  const unpricedVariants = useMemo(
+    () => unpricedVariantCount(draft.variants),
+    [draft.variants],
+  );
 
   const mutation = useMutation({
     mutationFn: (next: ProductDraft) => saveProduct(next, record?.id),
@@ -610,8 +616,22 @@ export function ProductEditor({ record }: Props) {
           <div className="rounded-md border border-border bg-card p-4">
             <FormSection
               title="Variants"
-              description="Each variant is separately purchasable with its own price, and optional cost, physical and image overrides."
+              description="Each variant is separately purchasable with its own price, and optional cost, physical and image overrides. A variant without a price cannot be purchased — the product price is never used as a fallback."
             >
+              {unpricedVariants > 0 && (
+                <p className="rounded border border-warning/40 bg-warning/10 px-2.5 py-2 text-[12px] text-foreground">
+                  {unpricedVariants} variant{unpricedVariants > 1 ? "s do" : " does"} not have a
+                  selling price. {unpricedVariants > 1 ? "They" : "It"} cannot be purchased.
+                  {draft.status === "active" && draft.is_purchasable
+                    ? " This product is active and purchasable."
+                    : ""}
+                </p>
+              )}
+              {unpricedVariants === 0 && variantRange === null && (
+                <p className="rounded border border-dashed border-border px-2.5 py-2 text-[12px] text-muted-foreground">
+                  No priced variant yet — this product will show as unpriced in the catalog.
+                </p>
+              )}
               <ProductVariantsEditor
                 value={draft.variants}
                 onChange={(v) => set("variants", v)}
@@ -724,15 +744,15 @@ export function ProductEditor({ record }: Props) {
                 </Label>
                 <Switch
                   id="purchasable"
-                  checked={draft.is_purchasable}
-                  disabled={readOnly || draft.status === "archived"}
+                  checked={draft.status === "active" && draft.is_purchasable}
+                  disabled={readOnly || draft.status !== "active"}
                   onCheckedChange={(v) => set("is_purchasable", v)}
                 />
               </div>
               <p className="text-[11px] text-muted-foreground">
-                {draft.status === "archived"
-                  ? "Archived products can never be purchasable."
-                  : "Turn off for “coming soon”, temporarily unavailable or a seasonal pause."}
+                {draft.status === "active"
+                  ? "Turn off for “coming soon”, temporarily unavailable or a seasonal pause."
+                  : `${PRODUCT_STATUS_LABELS[draft.status]} products are never purchasable. Set the status to Active to control this.`}
               </p>
             </div>
             <div className="flex items-center justify-between rounded border border-border px-2.5 py-2">

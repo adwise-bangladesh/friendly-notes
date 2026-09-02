@@ -9,9 +9,10 @@ import type {
   CategoryStatus,
   CategoryUpdate,
   EntityVisibility,
+  InternalProduct,
+  InternalProductWithRelations,
   ProductStatus,
-  Product,
-  ProductWithRelations,
+  PublicProduct,
 } from "@/types/commerce";
 
 /**
@@ -23,13 +24,33 @@ import type {
 
 const CATEGORY_FIELDS = "*";
 const BRAND_FIELDS = "*";
-const PRODUCT_FIELDS = "*";
-const PRODUCT_WITH_RELATIONS = `
+
+/**
+ * PRODUCT QUERY CONTRACTS (Step 4.2)
+ *
+ * INTERNAL — admin / operations. May include cost columns (base_cost,
+ * additional_cost, estimated_landed_cost). Never reuse for a storefront.
+ *
+ * PUBLIC — storefront / mobile safe. Explicit projection that must never
+ * contain a cost column, on the product or on its variants.
+ */
+export const INTERNAL_PRODUCT_SELECT = "*";
+
+export const INTERNAL_PRODUCT_WITH_RELATIONS_SELECT = `
   *,
   brand:brands(*),
   product_categories(*, category:categories(*)),
   product_variants(*),
   product_media(*)
+`;
+
+export const PUBLIC_PRODUCT_SELECT = `
+  id, name, slug, short_description, description, price, compare_at_price,
+  is_purchasable, status, visibility, product_type, supply_model, requires_shipping,
+  brand:brands(id, name, slug),
+  product_categories(is_primary, category:categories(id, name, slug)),
+  product_variants(id, title, sku, price, compare_at_price, status, sort_order),
+  product_media(url, alt_text, is_primary, sort_order)
 `;
 
 export interface ListOptions<TStatus extends string = string> {
@@ -117,12 +138,14 @@ export async function getBrandBySlug(slug: string): Promise<Brand | null> {
   return data;
 }
 
-/* ---------- Products ---------- */
+/* ---------- Products: INTERNAL (admin / operations, includes costs) ---------- */
 
-export async function getProducts(options: ListOptions<ProductStatus> = {}): Promise<Product[]> {
+export async function getInternalProducts(
+  options: ListOptions<ProductStatus> = {},
+): Promise<InternalProduct[]> {
   let query = supabase
     .from("products")
-    .select(PRODUCT_FIELDS)
+    .select(INTERNAL_PRODUCT_SELECT)
     .order("created_at", { ascending: false });
 
   if (options.status) query = query.eq("status", options.status);
@@ -135,25 +158,67 @@ export async function getProducts(options: ListOptions<ProductStatus> = {}): Pro
   return data ?? [];
 }
 
-export async function getProductById(id: string): Promise<ProductWithRelations | null> {
+export async function getInternalProductById(
+  id: string,
+): Promise<InternalProductWithRelations | null> {
   const { data, error } = await supabase
     .from("products")
-    .select(PRODUCT_WITH_RELATIONS)
+    .select(INTERNAL_PRODUCT_WITH_RELATIONS_SELECT)
     .eq("id", id)
     .maybeSingle();
   if (error) throw error;
-  return (data as ProductWithRelations | null) ?? null;
+  // Narrowing: PostgREST embeds are untyped at this depth; shape matches
+  // INTERNAL_PRODUCT_WITH_RELATIONS_SELECT above.
+  return (data as unknown as InternalProductWithRelations | null) ?? null;
 }
 
-export async function getProductBySlug(slug: string): Promise<ProductWithRelations | null> {
+export async function getInternalProductBySlug(
+  slug: string,
+): Promise<InternalProductWithRelations | null> {
   const { data, error } = await supabase
     .from("products")
-    .select(PRODUCT_WITH_RELATIONS)
+    .select(INTERNAL_PRODUCT_WITH_RELATIONS_SELECT)
     .eq("slug", slug.toLowerCase())
     .maybeSingle();
   if (error) throw error;
-  return (data as ProductWithRelations | null) ?? null;
+  return (data as unknown as InternalProductWithRelations | null) ?? null;
 }
+
+/* ---------- Products: PUBLIC-SAFE (no cost data, product or variant) ---------- */
+
+/**
+ * The only product read a future storefront / mobile client should reuse.
+ * Availability still has to be enforced by the caller via isProductPurchasable().
+ */
+export async function getPublicProductBySlug(slug: string): Promise<PublicProduct | null> {
+  const { data, error } = await supabase
+    .from("products")
+    .select(PUBLIC_PRODUCT_SELECT)
+    .eq("slug", slug.toLowerCase())
+    .maybeSingle();
+  if (error) throw error;
+  // Narrowing: shape is fixed by PUBLIC_PRODUCT_SELECT — cost columns absent.
+  return (data as unknown as PublicProduct | null) ?? null;
+}
+
+export async function getPublicProducts(
+  options: Pick<ListOptions<ProductStatus>, "search" | "limit"> = {},
+): Promise<PublicProduct[]> {
+  let query = supabase
+    .from("products")
+    .select(PUBLIC_PRODUCT_SELECT)
+    .eq("status", "active")
+    .eq("visibility", "visible")
+    .order("name", { ascending: true });
+
+  if (options.search) query = query.ilike("name", `%${options.search}%`);
+  if (options.limit) query = query.limit(options.limit);
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data ?? []) as unknown as PublicProduct[];
+}
+
 
 /* ---------- Shared helpers ---------- */
 

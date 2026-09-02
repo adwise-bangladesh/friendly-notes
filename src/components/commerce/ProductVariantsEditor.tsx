@@ -94,6 +94,8 @@ export function ProductVariantsEditor({
         const dupe = !!v.sku && duplicateSkus.has(v.sku.trim().toLowerCase());
         const cost = effectiveCost(v, productCost);
         const margin = estimatedMargin(v.price ?? 0, cost.landed);
+        // No parent-price fallback: an unpriced variant simply cannot be sold.
+        const unpriced = v.price === null || v.price === undefined;
         const open = expanded === v.key;
         return (
           <div key={v.key} className="rounded border border-border bg-muted/30 p-2.5">
@@ -168,17 +170,33 @@ export function ProductVariantsEditor({
                 ) : (
                   <ChevronRight className="h-3.5 w-3.5" />
                 )}
-                Cost, physical & images
+                Cost, physical &amp; images
               </button>
+              {unpriced && (
+                <span className="rounded bg-warning/15 px-1.5 py-0.5 text-[11px] font-medium text-warning-foreground">
+                  No price — not purchasable
+                </span>
+              )}
+              {/* Costs inherit independently, so each field gets its own badge. */}
               <span
                 className={cn(
                   "rounded px-1.5 py-0.5 text-[11px]",
-                  cost.overridden
+                  cost.baseOverridden
                     ? "bg-primary/10 text-primary"
                     : "bg-muted text-muted-foreground",
                 )}
               >
-                {cost.overridden ? "Uses Variant Override" : "Uses Product Default Cost"}
+                Base: {cost.baseOverridden ? "Variant override" : "Product default"}
+              </span>
+              <span
+                className={cn(
+                  "rounded px-1.5 py-0.5 text-[11px]",
+                  cost.additionalOverridden
+                    ? "bg-primary/10 text-primary"
+                    : "bg-muted text-muted-foreground",
+                )}
+              >
+                Additional: {cost.additionalOverridden ? "Variant override" : "Product default"}
               </span>
               <span className="text-[11.5px] text-muted-foreground">
                 Landed {formatMoney(cost.landed)}
@@ -195,6 +213,7 @@ export function ProductVariantsEditor({
                 </span>
               )}
             </div>
+
 
             {open && (
               <div className="mt-2.5 space-y-3 border-t border-border pt-2.5">
