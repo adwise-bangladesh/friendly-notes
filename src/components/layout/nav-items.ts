@@ -5,12 +5,14 @@ import {
   Boxes,
   Radar,
   Banknote,
+  BarChart3,
   Truck,
   Users,
   RotateCcw,
   Settings,
   type LucideIcon,
 } from "lucide-react";
+
 
 export interface NavItem {
   label: string;
@@ -21,6 +23,19 @@ export interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
+  {
+    label: "Analytics",
+    to: "/analytics",
+    icon: BarChart3,
+    children: [
+      { label: "Business Overview", to: "/analytics" },
+      { label: "Orders & Delivery", to: "/analytics/operations" },
+      { label: "Customers", to: "/analytics/customers" },
+      { label: "Products & Inventory", to: "/analytics/products" },
+      { label: "Procurement", to: "/analytics/procurement" },
+    ],
+  },
+
   {
     label: "Operations",
     to: "/operations",

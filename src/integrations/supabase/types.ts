@@ -580,6 +580,13 @@ export type Database = {
             foreignKeyName: "courier_settlement_items_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "courier_settlement_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -1284,6 +1291,13 @@ export type Database = {
             foreignKeyName: "inventory_reservations_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "inventory_reservations_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -1589,6 +1603,13 @@ export type Database = {
             foreignKeyName: "order_addresses_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: true
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "order_addresses_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -1647,6 +1668,13 @@ export type Database = {
           shipment_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "order_financial_adjustments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
+          },
           {
             foreignKeyName: "order_financial_adjustments_order_id_fkey"
             columns: ["order_id"]
@@ -1733,6 +1761,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "order_fulfillments"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_fulfillment_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
           },
           {
             foreignKeyName: "order_fulfillment_events_order_id_fkey"
@@ -1873,6 +1908,13 @@ export type Database = {
             foreignKeyName: "order_fulfillments_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "order_fulfillments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -1947,6 +1989,13 @@ export type Database = {
             foreignKeyName: "order_items_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -1999,6 +2048,13 @@ export type Database = {
             foreignKeyName: "order_notes_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "order_notes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -2046,6 +2102,13 @@ export type Database = {
           to_status?: Database["public"]["Enums"]["order_return_status"] | null
         }
         Relationships: [
+          {
+            foreignKeyName: "order_return_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
+          },
           {
             foreignKeyName: "order_return_events_order_id_fkey"
             columns: ["order_id"]
@@ -2197,6 +2260,13 @@ export type Database = {
             foreignKeyName: "order_returns_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "order_returns_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -2278,6 +2348,13 @@ export type Database = {
             foreignKeyName: "order_verification_attempts_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "order_verification_attempts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -2339,6 +2416,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "order_verification_attempts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_verification_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
           },
           {
             foreignKeyName: "order_verification_events_order_id_fkey"
@@ -3169,6 +3253,13 @@ export type Database = {
             foreignKeyName: "shipment_events_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "shipment_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -3243,6 +3334,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "shipment_exceptions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
+          },
           {
             foreignKeyName: "shipment_exceptions_order_id_fkey"
             columns: ["order_id"]
@@ -3509,6 +3607,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "order_fulfillments"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
           },
           {
             foreignKeyName: "shipments_order_id_fkey"
@@ -3862,7 +3967,46 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      order_financial_rollup: {
+        Row: {
+          actual_delivery_cost: number | null
+          actual_packing_cost: number | null
+          actual_product_cost: number | null
+          actual_profit: number | null
+          adjustment_expense: number | null
+          adjustment_income: number | null
+          cod_fees: number | null
+          collected_amount: number | null
+          completeness: string | null
+          cost_snapshot_complete: boolean | null
+          created_at: string | null
+          customer_id: string | null
+          est_delivery_cost: number | null
+          est_product_cost: number | null
+          estimated_profit: number | null
+          grand_total: number | null
+          order_discount: number | null
+          order_id: string | null
+          other_courier_charges: number | null
+          product_discount: number | null
+          return_charges: number | null
+          shipment_count: number | null
+          shipping_charge: number | null
+          source: Database["public"]["Enums"]["order_source"] | null
+          status: Database["public"]["Enums"]["order_status"] | null
+          subtotal: number | null
+          units: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       add_customer_note: {
@@ -3918,6 +4062,185 @@ export type Database = {
           _reason: Database["public"]["Enums"]["inventory_adjustment_reason"]
         }
         Returns: undefined
+      }
+      analytics_bucket: {
+        Args: { _grain: string; _ts: string }
+        Returns: string
+      }
+      analytics_courier_performance: {
+        Args: {
+          _account_id?: string
+          _from: string
+          _provider_id?: string
+          _to: string
+        }
+        Returns: {
+          account_id: string
+          account_name: string
+          avg_actual_cost: number
+          avg_delivery_hours: number
+          avg_estimated_cost: number
+          delivered: number
+          failed: number
+          partial: number
+          provider_id: string
+          provider_name: string
+          returned: number
+          settlement_difference: number
+          shipments: number
+          shipments_with_actual_cost: number
+        }[]
+      }
+      analytics_customer_trend: {
+        Args: { _from: string; _grain?: string; _to: string }
+        Returns: {
+          active_customers: number
+          bucket: string
+          new_customers: number
+        }[]
+      }
+      analytics_customers: {
+        Args: { _from: string; _to: string }
+        Returns: Json
+      }
+      analytics_delivery: {
+        Args: { _from: string; _to: string }
+        Returns: Json
+      }
+      analytics_guard: {
+        Args: { _from: string; _to: string }
+        Returns: undefined
+      }
+      analytics_inventory: { Args: never; Returns: Json }
+      analytics_movement_summary: {
+        Args: { _from: string; _to: string }
+        Returns: {
+          movement_type: string
+          movements: number
+          total_quantity: number
+        }[]
+      }
+      analytics_operations_trend: {
+        Args: { _from: string; _grain?: string; _to: string }
+        Returns: {
+          bucket: string
+          exceptions: number
+          failed_deliveries: number
+          returns: number
+          stock_adjustments: number
+          verification_failures: number
+        }[]
+      }
+      analytics_orders: {
+        Args: {
+          _from: string
+          _source?: Database["public"]["Enums"]["order_source"]
+          _to: string
+        }
+        Returns: Json
+      }
+      analytics_overview: {
+        Args: {
+          _from: string
+          _source?: Database["public"]["Enums"]["order_source"]
+          _to: string
+        }
+        Returns: Json
+      }
+      analytics_procurement: {
+        Args: { _from: string; _to: string }
+        Returns: Json
+      }
+      analytics_product_performance: {
+        Args: {
+          _from: string
+          _limit?: number
+          _product_id?: string
+          _to: string
+        }
+        Returns: {
+          cost_snapshot_complete: boolean
+          estimated_profit: number
+          orders: number
+          product_cost: number
+          product_id: string
+          product_name: string
+          revenue: number
+          sku: string
+          units_ordered: number
+          units_returned: number
+          variant_id: string
+          variant_name: string
+        }[]
+      }
+      analytics_purchased_products: {
+        Args: { _from: string; _limit?: number; _to: string }
+        Returns: {
+          ordered_value: number
+          product_id: string
+          product_name: string
+          quantity_ordered: number
+          quantity_received: number
+        }[]
+      }
+      analytics_sales_trend: {
+        Args: {
+          _from: string
+          _grain?: string
+          _source?: Database["public"]["Enums"]["order_source"]
+          _to: string
+        }
+        Returns: {
+          average_order_value: number
+          bucket: string
+          cancelled_revenue: number
+          delivered_revenue: number
+          discounts: number
+          net_product_revenue: number
+          orders: number
+          revenue: number
+          shipping: number
+        }[]
+      }
+      analytics_stock_risk: {
+        Args: { _limit?: number }
+        Returns: {
+          available: number
+          damaged: number
+          incoming: number
+          level_id: string
+          location_name: string
+          on_hand: number
+          product_id: string
+          product_name: string
+          risk: string
+          threshold: number
+          variant_name: string
+        }[]
+      }
+      analytics_supplier_spend: {
+        Args: { _from: string; _limit?: number; _to: string }
+        Returns: {
+          ordered_value: number
+          purchase_orders: number
+          quantity_ordered: number
+          quantity_received: number
+          received_value: number
+          supplier_id: string
+          supplier_name: string
+        }[]
+      }
+      analytics_top_customers: {
+        Args: { _from: string; _limit?: number; _to: string }
+        Returns: {
+          customer_id: string
+          delivered_orders: number
+          name: string
+          orders: number
+          phone: string
+          returned_orders: number
+          revenue: number
+        }[]
       }
       apply_catalog_cost_update: {
         Args: {
