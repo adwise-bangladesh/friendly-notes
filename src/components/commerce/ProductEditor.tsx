@@ -396,7 +396,7 @@ export function ProductEditor({ record }: Props) {
 
         <div className="rounded-md border border-border bg-card p-4">
           <FormSection
-            title="Pricing &amp; Costs"
+            title="Pricing & Costs"
             description={`All amounts are in ${CURRENCY_SYMBOL} BDT. Cost fields are internal and never shown to customers.`}
           >
             <div className="grid gap-3 sm:grid-cols-2">
