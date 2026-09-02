@@ -71,6 +71,61 @@ export type Database = {
         }
         Relationships: []
       }
+      bundle_items: {
+        Row: {
+          bundle_product_id: string
+          created_at: string
+          id: string
+          product_id: string | null
+          quantity: number
+          sort_order: number
+          updated_at: string
+          variant_id: string | null
+        }
+        Insert: {
+          bundle_product_id: string
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          quantity?: number
+          sort_order?: number
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Update: {
+          bundle_product_id?: string
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          quantity?: number
+          sort_order?: number
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bundle_items_bundle_product_id_fkey"
+            columns: ["bundle_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bundle_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bundle_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           banner_url: string | null
@@ -133,6 +188,71 @@ export type Database = {
           },
         ]
       }
+      group_buy_campaigns: {
+        Row: {
+          campaign_price: number | null
+          created_at: string
+          created_by: string | null
+          current_quantity: number
+          ends_at: string
+          expected_delivery_end: string | null
+          expected_delivery_start: string | null
+          id: string
+          minimum_quantity: number
+          product_id: string
+          starts_at: string
+          status: Database["public"]["Enums"]["group_buy_status"]
+          target_quantity: number | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          campaign_price?: number | null
+          created_at?: string
+          created_by?: string | null
+          current_quantity?: number
+          ends_at: string
+          expected_delivery_end?: string | null
+          expected_delivery_start?: string | null
+          id?: string
+          minimum_quantity?: number
+          product_id: string
+          starts_at: string
+          status?: Database["public"]["Enums"]["group_buy_status"]
+          target_quantity?: number | null
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          campaign_price?: number | null
+          created_at?: string
+          created_by?: string | null
+          current_quantity?: number
+          ends_at?: string
+          expected_delivery_end?: string | null
+          expected_delivery_start?: string | null
+          id?: string
+          minimum_quantity?: number
+          product_id?: string
+          starts_at?: string
+          status?: Database["public"]["Enums"]["group_buy_status"]
+          target_quantity?: number | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_buy_campaigns_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_categories: {
         Row: {
           category_id: string
@@ -181,27 +301,30 @@ export type Database = {
           created_at: string
           id: string
           is_primary: boolean
-          product_id: string
+          product_id: string | null
           sort_order: number
           url: string
+          variant_id: string | null
         }
         Insert: {
           alt_text?: string | null
           created_at?: string
           id?: string
           is_primary?: boolean
-          product_id: string
+          product_id?: string | null
           sort_order?: number
           url: string
+          variant_id?: string | null
         }
         Update: {
           alt_text?: string | null
           created_at?: string
           id?: string
           is_primary?: boolean
-          product_id?: string
+          product_id?: string | null
           sort_order?: number
           url?: string
+          variant_id?: string | null
         }
         Relationships: [
           {
@@ -209,6 +332,13 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_media_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
         ]
@@ -257,10 +387,14 @@ export type Database = {
       }
       product_variants: {
         Row: {
+          additional_cost: number | null
           barcode: string | null
+          base_cost: number | null
           compare_at_price: number | null
           created_at: string
+          height: number | null
           id: string
+          length: number | null
           price: number | null
           product_id: string
           sku: string | null
@@ -268,12 +402,18 @@ export type Database = {
           status: Database["public"]["Enums"]["variant_status"]
           title: string
           updated_at: string
+          weight: number | null
+          width: number | null
         }
         Insert: {
+          additional_cost?: number | null
           barcode?: string | null
+          base_cost?: number | null
           compare_at_price?: number | null
           created_at?: string
+          height?: number | null
           id?: string
+          length?: number | null
           price?: number | null
           product_id: string
           sku?: string | null
@@ -281,12 +421,18 @@ export type Database = {
           status?: Database["public"]["Enums"]["variant_status"]
           title: string
           updated_at?: string
+          weight?: number | null
+          width?: number | null
         }
         Update: {
+          additional_cost?: number | null
           barcode?: string | null
+          base_cost?: number | null
           compare_at_price?: number | null
           created_at?: string
+          height?: number | null
           id?: string
+          length?: number | null
           price?: number | null
           product_id?: string
           sku?: string | null
@@ -294,6 +440,8 @@ export type Database = {
           status?: Database["public"]["Enums"]["variant_status"]
           title?: string
           updated_at?: string
+          weight?: number | null
+          width?: number | null
         }
         Relationships: [
           {
@@ -307,16 +455,25 @@ export type Database = {
       }
       products: {
         Row: {
+          additional_cost: number
+          barcode: string | null
+          base_cost: number
           brand_id: string | null
           compare_at_price: number | null
           created_at: string
           created_by: string | null
           description: string | null
+          dimension_unit: string
+          estimated_landed_cost: number | null
           featured: boolean
+          height: number | null
           id: string
+          is_purchasable: boolean
+          length: number | null
           name: string
           price: number
           product_type: Database["public"]["Enums"]["product_type"]
+          requires_shipping: boolean
           short_description: string | null
           sku: string | null
           slug: string
@@ -325,18 +482,30 @@ export type Database = {
           updated_at: string
           updated_by: string | null
           visibility: Database["public"]["Enums"]["entity_visibility"]
+          weight: number | null
+          weight_unit: string
+          width: number | null
         }
         Insert: {
+          additional_cost?: number
+          barcode?: string | null
+          base_cost?: number
           brand_id?: string | null
           compare_at_price?: number | null
           created_at?: string
           created_by?: string | null
           description?: string | null
+          dimension_unit?: string
+          estimated_landed_cost?: number | null
           featured?: boolean
+          height?: number | null
           id?: string
+          is_purchasable?: boolean
+          length?: number | null
           name: string
           price?: number
           product_type?: Database["public"]["Enums"]["product_type"]
+          requires_shipping?: boolean
           short_description?: string | null
           sku?: string | null
           slug: string
@@ -345,18 +514,30 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           visibility?: Database["public"]["Enums"]["entity_visibility"]
+          weight?: number | null
+          weight_unit?: string
+          width?: number | null
         }
         Update: {
+          additional_cost?: number
+          barcode?: string | null
+          base_cost?: number
           brand_id?: string | null
           compare_at_price?: number | null
           created_at?: string
           created_by?: string | null
           description?: string | null
+          dimension_unit?: string
+          estimated_landed_cost?: number | null
           featured?: boolean
+          height?: number | null
           id?: string
+          is_purchasable?: boolean
+          length?: number | null
           name?: string
           price?: number
           product_type?: Database["public"]["Enums"]["product_type"]
+          requires_shipping?: boolean
           short_description?: string | null
           sku?: string | null
           slug?: string
@@ -365,6 +546,9 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           visibility?: Database["public"]["Enums"]["entity_visibility"]
+          weight?: number | null
+          weight_unit?: string
+          width?: number | null
         }
         Relationships: [
           {
@@ -459,14 +643,21 @@ export type Database = {
       brand_type: "standard" | "own_brand" | "generic"
       entity_status: "active" | "inactive" | "archived"
       entity_visibility: "visible" | "hidden"
-      product_relationship_type:
-        | "related"
-        | "upsell"
-        | "cross_sell"
-        | "bundle_item"
+      group_buy_status:
+        | "draft"
+        | "scheduled"
+        | "active"
+        | "closed"
+        | "target_met"
+        | "target_not_met"
+        | "procurement"
+        | "fulfillment"
+        | "completed"
+        | "cancelled"
+      product_relationship_type: "related" | "upsell" | "cross_sell"
       product_status: "draft" | "active" | "inactive" | "archived"
       product_type: "simple" | "variable" | "bundle" | "service" | "digital"
-      supply_model: "in_stock" | "local_sourcing" | "preorder"
+      supply_model: "in_stock" | "local_sourcing" | "preorder" | "group_buy"
       variant_status: "active" | "inactive"
     }
     CompositeTypes: {
@@ -599,15 +790,22 @@ export const Constants = {
       brand_type: ["standard", "own_brand", "generic"],
       entity_status: ["active", "inactive", "archived"],
       entity_visibility: ["visible", "hidden"],
-      product_relationship_type: [
-        "related",
-        "upsell",
-        "cross_sell",
-        "bundle_item",
+      group_buy_status: [
+        "draft",
+        "scheduled",
+        "active",
+        "closed",
+        "target_met",
+        "target_not_met",
+        "procurement",
+        "fulfillment",
+        "completed",
+        "cancelled",
       ],
+      product_relationship_type: ["related", "upsell", "cross_sell"],
       product_status: ["draft", "active", "inactive", "archived"],
       product_type: ["simple", "variable", "bundle", "service", "digital"],
-      supply_model: ["in_stock", "local_sourcing", "preorder"],
+      supply_model: ["in_stock", "local_sourcing", "preorder", "group_buy"],
       variant_status: ["active", "inactive"],
     },
   },

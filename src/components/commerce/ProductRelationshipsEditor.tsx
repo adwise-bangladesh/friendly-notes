@@ -30,7 +30,7 @@ interface Props {
   disabled?: boolean;
 }
 
-const TYPES: ProductRelationshipType[] = ["related", "upsell", "cross_sell", "bundle_item"];
+const TYPES: ProductRelationshipType[] = ["related", "upsell", "cross_sell"];
 
 export function ProductRelationshipsEditor({
   value,

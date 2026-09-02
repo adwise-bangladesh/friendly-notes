@@ -33,6 +33,7 @@ import { useCommercePermissions } from "@/hooks/use-permissions";
 import {
   PRODUCT_STATUS_LABELS,
   PRODUCT_TYPE_LABELS,
+  SUPPLY_MODELS,
   SUPPLY_MODEL_LABELS,
 } from "@/types/commerce";
 import type { ProductListRow, ProductStatus } from "@/types/commerce";
@@ -73,6 +74,7 @@ function Page() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<string>("all");
   const [brandId, setBrandId] = useState<string>("all");
+  const [supply, setSupply] = useState<string>("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [confirmArchive, setConfirmArchive] = useState(false);
 
@@ -88,14 +90,16 @@ function Page() {
       if (status !== "all" && p.status !== status) return false;
       if (status === "all" && p.status === "archived") return false;
       if (brandId !== "all" && p.brand?.id !== brandId) return false;
+      if (supply !== "all" && p.supply_model !== supply) return false;
       if (!term) return true;
       return (
         p.name.toLowerCase().includes(term) ||
         p.slug.toLowerCase().includes(term) ||
-        (p.sku ?? "").toLowerCase().includes(term)
+        (p.sku ?? "").toLowerCase().includes(term) ||
+        p.product_variants.some((v) => (v.sku ?? "").toLowerCase().includes(term))
       );
     });
-  }, [products, search, status, brandId]);
+  }, [products, search, status, brandId, supply]);
 
   const selectedIds = [...selected].filter((id) => rows.some((r) => r.id === id));
   const allChecked = rows.length > 0 && selectedIds.length === rows.length;
@@ -128,7 +132,8 @@ function Page() {
       return next;
     });
 
-  const filtersActive = search.trim() !== "" || status !== "all" || brandId !== "all";
+  const filtersActive =
+    search.trim() !== "" || status !== "all" || brandId !== "all" || supply !== "all";
 
   return (
     <>
@@ -154,7 +159,7 @@ function Page() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, slug or SKU…"
+            placeholder="Search by name, slug, product or variant SKU…"
             className="h-8 pl-7 text-[12.5px]"
           />
         </div>
@@ -184,6 +189,19 @@ function Page() {
             ))}
           </SelectContent>
         </Select>
+        <Select value={supply} onValueChange={setSupply}>
+          <SelectTrigger className="h-8 w-[160px] text-[12.5px]">
+            <SelectValue placeholder="Supply model" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All supply models</SelectItem>
+            {SUPPLY_MODELS.map((s) => (
+              <SelectItem key={s} value={s}>
+                {SUPPLY_MODEL_LABELS[s]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         {filtersActive && (
           <Button
             size="sm"
@@ -192,6 +210,7 @@ function Page() {
               setSearch("");
               setStatus("all");
               setBrandId("all");
+              setSupply("all");
             }}
           >
             <X className="mr-1.5 h-3.5 w-3.5" />

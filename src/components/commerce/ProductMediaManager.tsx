@@ -12,11 +12,23 @@ interface Props {
   value: ProductMediaDraft[];
   onChange: (next: ProductMediaDraft[]) => void;
   disabled?: boolean;
+  /** Compact mode is used for variant image strips. */
+  compact?: boolean;
+  maxImages?: number;
+  uploadLabel?: string;
 }
 
-const MAX_IMAGES = 10;
+const DEFAULT_MAX = 10;
 
-export function ProductMediaManager({ value, onChange, disabled }: Props) {
+export function ProductMediaManager({
+  value,
+  onChange,
+  disabled,
+  compact,
+  maxImages,
+  uploadLabel,
+}: Props) {
+  const MAX_IMAGES = maxImages ?? DEFAULT_MAX;
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
@@ -28,9 +40,10 @@ export function ProductMediaManager({ value, onChange, disabled }: Props) {
   const handleFiles = async (files: FileList) => {
     const room = MAX_IMAGES - value.length;
     if (room <= 0) {
-      toast.error(`Maximum ${MAX_IMAGES} images per product.`);
+      toast.error(`Maximum ${MAX_IMAGES} images.`);
       return;
     }
+
     setBusy(true);
     const added: ProductMediaDraft[] = [];
     try {
@@ -80,7 +93,7 @@ export function ProductMediaManager({ value, onChange, disabled }: Props) {
   return (
     <div className="space-y-3">
       {value.length > 0 && (
-        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <ul className={cn("grid gap-2", compact ? "grid-cols-3 sm:grid-cols-4" : "grid-cols-2 sm:grid-cols-3")}>
           {value.map((m, i) => (
             <li
               key={m.key}
@@ -89,7 +102,7 @@ export function ProductMediaManager({ value, onChange, disabled }: Props) {
                 m.is_primary ? "border-primary/60 bg-primary/5" : "border-border",
               )}
             >
-              <MediaImage path={m.url} alt={m.alt_text ?? "Product image"} className="h-24 w-full" />
+              <MediaImage path={m.url} alt={m.alt_text ?? "Product image"} className={cn("w-full", compact ? "h-16" : "h-24")} />
               <Input
                 value={m.alt_text ?? ""}
                 disabled={disabled}
@@ -166,7 +179,7 @@ export function ProductMediaManager({ value, onChange, disabled }: Props) {
           ) : (
             <Upload className="mr-1.5 h-3.5 w-3.5" />
           )}
-          Upload Images
+          {uploadLabel ?? "Upload Images"}
         </Button>
       )}
       <p className="text-[11.5px] text-muted-foreground">
