@@ -53,6 +53,7 @@ import { Route as AuthenticatedProductsCategoriesRouteImport } from './routes/_a
 import { Route as AuthenticatedProductsNewRouteImport } from './routes/_authenticated/products.new'
 import { Route as AuthenticatedReturnsIdRouteImport } from './routes/_authenticated/returns_.$id'
 import { Route as AuthenticatedStoresIndexRouteImport } from './routes/_authenticated/stores.index'
+import { Route as AuthenticatedStoresIdRouteImport } from './routes/_authenticated/stores.$id'
 import { Route as AuthenticatedSuppliersIndexRouteImport } from './routes/_authenticated/suppliers.index'
 import { Route as AuthenticatedSuppliersIdRouteImport } from './routes/_authenticated/suppliers.$id'
 import { Route as AuthenticatedAiBrainRunsIdRouteImport } from './routes/_authenticated/ai-brain.runs.$id'
@@ -318,6 +319,11 @@ const AuthenticatedStoresIndexRoute =
     path: '/stores/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedStoresIdRoute = AuthenticatedStoresIdRouteImport.update({
+  id: '/stores/$id',
+  path: '/stores/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSuppliersIndexRoute =
   AuthenticatedSuppliersIndexRouteImport.update({
     id: '/suppliers/',
@@ -431,6 +437,7 @@ export interface FileRoutesByFullPath {
   '/products/categories': typeof AuthenticatedProductsCategoriesRoute
   '/products/new': typeof AuthenticatedProductsNewRoute
   '/returns/$id': typeof AuthenticatedReturnsIdRoute
+  '/stores/$id': typeof AuthenticatedStoresIdRoute
   '/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
   '/ai-brain/': typeof AuthenticatedAiBrainIndexRoute
   '/analytics/': typeof AuthenticatedAnalyticsIndexRoute
@@ -489,6 +496,7 @@ export interface FileRoutesByTo {
   '/products/categories': typeof AuthenticatedProductsCategoriesRoute
   '/products/new': typeof AuthenticatedProductsNewRoute
   '/returns/$id': typeof AuthenticatedReturnsIdRoute
+  '/stores/$id': typeof AuthenticatedStoresIdRoute
   '/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
   '/ai-brain': typeof AuthenticatedAiBrainIndexRoute
   '/analytics': typeof AuthenticatedAnalyticsIndexRoute
@@ -549,6 +557,7 @@ export interface FileRoutesById {
   '/_authenticated/products/categories': typeof AuthenticatedProductsCategoriesRoute
   '/_authenticated/products/new': typeof AuthenticatedProductsNewRoute
   '/_authenticated/returns_/$id': typeof AuthenticatedReturnsIdRoute
+  '/_authenticated/stores/$id': typeof AuthenticatedStoresIdRoute
   '/_authenticated/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
   '/_authenticated/ai-brain/': typeof AuthenticatedAiBrainIndexRoute
   '/_authenticated/analytics/': typeof AuthenticatedAnalyticsIndexRoute
@@ -609,6 +618,7 @@ export interface FileRouteTypes {
     | '/products/categories'
     | '/products/new'
     | '/returns/$id'
+    | '/stores/$id'
     | '/suppliers/$id'
     | '/ai-brain/'
     | '/analytics/'
@@ -667,6 +677,7 @@ export interface FileRouteTypes {
     | '/products/categories'
     | '/products/new'
     | '/returns/$id'
+    | '/stores/$id'
     | '/suppliers/$id'
     | '/ai-brain'
     | '/analytics'
@@ -726,6 +737,7 @@ export interface FileRouteTypes {
     | '/_authenticated/products/categories'
     | '/_authenticated/products/new'
     | '/_authenticated/returns_/$id'
+    | '/_authenticated/stores/$id'
     | '/_authenticated/suppliers/$id'
     | '/_authenticated/ai-brain/'
     | '/_authenticated/analytics/'
@@ -1071,6 +1083,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStoresIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/stores/$id': {
+      id: '/_authenticated/stores/$id'
+      path: '/stores/$id'
+      fullPath: '/stores/$id'
+      preLoaderRoute: typeof AuthenticatedStoresIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/suppliers/': {
       id: '/_authenticated/suppliers/'
       path: '/suppliers'
@@ -1194,6 +1213,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProductsCategoriesRoute: typeof AuthenticatedProductsCategoriesRoute
   AuthenticatedProductsNewRoute: typeof AuthenticatedProductsNewRoute
   AuthenticatedReturnsIdRoute: typeof AuthenticatedReturnsIdRoute
+  AuthenticatedStoresIdRoute: typeof AuthenticatedStoresIdRoute
   AuthenticatedSuppliersIdRoute: typeof AuthenticatedSuppliersIdRoute
   AuthenticatedAiBrainIndexRoute: typeof AuthenticatedAiBrainIndexRoute
   AuthenticatedAnalyticsIndexRoute: typeof AuthenticatedAnalyticsIndexRoute
@@ -1250,6 +1270,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProductsCategoriesRoute: AuthenticatedProductsCategoriesRoute,
   AuthenticatedProductsNewRoute: AuthenticatedProductsNewRoute,
   AuthenticatedReturnsIdRoute: AuthenticatedReturnsIdRoute,
+  AuthenticatedStoresIdRoute: AuthenticatedStoresIdRoute,
   AuthenticatedSuppliersIdRoute: AuthenticatedSuppliersIdRoute,
   AuthenticatedAiBrainIndexRoute: AuthenticatedAiBrainIndexRoute,
   AuthenticatedAnalyticsIndexRoute: AuthenticatedAnalyticsIndexRoute,
