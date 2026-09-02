@@ -168,7 +168,7 @@ export function ProductVariantsEditor({
                 ) : (
                   <ChevronRight className="h-3.5 w-3.5" />
                 )}
-                Cost, physical &amp; images
+                Cost, physical & images
               </button>
               <span
                 className={cn(
