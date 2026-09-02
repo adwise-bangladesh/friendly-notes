@@ -6,7 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { APP_CONFIG } from "@/lib/app-config";
 
+function safeNext(next: unknown): string | null {
+  if (typeof next !== "string" || !next.startsWith("/") || next.startsWith("//")) return null;
+  return next;
+}
+
 export const Route = createFileRoute("/auth")({
+  validateSearch: (s: Record<string, unknown>) => ({ next: safeNext(s["next"]) ?? undefined }),
 
   head: () => ({
     meta: [
@@ -28,6 +34,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -36,12 +43,14 @@ function AuthPage() {
   useEffect(() => {
     let cancelled = false;
     void supabase.auth.getSession().then(({ data }) => {
-      if (!cancelled && data.session) navigate({ to: "/dashboard", replace: true });
+      if (cancelled || !data.session) return;
+      if (next) window.location.replace(next);
+      else navigate({ to: "/dashboard", replace: true });
     });
     return () => {
       cancelled = true;
     };
-  }, [navigate]);
+  }, [navigate, next]);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -53,7 +62,8 @@ function AuthPage() {
       setError(signInError.message);
       return;
     }
-    navigate({ to: "/dashboard", replace: true });
+    if (next) window.location.replace(next);
+    else navigate({ to: "/dashboard", replace: true });
   }
 
   return (
