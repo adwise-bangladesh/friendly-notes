@@ -11,6 +11,8 @@ import {
   RotateCcw,
   Zap,
   Plug,
+  Store,
+
   Brain,
   Settings,
   type LucideIcon,
@@ -98,7 +100,9 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
   { label: "Customers", to: "/customers", icon: Users },
+  { label: "Stores", to: "/stores", icon: Store },
   { label: "Returns", to: "/returns", icon: RotateCcw },
+
   {
     label: "Automation",
     to: "/automation",
