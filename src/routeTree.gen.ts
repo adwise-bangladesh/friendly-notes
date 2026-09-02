@@ -19,6 +19,7 @@ import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AuthenticatedAnalyticsIndexRouteImport } from './routes/_authenticated/analytics.index'
+import { Route as AuthenticatedAnalyticsOperationsRouteImport } from './routes/_authenticated/analytics.operations'
 import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers.index'
 import { Route as AuthenticatedCustomersIdRouteImport } from './routes/_authenticated/customers_.$id'
 import { Route as AuthenticatedFinanceCourierSettlementsRouteImport } from './routes/_authenticated/finance.courier-settlements'
@@ -103,6 +104,12 @@ const AuthenticatedAnalyticsIndexRoute =
   AuthenticatedAnalyticsIndexRouteImport.update({
     id: '/analytics/',
     path: '/analytics/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAnalyticsOperationsRoute =
+  AuthenticatedAnalyticsOperationsRouteImport.update({
+    id: '/analytics/operations',
+    path: '/analytics/operations',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedCustomersIndexRoute =
@@ -315,6 +322,7 @@ export interface FileRoutesByFullPath {
   '/returns': typeof AuthenticatedReturnsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/analytics/operations': typeof AuthenticatedAnalyticsOperationsRoute
   '/customers/$id': typeof AuthenticatedCustomersIdRoute
   '/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
   '/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
@@ -360,6 +368,7 @@ export interface FileRoutesByTo {
   '/returns': typeof AuthenticatedReturnsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/analytics/operations': typeof AuthenticatedAnalyticsOperationsRoute
   '/customers/$id': typeof AuthenticatedCustomersIdRoute
   '/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
   '/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
@@ -407,6 +416,7 @@ export interface FileRoutesById {
   '/_authenticated/returns': typeof AuthenticatedReturnsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/_authenticated/analytics/operations': typeof AuthenticatedAnalyticsOperationsRoute
   '/_authenticated/customers_/$id': typeof AuthenticatedCustomersIdRoute
   '/_authenticated/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
   '/_authenticated/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
@@ -454,6 +464,7 @@ export interface FileRouteTypes {
     | '/returns'
     | '/settings'
     | '/.lovable/oauth/consent'
+    | '/analytics/operations'
     | '/customers/$id'
     | '/finance/courier-settlements'
     | '/inventory/locations'
@@ -499,6 +510,7 @@ export interface FileRouteTypes {
     | '/returns'
     | '/settings'
     | '/.lovable/oauth/consent'
+    | '/analytics/operations'
     | '/customers/$id'
     | '/finance/courier-settlements'
     | '/inventory/locations'
@@ -545,6 +557,7 @@ export interface FileRouteTypes {
     | '/_authenticated/returns'
     | '/_authenticated/settings'
     | '/.lovable/oauth/consent'
+    | '/_authenticated/analytics/operations'
     | '/_authenticated/customers_/$id'
     | '/_authenticated/finance/courier-settlements'
     | '/_authenticated/inventory/locations'
@@ -662,6 +675,13 @@ declare module '@tanstack/react-router' {
       path: '/analytics'
       fullPath: '/analytics/'
       preLoaderRoute: typeof AuthenticatedAnalyticsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/analytics/operations': {
+      id: '/_authenticated/analytics/operations'
+      path: '/analytics/operations'
+      fullPath: '/analytics/operations'
+      preLoaderRoute: typeof AuthenticatedAnalyticsOperationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/customers/': {
@@ -909,6 +929,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedReturnsRoute: typeof AuthenticatedReturnsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedAnalyticsOperationsRoute: typeof AuthenticatedAnalyticsOperationsRoute
   AuthenticatedCustomersIdRoute: typeof AuthenticatedCustomersIdRoute
   AuthenticatedFinanceCourierSettlementsRoute: typeof AuthenticatedFinanceCourierSettlementsRoute
   AuthenticatedInventoryLocationsRoute: typeof AuthenticatedInventoryLocationsRoute
@@ -949,6 +970,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedReturnsRoute: AuthenticatedReturnsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedAnalyticsOperationsRoute: AuthenticatedAnalyticsOperationsRoute,
   AuthenticatedCustomersIdRoute: AuthenticatedCustomersIdRoute,
   AuthenticatedFinanceCourierSettlementsRoute:
     AuthenticatedFinanceCourierSettlementsRoute,
