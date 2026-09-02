@@ -229,7 +229,9 @@ function AutomationRulesPage() {
         title="Archive this rule?"
         description="Archived rules stop running and can no longer be edited. Their execution history is kept."
         confirmLabel="Archive"
-        onConfirm={() => archiving && changeStatus.mutate({ id: archiving.id, status: "archived" })}
+        onConfirm={() => {
+          if (archiving) changeStatus.mutate({ id: archiving.id, status: "archived" });
+        }}
       />
     </div>
   );
