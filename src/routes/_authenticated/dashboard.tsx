@@ -229,6 +229,9 @@ function DashboardPage() {
         <Panel title="Processing Queue" icon={ListChecks}>
           <ProcessingQueue />
         </Panel>
+        <Panel title="Shipping Desk" icon={Truck}>
+          <ShippingQueue />
+        </Panel>
         <Panel title="Low Stock" icon={Boxes}>
           <EmptyState
             compact
