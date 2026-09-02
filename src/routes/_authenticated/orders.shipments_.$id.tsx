@@ -62,7 +62,7 @@ import type {
 const TITLE = "Shipment Workspace · Commerce Operations";
 const DESCRIPTION = "Track and update one internal shipment through its courier lifecycle.";
 
-export const Route = createFileRoute("/_authenticated/orders/shipments/$id")({
+export const Route = createFileRoute("/_authenticated/orders/shipments_/$id")({
   head: () => ({
     meta: [
       { title: TITLE },
@@ -77,7 +77,7 @@ export const Route = createFileRoute("/_authenticated/orders/shipments/$id")({
 });
 
 function Page() {
-  const { id } = useParams({ from: "/_authenticated/orders/shipments/$id" });
+  const { id } = useParams({ from: "/_authenticated/orders/shipments_/$id" });
   const queryClient = useQueryClient();
   const { canManage } = useCommercePermissions();
 
