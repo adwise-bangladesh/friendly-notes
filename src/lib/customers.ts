@@ -66,7 +66,7 @@ export async function getCustomerList(
   filters: CustomerListFilters = {},
 ): Promise<CustomerListResult> {
   const { data, error } = await supabase.rpc("customer_list", {
-    _search: filters.search?.trim() || undefined,
+    ...(filters.search?.trim() ? { _search: filters.search.trim() } : {}),
     ...(filters.status && filters.status !== "all" ? { _status: filters.status } : {}),
     ...(filters.customerType && filters.customerType !== "all"
       ? { _customer_type: filters.customerType }
