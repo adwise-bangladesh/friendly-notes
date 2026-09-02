@@ -26,6 +26,7 @@ export const NAV_ITEMS: NavItem[] = [
       { label: "All Orders", to: "/orders" },
       { label: "Verification", to: "/orders/verification" },
       { label: "Warehouse", to: "/orders/fulfillment" },
+      { label: "Shipping", to: "/orders/shipments" },
     ],
   },
   {
