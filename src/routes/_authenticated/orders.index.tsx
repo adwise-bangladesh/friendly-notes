@@ -199,6 +199,7 @@ function Page() {
                   <th className="px-3 py-2 text-left font-medium">Status</th>
                   <th className="px-3 py-2 text-left font-medium">Verification</th>
                   <th className="px-3 py-2 text-left font-medium">Fulfillment</th>
+                  <th className="px-3 py-2 text-left font-medium">Delivery</th>
                   <th className="px-3 py-2 text-left font-medium">Created</th>
                 </tr>
               </thead>
@@ -237,6 +238,11 @@ function Page() {
                     </td>
                     <td className="px-3 py-2 text-muted-foreground">
                       {FULFILLMENT_STATUS_LABELS[o.fulfillment_status]}
+                    </td>
+                    <td className="px-3 py-2">
+                      <StatusBadge tone={DELIVERY_STATUS_TONE[o.delivery_status]}>
+                        {DELIVERY_STATUS_LABELS[o.delivery_status]}
+                      </StatusBadge>
                     </td>
                     <td className="px-3 py-2 text-muted-foreground">
                       {new Date(o.created_at).toLocaleDateString()}

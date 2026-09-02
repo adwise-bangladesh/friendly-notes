@@ -22,6 +22,7 @@ import { formatMoney } from "@/lib/currency";
 import { addOrderNote, cancelOrder, getOrderById } from "@/lib/orders";
 import {
   DELIVERY_STATUS_LABELS,
+  DELIVERY_STATUS_TONE,
   FINANCIAL_STATUS_LABELS,
   FULFILLMENT_STATUS_LABELS,
   NOTE_TYPE_LABELS,
@@ -163,7 +164,9 @@ function Page() {
         <StatusBadge tone={RESERVATION_STATUS_TONE[order.reservation_status]}>
           Stock · {RESERVATION_STATUS_LABELS[order.reservation_status]}
         </StatusBadge>
-        <StatusBadge>Delivery · {DELIVERY_STATUS_LABELS[order.delivery_status]}</StatusBadge>
+        <StatusBadge tone={DELIVERY_STATUS_TONE[order.delivery_status]}>
+          Delivery · {DELIVERY_STATUS_LABELS[order.delivery_status]}
+        </StatusBadge>
         <StatusBadge>Settlement · {FINANCIAL_STATUS_LABELS[order.financial_status]}</StatusBadge>
         <span className="text-[12px] text-muted-foreground">
           {ORDER_SOURCE_LABELS[order.source]} · {new Date(order.created_at).toLocaleString()}
