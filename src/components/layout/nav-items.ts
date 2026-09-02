@@ -10,6 +10,7 @@ import {
   Users,
   RotateCcw,
   Zap,
+  Plug,
   Settings,
   type LucideIcon,
 } from "lucide-react";
