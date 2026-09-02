@@ -14,24 +14,18 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { getFulfillmentQueue } from "@/lib/fulfillment";
+import { getFulfillmentRecordQueue } from "@/lib/fulfillment-records";
 import { getActiveLocations } from "@/lib/inventory";
-import { ORDER_SOURCE_LABELS } from "@/types/orders";
 import {
-  FULFILLMENT_QUEUE_STATUSES,
-  FULFILLMENT_STATUS_LABELS,
-  FULFILLMENT_STATUS_TONE,
-  RESERVATION_STATUSES,
-  RESERVATION_STATUS_LABELS,
-  RESERVATION_STATUS_TONE,
-  nextFulfillmentAction,
-  FULFILLMENT_ACTION_LABELS,
-} from "@/types/fulfillment";
-import type { FulfillmentStatus, ReservationStatus } from "@/types/fulfillment";
+  FULFILLMENT_RECORD_STATUSES,
+  FULFILLMENT_RECORD_STATUS_LABELS,
+  FULFILLMENT_RECORD_STATUS_TONE,
+} from "@/types/fulfillment-records";
+import type { FulfillmentRecordStatus } from "@/types/fulfillment-records";
 
 const TITLE = "Warehouse Queue · Commerce Operations";
 const DESCRIPTION =
-  "Pick, pack and hand over confirmed Bangladesh orders with inventory held at the warehouse.";
+  "Every warehouse fulfillment in progress: picking, quality control, packing and handover readiness.";
 
 export const Route = createFileRoute("/_authenticated/orders/fulfillment")({
   head: () => ({
@@ -49,9 +43,10 @@ export const Route = createFileRoute("/_authenticated/orders/fulfillment")({
 
 function Page() {
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<FulfillmentStatus | "all">("all");
-  const [reservation, setReservation] = useState<ReservationStatus | "all">("all");
+  const [status, setStatus] = useState<FulfillmentRecordStatus | "all" | "active">("active");
   const [locationId, setLocationId] = useState<string | "all">("all");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
 
   const { data: locations = [] } = useQuery({
     queryKey: ["inventory-locations", "active"],
@@ -59,8 +54,15 @@ function Page() {
   });
 
   const { data: rows = [], isLoading } = useQuery({
-    queryKey: ["fulfillment-queue", search, status, reservation, locationId],
-    queryFn: () => getFulfillmentQueue({ search, status, reservation, locationId }),
+    queryKey: ["fulfillment-record-queue", search, status, locationId, from, to],
+    queryFn: () =>
+      getFulfillmentRecordQueue({
+        search,
+        status,
+        locationId,
+        ...(from ? { from: new Date(from).toISOString() } : {}),
+        ...(to ? { to: new Date(`${to}T23:59:59`).toISOString() } : {}),
+      }),
   });
 
   return (
@@ -71,45 +73,33 @@ function Page() {
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search order number, customer or phone"
-          className="h-8 w-64 text-[13px]"
-          aria-label="Search warehouse queue"
+          placeholder="Order number, customer, phone or fulfillment number"
+          className="h-8 w-72 text-[13px]"
+          aria-label="Search the warehouse queue"
         />
-        <Select value={status} onValueChange={(v) => setStatus(v as FulfillmentStatus | "all")}>
-          <SelectTrigger className="h-8 w-44 text-[13px]" aria-label="Warehouse status">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Open queue</SelectItem>
-            {FULFILLMENT_QUEUE_STATUSES.map((s) => (
-              <SelectItem key={s} value={s}>
-                {FULFILLMENT_STATUS_LABELS[s]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
         <Select
-          value={reservation}
-          onValueChange={(v) => setReservation(v as ReservationStatus | "all")}
+          value={status}
+          onValueChange={(v) => setStatus(v as FulfillmentRecordStatus | "all" | "active")}
         >
-          <SelectTrigger className="h-8 w-40 text-[13px]" aria-label="Stock reservation">
+          <SelectTrigger className="h-8 w-44 text-[13px]" aria-label="Fulfillment status">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Any stock state</SelectItem>
-            {RESERVATION_STATUSES.map((s) => (
+            <SelectItem value="active">Active work</SelectItem>
+            <SelectItem value="all">All statuses</SelectItem>
+            {FULFILLMENT_RECORD_STATUSES.map((s) => (
               <SelectItem key={s} value={s}>
-                {RESERVATION_STATUS_LABELS[s]}
+                {FULFILLMENT_RECORD_STATUS_LABELS[s]}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
         <Select value={locationId} onValueChange={setLocationId}>
-          <SelectTrigger className="h-8 w-44 text-[13px]" aria-label="Warehouse location">
+          <SelectTrigger className="h-8 w-44 text-[13px]" aria-label="Warehouse">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All locations</SelectItem>
+            <SelectItem value="all">All warehouses</SelectItem>
             {locations.map((l) => (
               <SelectItem key={l.id} value={l.id}>
                 {l.name}
@@ -117,91 +107,101 @@ function Page() {
             ))}
           </SelectContent>
         </Select>
+        <Input
+          type="date"
+          value={from}
+          onChange={(e) => setFrom(e.target.value)}
+          className="h-8 w-36 text-[13px]"
+          aria-label="Created from"
+        />
+        <Input
+          type="date"
+          value={to}
+          onChange={(e) => setTo(e.target.value)}
+          className="h-8 w-36 text-[13px]"
+          aria-label="Created to"
+        />
       </div>
 
-      <div className="rounded border border-border">
-        {isLoading ? (
-          <LoadingState rows={6} label="Loading warehouse queue" />
-        ) : rows.length === 0 ? (
-          <EmptyState
-            icon={PackageSearch}
-            title="Nothing in the warehouse queue"
-            description="Orders appear here once verification is confirmed and stock is held."
-          />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-[13px]">
-              <thead className="border-b border-border bg-muted/50 text-[11.5px] uppercase tracking-wide text-muted-foreground">
-                <tr>
-                  <th className="px-3 py-2 text-left font-medium">Order</th>
-                  <th className="px-3 py-2 text-left font-medium">Customer</th>
-                  <th className="px-3 py-2 text-right font-medium">Items</th>
-                  <th className="px-3 py-2 text-left font-medium">Source</th>
-                  <th className="px-3 py-2 text-left font-medium">Stock</th>
-                  <th className="px-3 py-2 text-left font-medium">Warehouse</th>
-                  <th className="px-3 py-2 text-left font-medium">Location</th>
-                  <th className="px-3 py-2 text-left font-medium">Next step</th>
-                  <th className="px-3 py-2 text-left font-medium">Created</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r) => {
-                  const next = nextFulfillmentAction(r.fulfillment_status, r.reservation_status);
-                  return (
-                    <tr key={r.id} className="border-b border-border last:border-0 hover:bg-muted/40">
-                      <td className="px-3 py-2">
+      {isLoading ? (
+        <LoadingState rows={8} label="Loading warehouse queue" />
+      ) : rows.length === 0 ? (
+        <EmptyState
+          icon={PackageSearch}
+          title="Nothing in the warehouse queue"
+          description="Fulfillments appear here once they are created from a confirmed order."
+        />
+      ) : (
+        <div className="overflow-x-auto rounded border border-border">
+          <table className="w-full text-[12.5px]">
+            <thead className="bg-muted/50 text-left text-[11px] uppercase tracking-wide text-muted-foreground">
+              <tr>
+                <th className="px-2 py-1.5 font-medium">Fulfillment</th>
+                <th className="px-2 py-1.5 font-medium">Order</th>
+                <th className="px-2 py-1.5 font-medium">Customer</th>
+                <th className="px-2 py-1.5 font-medium">Warehouse</th>
+                <th className="px-2 py-1.5 font-medium">Status</th>
+                <th className="px-2 py-1.5 text-right font-medium">Items</th>
+                <th className="px-2 py-1.5 font-medium">Progress</th>
+                <th className="px-2 py-1.5 font-medium">Created</th>
+                <th className="px-2 py-1.5 font-medium">Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => {
+                const planned = row.items.reduce((sum, i) => sum + i.quantity, 0);
+                const picked = row.items.reduce((sum, i) => sum + i.picked_quantity, 0);
+                return (
+                  <tr key={row.id} className="border-t border-border hover:bg-muted/40">
+                    <td className="px-2 py-1.5">
+                      <Link
+                        to="/orders/fulfillments/$id"
+                        params={{ id: row.id }}
+                        className="font-medium underline-offset-2 hover:underline"
+                      >
+                        #{row.fulfillment_number}
+                      </Link>
+                    </td>
+                    <td className="px-2 py-1.5">
+                      {row.order && (
                         <Link
                           to="/orders/$id"
-                          params={{ id: r.id }}
-                          className="font-medium text-primary hover:underline"
+                          params={{ id: row.order.id }}
+                          className="underline-offset-2 hover:underline"
                         >
-                          {r.order_number}
+                          {row.order.order_number}
                         </Link>
-                      </td>
-                      <td className="px-3 py-2">
-                        {r.customer_name}
-                        <div className="text-[11.5px] tabular-nums text-muted-foreground">
-                          {r.customer_phone}
-                        </div>
-                      </td>
-                      <td className="px-3 py-2 text-right tabular-nums">
-                        {r.item_count?.[0]?.count ?? 0}
-                      </td>
-                      <td className="px-3 py-2 text-muted-foreground">
-                        {ORDER_SOURCE_LABELS[r.source]}
-                      </td>
-                      <td className="px-3 py-2">
-                        <StatusBadge tone={RESERVATION_STATUS_TONE[r.reservation_status]}>
-                          {RESERVATION_STATUS_LABELS[r.reservation_status]}
-                        </StatusBadge>
-                      </td>
-                      <td className="px-3 py-2">
-                        <StatusBadge tone={FULFILLMENT_STATUS_TONE[r.fulfillment_status]}>
-                          {FULFILLMENT_STATUS_LABELS[r.fulfillment_status]}
-                        </StatusBadge>
-                        {r.fulfillment_hold_reason && (
-                          <div className="mt-0.5 text-[11.5px] text-destructive">
-                            {r.fulfillment_hold_reason}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-3 py-2 text-muted-foreground">
-                        {r.location?.name ?? "—"}
-                      </td>
-                      <td className="px-3 py-2 text-muted-foreground">
-                        {next ? FULFILLMENT_ACTION_LABELS[next] : "—"}
-                      </td>
-                      <td className="px-3 py-2 text-muted-foreground">
-                        {new Date(r.created_at).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+                      )}
+                    </td>
+                    <td className="px-2 py-1.5">
+                      {row.order?.customer_name}
+                      <span className="block text-[11.5px] text-muted-foreground">
+                        {row.order?.customer_phone}
+                      </span>
+                    </td>
+                    <td className="px-2 py-1.5">{row.location?.name ?? "—"}</td>
+                    <td className="px-2 py-1.5">
+                      <StatusBadge tone={FULFILLMENT_RECORD_STATUS_TONE[row.status]}>
+                        {FULFILLMENT_RECORD_STATUS_LABELS[row.status]}
+                      </StatusBadge>
+                    </td>
+                    <td className="px-2 py-1.5 text-right tabular-nums">{row.items.length}</td>
+                    <td className="px-2 py-1.5 tabular-nums">
+                      {picked} / {planned} units picked
+                    </td>
+                    <td className="px-2 py-1.5 text-muted-foreground">
+                      {new Date(row.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-2 py-1.5 text-muted-foreground">
+                      {new Date(row.updated_at).toLocaleString()}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </>
   );
 }
