@@ -1266,6 +1266,211 @@ export type Database = {
           },
         ]
       }
+      order_return_events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          event_type: Database["public"]["Enums"]["return_event_type"]
+          from_status: Database["public"]["Enums"]["order_return_status"] | null
+          id: string
+          message: string
+          metadata: Json | null
+          order_id: string
+          return_id: string
+          to_status: Database["public"]["Enums"]["order_return_status"] | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          event_type: Database["public"]["Enums"]["return_event_type"]
+          from_status?:
+            | Database["public"]["Enums"]["order_return_status"]
+            | null
+          id?: string
+          message: string
+          metadata?: Json | null
+          order_id: string
+          return_id: string
+          to_status?: Database["public"]["Enums"]["order_return_status"] | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          event_type?: Database["public"]["Enums"]["return_event_type"]
+          from_status?:
+            | Database["public"]["Enums"]["order_return_status"]
+            | null
+          id?: string
+          message?: string
+          metadata?: Json | null
+          order_id?: string
+          return_id?: string
+          to_status?: Database["public"]["Enums"]["order_return_status"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_return_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_return_events_return_id_fkey"
+            columns: ["return_id"]
+            isOneToOne: false
+            referencedRelation: "order_returns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_return_items: {
+        Row: {
+          condition: Database["public"]["Enums"]["return_item_condition"]
+          created_at: string
+          id: string
+          notes: string | null
+          order_item_id: string
+          quantity_accepted: number
+          quantity_expected: number
+          quantity_received: number
+          reason: string | null
+          return_id: string
+          updated_at: string
+        }
+        Insert: {
+          condition?: Database["public"]["Enums"]["return_item_condition"]
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_item_id: string
+          quantity_accepted?: number
+          quantity_expected?: number
+          quantity_received?: number
+          reason?: string | null
+          return_id: string
+          updated_at?: string
+        }
+        Update: {
+          condition?: Database["public"]["Enums"]["return_item_condition"]
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_item_id?: string
+          quantity_accepted?: number
+          quantity_expected?: number
+          quantity_received?: number
+          reason?: string | null
+          return_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_return_items_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_return_items_return_id_fkey"
+            columns: ["return_id"]
+            isOneToOne: false
+            referencedRelation: "order_returns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_returns: {
+        Row: {
+          cancelled_at: string | null
+          completed_at: string | null
+          courier_reason: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          initiated_at: string | null
+          inspected_at: string | null
+          notes: string | null
+          order_id: string
+          reason: string | null
+          received_at: string | null
+          requested_at: string
+          resolution_note: string | null
+          return_number: string
+          return_type: Database["public"]["Enums"]["order_return_type"]
+          shipment_id: string | null
+          source: string
+          status: Database["public"]["Enums"]["order_return_status"]
+          tracking_reference: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          cancelled_at?: string | null
+          completed_at?: string | null
+          courier_reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          initiated_at?: string | null
+          inspected_at?: string | null
+          notes?: string | null
+          order_id: string
+          reason?: string | null
+          received_at?: string | null
+          requested_at?: string
+          resolution_note?: string | null
+          return_number: string
+          return_type?: Database["public"]["Enums"]["order_return_type"]
+          shipment_id?: string | null
+          source?: string
+          status?: Database["public"]["Enums"]["order_return_status"]
+          tracking_reference?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          cancelled_at?: string | null
+          completed_at?: string | null
+          courier_reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          initiated_at?: string | null
+          inspected_at?: string | null
+          notes?: string | null
+          order_id?: string
+          reason?: string | null
+          received_at?: string | null
+          requested_at?: string
+          resolution_note?: string | null
+          return_number?: string
+          return_type?: Database["public"]["Enums"]["order_return_type"]
+          shipment_id?: string | null
+          source?: string
+          status?: Database["public"]["Enums"]["order_return_status"]
+          tracking_reference?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_returns_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_returns_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_verification_attempts: {
         Row: {
           ai_result: Json | null
@@ -1940,6 +2145,84 @@ export type Database = {
           },
         ]
       }
+      shipment_exceptions: {
+        Row: {
+          collected_amount: number | null
+          courier_reason: string | null
+          created_at: string
+          created_by: string | null
+          exception_type: Database["public"]["Enums"]["shipment_exception_type"]
+          id: string
+          notes: string | null
+          occurred_at: string
+          order_id: string
+          provider_event: string | null
+          reason: string | null
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          shipment_id: string
+          source: string
+          status: Database["public"]["Enums"]["shipment_exception_status"]
+          updated_at: string
+        }
+        Insert: {
+          collected_amount?: number | null
+          courier_reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          exception_type: Database["public"]["Enums"]["shipment_exception_type"]
+          id?: string
+          notes?: string | null
+          occurred_at?: string
+          order_id: string
+          provider_event?: string | null
+          reason?: string | null
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          shipment_id: string
+          source?: string
+          status?: Database["public"]["Enums"]["shipment_exception_status"]
+          updated_at?: string
+        }
+        Update: {
+          collected_amount?: number | null
+          courier_reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          exception_type?: Database["public"]["Enums"]["shipment_exception_type"]
+          id?: string
+          notes?: string | null
+          occurred_at?: string
+          order_id?: string
+          provider_event?: string | null
+          reason?: string | null
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          shipment_id?: string
+          source?: string
+          status?: Database["public"]["Enums"]["shipment_exception_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipment_exceptions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipment_exceptions_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shipment_items: {
         Row: {
           created_at: string
@@ -2215,6 +2498,16 @@ export type Database = {
       adjust_group_buy_campaign_quantity: {
         Args: { _campaign_id: string; _quantity: number }
         Returns: number
+      }
+      apply_courier_operational_effects: {
+        Args: {
+          _at: string
+          _event_type: Database["public"]["Enums"]["shipment_event_type"]
+          _payload: Json
+          _provider_event: string
+          _shipment_id: string
+        }
+        Returns: undefined
       }
       apply_inventory_movement: {
         Args: {
@@ -2589,6 +2882,49 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      create_order_return: {
+        Args: {
+          _courier_reason?: string
+          _items?: Json
+          _notes?: string
+          _order_id: string
+          _reason?: string
+          _return_type?: Database["public"]["Enums"]["order_return_type"]
+          _shipment_id?: string
+          _source?: string
+          _tracking_reference?: string
+        }
+        Returns: {
+          cancelled_at: string | null
+          completed_at: string | null
+          courier_reason: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          initiated_at: string | null
+          inspected_at: string | null
+          notes: string | null
+          order_id: string
+          reason: string | null
+          received_at: string | null
+          requested_at: string
+          resolution_note: string | null
+          return_number: string
+          return_type: Database["public"]["Enums"]["order_return_type"]
+          shipment_id: string | null
+          source: string
+          status: Database["public"]["Enums"]["order_return_status"]
+          tracking_reference: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_returns"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       create_shipment: {
         Args: {
           _cash_on_delivery_amount?: number
@@ -2664,6 +3000,45 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      create_shipment_exception: {
+        Args: {
+          _collected_amount?: number
+          _courier_reason?: string
+          _exception_type: Database["public"]["Enums"]["shipment_exception_type"]
+          _notes?: string
+          _occurred_at?: string
+          _provider_event?: string
+          _reason?: string
+          _shipment_id: string
+          _source?: string
+        }
+        Returns: {
+          collected_amount: number | null
+          courier_reason: string | null
+          created_at: string
+          created_by: string | null
+          exception_type: Database["public"]["Enums"]["shipment_exception_type"]
+          id: string
+          notes: string | null
+          occurred_at: string
+          order_id: string
+          provider_event: string | null
+          reason: string | null
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          shipment_id: string
+          source: string
+          status: Database["public"]["Enums"]["shipment_exception_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shipment_exceptions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       fulfillment_shippable_summary: {
         Args: { _fulfillment_id: string }
         Returns: {
@@ -2734,6 +3109,39 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      inspect_return_items: {
+        Args: { _items: Json; _note?: string; _return_id: string }
+        Returns: {
+          cancelled_at: string | null
+          completed_at: string | null
+          courier_reason: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          initiated_at: string | null
+          inspected_at: string | null
+          notes: string | null
+          order_id: string
+          reason: string | null
+          received_at: string | null
+          requested_at: string
+          resolution_note: string | null
+          return_number: string
+          return_type: Database["public"]["Enums"]["order_return_type"]
+          shipment_id: string | null
+          source: string
+          status: Database["public"]["Enums"]["order_return_status"]
+          tracking_reference: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_returns"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       log_fulfillment_event: {
         Args: {
@@ -2744,6 +3152,18 @@ export type Database = {
           _metadata?: Json
           _order_id: string
           _to: Database["public"]["Enums"]["fulfillment_record_status"]
+        }
+        Returns: undefined
+      }
+      log_return_event: {
+        Args: {
+          _event: Database["public"]["Enums"]["return_event_type"]
+          _from: Database["public"]["Enums"]["order_return_status"]
+          _message: string
+          _metadata?: Json
+          _order_id: string
+          _return_id: string
+          _to: Database["public"]["Enums"]["order_return_status"]
         }
         Returns: undefined
       }
@@ -2760,6 +3180,7 @@ export type Database = {
         Returns: undefined
       }
       next_order_number: { Args: never; Returns: string }
+      next_return_number: { Args: never; Returns: string }
       next_shipment_number: { Args: never; Returns: string }
       order_fulfillment_summary: {
         Args: { _order_id: string }
@@ -2927,6 +3348,39 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "order_fulfillments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      record_return_receipt: {
+        Args: { _items: Json; _note?: string; _return_id: string }
+        Returns: {
+          cancelled_at: string | null
+          completed_at: string | null
+          courier_reason: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          initiated_at: string | null
+          inspected_at: string | null
+          notes: string | null
+          order_id: string
+          reason: string | null
+          received_at: string | null
+          requested_at: string
+          resolution_note: string | null
+          return_number: string
+          return_type: Database["public"]["Enums"]["order_return_type"]
+          shipment_id: string | null
+          source: string
+          status: Database["public"]["Enums"]["order_return_status"]
+          tracking_reference: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_returns"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -3104,9 +3558,45 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      return_transition_valid: {
+        Args: {
+          _from: Database["public"]["Enums"]["order_return_status"]
+          _to: Database["public"]["Enums"]["order_return_status"]
+        }
+        Returns: boolean
+      }
       set_default_inventory_location: {
         Args: { _location_id: string }
         Returns: string
+      }
+      set_exception_state: {
+        Args: { _action: string; _exception_id: string; _note?: string }
+        Returns: {
+          collected_amount: number | null
+          courier_reason: string | null
+          created_at: string
+          created_by: string | null
+          exception_type: Database["public"]["Enums"]["shipment_exception_type"]
+          id: string
+          notes: string | null
+          occurred_at: string
+          order_id: string
+          provider_event: string | null
+          reason: string | null
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          shipment_id: string
+          source: string
+          status: Database["public"]["Enums"]["shipment_exception_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shipment_exceptions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       set_fulfillment_item_qc: {
         Args: {
@@ -3330,6 +3820,39 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_return_state: {
+        Args: { _action: string; _reason?: string; _return_id: string }
+        Returns: {
+          cancelled_at: string | null
+          completed_at: string | null
+          courier_reason: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          initiated_at: string | null
+          inspected_at: string | null
+          notes: string | null
+          order_id: string
+          reason: string | null
+          received_at: string | null
+          requested_at: string
+          resolution_note: string | null
+          return_number: string
+          return_type: Database["public"]["Enums"]["order_return_type"]
+          shipment_id: string | null
+          source: string
+          status: Database["public"]["Enums"]["order_return_status"]
+          tracking_reference: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_returns"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -3713,6 +4236,20 @@ export type Database = {
         | "packed"
         | "ready_for_courier"
       order_note_type: "general" | "system"
+      order_return_status:
+        | "pending"
+        | "in_transit"
+        | "received"
+        | "inspected"
+        | "completed"
+        | "cancelled"
+        | "lost"
+      order_return_type:
+        | "return_to_merchant"
+        | "paid_return"
+        | "customer_return"
+        | "exchange_return"
+        | "other"
       order_source:
         | "admin"
         | "web"
@@ -3754,6 +4291,23 @@ export type Database = {
         | "partial"
         | "failed"
         | "released"
+      return_event_type:
+        | "return_created"
+        | "status_changed"
+        | "items_received"
+        | "inspection_recorded"
+        | "return_completed"
+        | "return_cancelled"
+        | "return_lost"
+        | "provider_event"
+        | "note_added"
+      return_item_condition:
+        | "unknown"
+        | "good"
+        | "opened"
+        | "damaged"
+        | "missing"
+        | "unusable"
       shipment_event_type:
         | "shipment_created"
         | "ready_for_booking"
@@ -3777,6 +4331,23 @@ export type Database = {
         | "partial_delivery"
         | "pickup_failed"
         | "return_created"
+      shipment_exception_status:
+        | "open"
+        | "under_review"
+        | "resolved"
+        | "dismissed"
+      shipment_exception_type:
+        | "delivery_failed"
+        | "delivery_on_hold"
+        | "pickup_failed"
+        | "pickup_cancelled"
+        | "address_issue"
+        | "customer_unavailable"
+        | "customer_refused"
+        | "damaged_in_transit"
+        | "lost_in_transit"
+        | "partial_delivery"
+        | "other"
       shipment_failure_reason:
         | "customer_unreachable"
         | "customer_refused"
@@ -4080,6 +4651,22 @@ export const Constants = {
         "ready_for_courier",
       ],
       order_note_type: ["general", "system"],
+      order_return_status: [
+        "pending",
+        "in_transit",
+        "received",
+        "inspected",
+        "completed",
+        "cancelled",
+        "lost",
+      ],
+      order_return_type: [
+        "return_to_merchant",
+        "paid_return",
+        "customer_return",
+        "exchange_return",
+        "other",
+      ],
       order_source: [
         "admin",
         "web",
@@ -4125,6 +4712,25 @@ export const Constants = {
         "failed",
         "released",
       ],
+      return_event_type: [
+        "return_created",
+        "status_changed",
+        "items_received",
+        "inspection_recorded",
+        "return_completed",
+        "return_cancelled",
+        "return_lost",
+        "provider_event",
+        "note_added",
+      ],
+      return_item_condition: [
+        "unknown",
+        "good",
+        "opened",
+        "damaged",
+        "missing",
+        "unusable",
+      ],
       shipment_event_type: [
         "shipment_created",
         "ready_for_booking",
@@ -4148,6 +4754,25 @@ export const Constants = {
         "partial_delivery",
         "pickup_failed",
         "return_created",
+      ],
+      shipment_exception_status: [
+        "open",
+        "under_review",
+        "resolved",
+        "dismissed",
+      ],
+      shipment_exception_type: [
+        "delivery_failed",
+        "delivery_on_hold",
+        "pickup_failed",
+        "pickup_cancelled",
+        "address_issue",
+        "customer_unavailable",
+        "customer_refused",
+        "damaged_in_transit",
+        "lost_in_transit",
+        "partial_delivery",
+        "other",
       ],
       shipment_failure_reason: [
         "customer_unreachable",

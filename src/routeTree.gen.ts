@@ -23,6 +23,7 @@ import { Route as AuthenticatedInventoryIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedInventoryLocationsRouteImport } from './routes/_authenticated/inventory.locations'
 import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenticated/orders.index'
 import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders.$id'
+import { Route as AuthenticatedOrdersExceptionsRouteImport } from './routes/_authenticated/orders.exceptions'
 import { Route as AuthenticatedOrdersFulfillmentRouteImport } from './routes/_authenticated/orders.fulfillment'
 import { Route as AuthenticatedOrdersNewRouteImport } from './routes/_authenticated/orders.new'
 import { Route as AuthenticatedOrdersShipmentsRouteImport } from './routes/_authenticated/orders.shipments'
@@ -32,6 +33,7 @@ import { Route as AuthenticatedProductsIdRouteImport } from './routes/_authentic
 import { Route as AuthenticatedProductsBrandsRouteImport } from './routes/_authenticated/products.brands'
 import { Route as AuthenticatedProductsCategoriesRouteImport } from './routes/_authenticated/products.categories'
 import { Route as AuthenticatedProductsNewRouteImport } from './routes/_authenticated/products.new'
+import { Route as AuthenticatedReturnsIdRouteImport } from './routes/_authenticated/returns_.$id'
 import { Route as AuthenticatedOrdersFulfillmentsIdRouteImport } from './routes/_authenticated/orders.fulfillments.$id'
 import { Route as AuthenticatedOrdersShipmentsIdRouteImport } from './routes/_authenticated/orders.shipments_.$id'
 import { Route as ApiPublicCouriersProviderWebhookRouteImport } from './routes/api/public/couriers.$provider.webhook'
@@ -109,6 +111,12 @@ const AuthenticatedOrdersIdRoute = AuthenticatedOrdersIdRouteImport.update({
   path: '/orders/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOrdersExceptionsRoute =
+  AuthenticatedOrdersExceptionsRouteImport.update({
+    id: '/orders/exceptions',
+    path: '/orders/exceptions',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOrdersFulfillmentRoute =
   AuthenticatedOrdersFulfillmentRouteImport.update({
     id: '/orders/fulfillment',
@@ -161,6 +169,11 @@ const AuthenticatedProductsNewRoute =
     path: '/products/new',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedReturnsIdRoute = AuthenticatedReturnsIdRouteImport.update({
+  id: '/returns_/$id',
+  path: '/returns/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOrdersFulfillmentsIdRoute =
   AuthenticatedOrdersFulfillmentsIdRouteImport.update({
     id: '/orders/fulfillments/$id',
@@ -192,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
+  '/orders/exceptions': typeof AuthenticatedOrdersExceptionsRoute
   '/orders/fulfillment': typeof AuthenticatedOrdersFulfillmentRoute
   '/orders/new': typeof AuthenticatedOrdersNewRoute
   '/orders/shipments': typeof AuthenticatedOrdersShipmentsRoute
@@ -200,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/products/brands': typeof AuthenticatedProductsBrandsRoute
   '/products/categories': typeof AuthenticatedProductsCategoriesRoute
   '/products/new': typeof AuthenticatedProductsNewRoute
+  '/returns/$id': typeof AuthenticatedReturnsIdRoute
   '/inventory/': typeof AuthenticatedInventoryIndexRoute
   '/orders/': typeof AuthenticatedOrdersIndexRoute
   '/products/': typeof AuthenticatedProductsIndexRoute
@@ -219,6 +234,7 @@ export interface FileRoutesByTo {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
+  '/orders/exceptions': typeof AuthenticatedOrdersExceptionsRoute
   '/orders/fulfillment': typeof AuthenticatedOrdersFulfillmentRoute
   '/orders/new': typeof AuthenticatedOrdersNewRoute
   '/orders/shipments': typeof AuthenticatedOrdersShipmentsRoute
@@ -227,6 +243,7 @@ export interface FileRoutesByTo {
   '/products/brands': typeof AuthenticatedProductsBrandsRoute
   '/products/categories': typeof AuthenticatedProductsCategoriesRoute
   '/products/new': typeof AuthenticatedProductsNewRoute
+  '/returns/$id': typeof AuthenticatedReturnsIdRoute
   '/inventory': typeof AuthenticatedInventoryIndexRoute
   '/orders': typeof AuthenticatedOrdersIndexRoute
   '/products': typeof AuthenticatedProductsIndexRoute
@@ -248,6 +265,7 @@ export interface FileRoutesById {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
   '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRoute
+  '/_authenticated/orders/exceptions': typeof AuthenticatedOrdersExceptionsRoute
   '/_authenticated/orders/fulfillment': typeof AuthenticatedOrdersFulfillmentRoute
   '/_authenticated/orders/new': typeof AuthenticatedOrdersNewRoute
   '/_authenticated/orders/shipments': typeof AuthenticatedOrdersShipmentsRoute
@@ -256,6 +274,7 @@ export interface FileRoutesById {
   '/_authenticated/products/brands': typeof AuthenticatedProductsBrandsRoute
   '/_authenticated/products/categories': typeof AuthenticatedProductsCategoriesRoute
   '/_authenticated/products/new': typeof AuthenticatedProductsNewRoute
+  '/_authenticated/returns_/$id': typeof AuthenticatedReturnsIdRoute
   '/_authenticated/inventory/': typeof AuthenticatedInventoryIndexRoute
   '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
   '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
@@ -277,6 +296,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/inventory/locations'
     | '/orders/$id'
+    | '/orders/exceptions'
     | '/orders/fulfillment'
     | '/orders/new'
     | '/orders/shipments'
@@ -285,6 +305,7 @@ export interface FileRouteTypes {
     | '/products/brands'
     | '/products/categories'
     | '/products/new'
+    | '/returns/$id'
     | '/inventory/'
     | '/orders/'
     | '/products/'
@@ -304,6 +325,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/inventory/locations'
     | '/orders/$id'
+    | '/orders/exceptions'
     | '/orders/fulfillment'
     | '/orders/new'
     | '/orders/shipments'
@@ -312,6 +334,7 @@ export interface FileRouteTypes {
     | '/products/brands'
     | '/products/categories'
     | '/products/new'
+    | '/returns/$id'
     | '/inventory'
     | '/orders'
     | '/products'
@@ -332,6 +355,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/_authenticated/inventory/locations'
     | '/_authenticated/orders/$id'
+    | '/_authenticated/orders/exceptions'
     | '/_authenticated/orders/fulfillment'
     | '/_authenticated/orders/new'
     | '/_authenticated/orders/shipments'
@@ -340,6 +364,7 @@ export interface FileRouteTypes {
     | '/_authenticated/products/brands'
     | '/_authenticated/products/categories'
     | '/_authenticated/products/new'
+    | '/_authenticated/returns_/$id'
     | '/_authenticated/inventory/'
     | '/_authenticated/orders/'
     | '/_authenticated/products/'
@@ -458,6 +483,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrdersIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/orders/exceptions': {
+      id: '/_authenticated/orders/exceptions'
+      path: '/orders/exceptions'
+      fullPath: '/orders/exceptions'
+      preLoaderRoute: typeof AuthenticatedOrdersExceptionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/orders/fulfillment': {
       id: '/_authenticated/orders/fulfillment'
       path: '/orders/fulfillment'
@@ -521,6 +553,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProductsNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/returns_/$id': {
+      id: '/_authenticated/returns_/$id'
+      path: '/returns/$id'
+      fullPath: '/returns/$id'
+      preLoaderRoute: typeof AuthenticatedReturnsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/orders/fulfillments/$id': {
       id: '/_authenticated/orders/fulfillments/$id'
       path: '/orders/fulfillments/$id'
@@ -552,6 +591,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedInventoryLocationsRoute: typeof AuthenticatedInventoryLocationsRoute
   AuthenticatedOrdersIdRoute: typeof AuthenticatedOrdersIdRoute
+  AuthenticatedOrdersExceptionsRoute: typeof AuthenticatedOrdersExceptionsRoute
   AuthenticatedOrdersFulfillmentRoute: typeof AuthenticatedOrdersFulfillmentRoute
   AuthenticatedOrdersNewRoute: typeof AuthenticatedOrdersNewRoute
   AuthenticatedOrdersShipmentsRoute: typeof AuthenticatedOrdersShipmentsRoute
@@ -560,6 +600,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProductsBrandsRoute: typeof AuthenticatedProductsBrandsRoute
   AuthenticatedProductsCategoriesRoute: typeof AuthenticatedProductsCategoriesRoute
   AuthenticatedProductsNewRoute: typeof AuthenticatedProductsNewRoute
+  AuthenticatedReturnsIdRoute: typeof AuthenticatedReturnsIdRoute
   AuthenticatedInventoryIndexRoute: typeof AuthenticatedInventoryIndexRoute
   AuthenticatedOrdersIndexRoute: typeof AuthenticatedOrdersIndexRoute
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
@@ -574,6 +615,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedInventoryLocationsRoute: AuthenticatedInventoryLocationsRoute,
   AuthenticatedOrdersIdRoute: AuthenticatedOrdersIdRoute,
+  AuthenticatedOrdersExceptionsRoute: AuthenticatedOrdersExceptionsRoute,
   AuthenticatedOrdersFulfillmentRoute: AuthenticatedOrdersFulfillmentRoute,
   AuthenticatedOrdersNewRoute: AuthenticatedOrdersNewRoute,
   AuthenticatedOrdersShipmentsRoute: AuthenticatedOrdersShipmentsRoute,
@@ -582,6 +624,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProductsBrandsRoute: AuthenticatedProductsBrandsRoute,
   AuthenticatedProductsCategoriesRoute: AuthenticatedProductsCategoriesRoute,
   AuthenticatedProductsNewRoute: AuthenticatedProductsNewRoute,
+  AuthenticatedReturnsIdRoute: AuthenticatedReturnsIdRoute,
   AuthenticatedInventoryIndexRoute: AuthenticatedInventoryIndexRoute,
   AuthenticatedOrdersIndexRoute: AuthenticatedOrdersIndexRoute,
   AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
