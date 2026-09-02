@@ -14,11 +14,12 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
-import { Route as AuthenticatedCustomersRouteImport } from './routes/_authenticated/customers'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticated/returns'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers.index'
+import { Route as AuthenticatedCustomersIdRouteImport } from './routes/_authenticated/customers_.$id'
 import { Route as AuthenticatedFinanceCourierSettlementsRouteImport } from './routes/_authenticated/finance.courier-settlements'
 import { Route as AuthenticatedInventoryIndexRouteImport } from './routes/_authenticated/inventory.index'
 import { Route as AuthenticatedInventoryLocationsRouteImport } from './routes/_authenticated/inventory.locations'
@@ -75,11 +76,6 @@ const Char91DotwellKnownChar93OauthProtectedResourceRoute =
     path: '/.well-known/oauth-protected-resource',
     getParentRoute: () => rootRouteImport,
   } as any)
-const AuthenticatedCustomersRoute = AuthenticatedCustomersRouteImport.update({
-  id: '/customers',
-  path: '/customers',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -100,6 +96,18 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedCustomersIndexRoute =
+  AuthenticatedCustomersIndexRouteImport.update({
+    id: '/customers/',
+    path: '/customers/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCustomersIdRoute =
+  AuthenticatedCustomersIdRouteImport.update({
+    id: '/customers_/$id',
+    path: '/customers/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFinanceCourierSettlementsRoute =
   AuthenticatedFinanceCourierSettlementsRouteImport.update({
     id: '/finance/courier-settlements',
@@ -282,11 +290,11 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/customers': typeof AuthenticatedCustomersRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/returns': typeof AuthenticatedReturnsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/customers/$id': typeof AuthenticatedCustomersIdRoute
   '/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
   '/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
   '/inventory/movements': typeof AuthenticatedInventoryMovementsRoute
@@ -304,6 +312,7 @@ export interface FileRoutesByFullPath {
   '/products/new': typeof AuthenticatedProductsNewRoute
   '/returns/$id': typeof AuthenticatedReturnsIdRoute
   '/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
+  '/customers/': typeof AuthenticatedCustomersIndexRoute
   '/inventory/': typeof AuthenticatedInventoryIndexRoute
   '/orders/': typeof AuthenticatedOrdersIndexRoute
   '/products/': typeof AuthenticatedProductsIndexRoute
@@ -323,11 +332,11 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/customers': typeof AuthenticatedCustomersRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/returns': typeof AuthenticatedReturnsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/customers/$id': typeof AuthenticatedCustomersIdRoute
   '/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
   '/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
   '/inventory/movements': typeof AuthenticatedInventoryMovementsRoute
@@ -345,6 +354,7 @@ export interface FileRoutesByTo {
   '/products/new': typeof AuthenticatedProductsNewRoute
   '/returns/$id': typeof AuthenticatedReturnsIdRoute
   '/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
+  '/customers': typeof AuthenticatedCustomersIndexRoute
   '/inventory': typeof AuthenticatedInventoryIndexRoute
   '/orders': typeof AuthenticatedOrdersIndexRoute
   '/products': typeof AuthenticatedProductsIndexRoute
@@ -366,11 +376,11 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/_authenticated/customers': typeof AuthenticatedCustomersRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/returns': typeof AuthenticatedReturnsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/_authenticated/customers_/$id': typeof AuthenticatedCustomersIdRoute
   '/_authenticated/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
   '/_authenticated/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
   '/_authenticated/inventory/movements': typeof AuthenticatedInventoryMovementsRoute
@@ -388,6 +398,7 @@ export interface FileRoutesById {
   '/_authenticated/products/new': typeof AuthenticatedProductsNewRoute
   '/_authenticated/returns_/$id': typeof AuthenticatedReturnsIdRoute
   '/_authenticated/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
+  '/_authenticated/customers/': typeof AuthenticatedCustomersIndexRoute
   '/_authenticated/inventory/': typeof AuthenticatedInventoryIndexRoute
   '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
   '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
@@ -409,11 +420,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/.well-known/oauth-protected-resource'
-    | '/customers'
     | '/dashboard'
     | '/returns'
     | '/settings'
     | '/.lovable/oauth/consent'
+    | '/customers/$id'
     | '/finance/courier-settlements'
     | '/inventory/locations'
     | '/inventory/movements'
@@ -431,6 +442,7 @@ export interface FileRouteTypes {
     | '/products/new'
     | '/returns/$id'
     | '/suppliers/$id'
+    | '/customers/'
     | '/inventory/'
     | '/orders/'
     | '/products/'
@@ -450,11 +462,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/.well-known/oauth-protected-resource'
-    | '/customers'
     | '/dashboard'
     | '/returns'
     | '/settings'
     | '/.lovable/oauth/consent'
+    | '/customers/$id'
     | '/finance/courier-settlements'
     | '/inventory/locations'
     | '/inventory/movements'
@@ -472,6 +484,7 @@ export interface FileRouteTypes {
     | '/products/new'
     | '/returns/$id'
     | '/suppliers/$id'
+    | '/customers'
     | '/inventory'
     | '/orders'
     | '/products'
@@ -492,11 +505,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/.well-known/oauth-protected-resource'
-    | '/_authenticated/customers'
     | '/_authenticated/dashboard'
     | '/_authenticated/returns'
     | '/_authenticated/settings'
     | '/.lovable/oauth/consent'
+    | '/_authenticated/customers_/$id'
     | '/_authenticated/finance/courier-settlements'
     | '/_authenticated/inventory/locations'
     | '/_authenticated/inventory/movements'
@@ -514,6 +527,7 @@ export interface FileRouteTypes {
     | '/_authenticated/products/new'
     | '/_authenticated/returns_/$id'
     | '/_authenticated/suppliers/$id'
+    | '/_authenticated/customers/'
     | '/_authenticated/inventory/'
     | '/_authenticated/orders/'
     | '/_authenticated/products/'
@@ -576,13 +590,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/customers': {
-      id: '/_authenticated/customers'
-      path: '/customers'
-      fullPath: '/customers'
-      preLoaderRoute: typeof AuthenticatedCustomersRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -610,6 +617,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/.lovable/oauth/consent'
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/customers/': {
+      id: '/_authenticated/customers/'
+      path: '/customers'
+      fullPath: '/customers/'
+      preLoaderRoute: typeof AuthenticatedCustomersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/customers_/$id': {
+      id: '/_authenticated/customers_/$id'
+      path: '/customers/$id'
+      fullPath: '/customers/$id'
+      preLoaderRoute: typeof AuthenticatedCustomersIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/finance/courier-settlements': {
       id: '/_authenticated/finance/courier-settlements'
@@ -825,10 +846,10 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedCustomersRoute: typeof AuthenticatedCustomersRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedReturnsRoute: typeof AuthenticatedReturnsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedCustomersIdRoute: typeof AuthenticatedCustomersIdRoute
   AuthenticatedFinanceCourierSettlementsRoute: typeof AuthenticatedFinanceCourierSettlementsRoute
   AuthenticatedInventoryLocationsRoute: typeof AuthenticatedInventoryLocationsRoute
   AuthenticatedInventoryMovementsRoute: typeof AuthenticatedInventoryMovementsRoute
@@ -846,6 +867,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProductsNewRoute: typeof AuthenticatedProductsNewRoute
   AuthenticatedReturnsIdRoute: typeof AuthenticatedReturnsIdRoute
   AuthenticatedSuppliersIdRoute: typeof AuthenticatedSuppliersIdRoute
+  AuthenticatedCustomersIndexRoute: typeof AuthenticatedCustomersIndexRoute
   AuthenticatedInventoryIndexRoute: typeof AuthenticatedInventoryIndexRoute
   AuthenticatedOrdersIndexRoute: typeof AuthenticatedOrdersIndexRoute
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
@@ -861,10 +883,10 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedCustomersRoute: AuthenticatedCustomersRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedReturnsRoute: AuthenticatedReturnsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedCustomersIdRoute: AuthenticatedCustomersIdRoute,
   AuthenticatedFinanceCourierSettlementsRoute:
     AuthenticatedFinanceCourierSettlementsRoute,
   AuthenticatedInventoryLocationsRoute: AuthenticatedInventoryLocationsRoute,
@@ -883,6 +905,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProductsNewRoute: AuthenticatedProductsNewRoute,
   AuthenticatedReturnsIdRoute: AuthenticatedReturnsIdRoute,
   AuthenticatedSuppliersIdRoute: AuthenticatedSuppliersIdRoute,
+  AuthenticatedCustomersIndexRoute: AuthenticatedCustomersIndexRoute,
   AuthenticatedInventoryIndexRoute: AuthenticatedInventoryIndexRoute,
   AuthenticatedOrdersIndexRoute: AuthenticatedOrdersIndexRoute,
   AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,

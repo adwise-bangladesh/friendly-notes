@@ -170,6 +170,8 @@ export async function searchOrderProducts(term: string, limit = 20): Promise<Ord
 export interface CreateOrderInput {
   source?: "admin";
   status?: Extract<OrderStatus, "draft" | "created">;
+  /** Reuse an existing customer identity. Omitted = resolve/create by phone. */
+  customerId?: string | null;
   customerName: string;
   customerPhone: string;
   customerEmail?: string | null;
@@ -203,6 +205,7 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
   const payload = {
     source: input.source ?? "admin",
     status: input.status ?? "created",
+    customer_id: input.customerId ?? null,
     customer_name: input.customerName,
     customer_phone: input.customerPhone,
     customer_email: input.customerEmail ?? null,
