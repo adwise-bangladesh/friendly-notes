@@ -49,7 +49,7 @@ export interface AutomationRuleInput {
 
 export async function saveAutomationRule(input: AutomationRuleInput): Promise<AutomationRule> {
   const { data, error } = await supabase.rpc("save_automation_rule", {
-    _payload: input as unknown as Record<string, unknown>,
+    _payload: JSON.parse(JSON.stringify(input)) as never,
   });
   if (error) throw error;
   return data as unknown as AutomationRule;
