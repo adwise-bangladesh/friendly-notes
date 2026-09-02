@@ -258,8 +258,10 @@ export type Database = {
       product_variants: {
         Row: {
           barcode: string | null
+          compare_at_price: number | null
           created_at: string
           id: string
+          price: number | null
           product_id: string
           sku: string | null
           sort_order: number
@@ -269,8 +271,10 @@ export type Database = {
         }
         Insert: {
           barcode?: string | null
+          compare_at_price?: number | null
           created_at?: string
           id?: string
+          price?: number | null
           product_id: string
           sku?: string | null
           sort_order?: number
@@ -280,8 +284,10 @@ export type Database = {
         }
         Update: {
           barcode?: string | null
+          compare_at_price?: number | null
           created_at?: string
           id?: string
+          price?: number | null
           product_id?: string
           sku?: string | null
           sort_order?: number
@@ -302,14 +308,17 @@ export type Database = {
       products: {
         Row: {
           brand_id: string | null
+          compare_at_price: number | null
           created_at: string
           created_by: string | null
           description: string | null
           featured: boolean
           id: string
           name: string
+          price: number
           product_type: Database["public"]["Enums"]["product_type"]
           short_description: string | null
+          sku: string | null
           slug: string
           status: Database["public"]["Enums"]["product_status"]
           supply_model: Database["public"]["Enums"]["supply_model"]
@@ -319,14 +328,17 @@ export type Database = {
         }
         Insert: {
           brand_id?: string | null
+          compare_at_price?: number | null
           created_at?: string
           created_by?: string | null
           description?: string | null
           featured?: boolean
           id?: string
           name: string
+          price?: number
           product_type?: Database["public"]["Enums"]["product_type"]
           short_description?: string | null
+          sku?: string | null
           slug: string
           status?: Database["public"]["Enums"]["product_status"]
           supply_model?: Database["public"]["Enums"]["supply_model"]
@@ -336,14 +348,17 @@ export type Database = {
         }
         Update: {
           brand_id?: string | null
+          compare_at_price?: number | null
           created_at?: string
           created_by?: string | null
           description?: string | null
           featured?: boolean
           id?: string
           name?: string
+          price?: number
           product_type?: Database["public"]["Enums"]["product_type"]
           short_description?: string | null
+          sku?: string | null
           slug?: string
           status?: Database["public"]["Enums"]["product_status"]
           supply_model?: Database["public"]["Enums"]["supply_model"]
