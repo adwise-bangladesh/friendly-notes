@@ -1,5 +1,10 @@
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { CustomerIndicator } from "@/types/customers";
 
 /**
@@ -16,7 +21,8 @@ export function CustomerIndicators({
 }) {
   if (indicators.length === 0) return null;
   return (
-    <div className={className ?? "flex flex-wrap items-center gap-1.5"}>
+    <TooltipProvider delayDuration={150}>
+      <div className={className ?? "flex flex-wrap items-center gap-1.5"}>
       {indicators.map((indicator) => (
         <Tooltip key={indicator.key}>
           <TooltipTrigger asChild>
@@ -38,6 +44,7 @@ export function CustomerIndicators({
           </TooltipContent>
         </Tooltip>
       ))}
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }
