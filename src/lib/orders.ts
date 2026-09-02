@@ -37,7 +37,7 @@ const ORDER_DETAIL_SELECT = `
   *,
   address:order_addresses(*),
   items:order_items(*),
-  notes:order_notes(*, author:profiles(id, full_name))
+  notes:order_notes(*)
 `;
 
 export interface OrderListFilters {
@@ -86,11 +86,26 @@ export async function getOrderById(id: string): Promise<OrderWithDetails | null>
   if (!data) return null;
   const row = data as unknown as OrderWithDetails & { address: unknown };
   const address = Array.isArray(row.address) ? (row.address[0] ?? null) : row.address;
+
+  // order_notes.created_by references auth.users, so the author name is
+  // resolved with a second read against profiles rather than an embed.
+  const authorIds = [...new Set((row.notes ?? []).map((n) => n.created_by).filter(Boolean))] as string[];
+  const authors = new Map<string, { id: string; full_name: string | null }>();
+  if (authorIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, full_name")
+      .in("id", authorIds);
+    for (const p of profiles ?? []) authors.set(p.id, p);
+  }
+
   return {
     ...row,
     address: address as OrderWithDetails["address"],
     items: [...(row.items ?? [])].sort((a, b) => a.sort_order - b.sort_order),
-    notes: [...(row.notes ?? [])].sort((a, b) => a.created_at.localeCompare(b.created_at)),
+    notes: [...(row.notes ?? [])]
+      .sort((a, b) => a.created_at.localeCompare(b.created_at))
+      .map((n) => ({ ...n, author: n.created_by ? (authors.get(n.created_by) ?? null) : null })),
   };
 }
 
