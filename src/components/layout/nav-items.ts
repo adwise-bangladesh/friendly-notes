@@ -24,6 +24,19 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
   {
+    label: "Analytics",
+    to: "/analytics",
+    icon: BarChart3,
+    children: [
+      { label: "Business Overview", to: "/analytics" },
+      { label: "Orders & Delivery", to: "/analytics/operations" },
+      { label: "Customers", to: "/analytics/customers" },
+      { label: "Products & Inventory", to: "/analytics/products" },
+      { label: "Procurement", to: "/analytics/procurement" },
+    ],
+  },
+
+  {
     label: "Operations",
     to: "/operations",
     icon: Radar,
