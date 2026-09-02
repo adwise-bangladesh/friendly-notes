@@ -1,0 +1,9 @@
+ALTER TYPE public.order_delivery_status ADD VALUE IF NOT EXISTS 'partially_shipped' AFTER 'not_shipped';
+ALTER TYPE public.order_delivery_status ADD VALUE IF NOT EXISTS 'shipped' AFTER 'partially_shipped';
+ALTER TYPE public.order_delivery_status ADD VALUE IF NOT EXISTS 'in_transit' AFTER 'shipped';
+ALTER TYPE public.order_delivery_status ADD VALUE IF NOT EXISTS 'on_hold' AFTER 'in_transit';
+ALTER TYPE public.order_delivery_status ADD VALUE IF NOT EXISTS 'partially_delivered' AFTER 'on_hold';
+ALTER TYPE public.order_delivery_status ADD VALUE IF NOT EXISTS 'delivered' AFTER 'partially_delivered';
+ALTER TYPE public.order_delivery_status ADD VALUE IF NOT EXISTS 'delivery_failed' AFTER 'delivered';
+ALTER TYPE public.order_delivery_status ADD VALUE IF NOT EXISTS 'partially_returned' AFTER 'delivery_failed';
+ALTER TYPE public.order_delivery_status ADD VALUE IF NOT EXISTS 'returned' AFTER 'partially_returned';

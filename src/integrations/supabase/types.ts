@@ -3687,7 +3687,17 @@ export type Database = {
         | "reservation"
         | "release_reservation"
         | "fulfillment_out"
-      order_delivery_status: "not_shipped"
+      order_delivery_status:
+        | "not_shipped"
+        | "partially_shipped"
+        | "shipped"
+        | "in_transit"
+        | "on_hold"
+        | "partially_delivered"
+        | "delivered"
+        | "delivery_failed"
+        | "partially_returned"
+        | "returned"
       order_financial_status: "not_applicable"
       order_fulfillment_status:
         | "not_started"
@@ -4042,7 +4052,18 @@ export const Constants = {
         "release_reservation",
         "fulfillment_out",
       ],
-      order_delivery_status: ["not_shipped"],
+      order_delivery_status: [
+        "not_shipped",
+        "partially_shipped",
+        "shipped",
+        "in_transit",
+        "on_hold",
+        "partially_delivered",
+        "delivered",
+        "delivery_failed",
+        "partially_returned",
+        "returned",
+      ],
       order_financial_status: ["not_applicable"],
       order_fulfillment_status: [
         "not_started",
