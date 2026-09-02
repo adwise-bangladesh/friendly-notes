@@ -5,12 +5,14 @@ import {
   Boxes,
   Radar,
   Banknote,
+  BarChart3,
   Truck,
   Users,
   RotateCcw,
   Settings,
   type LucideIcon,
 } from "lucide-react";
+
 
 export interface NavItem {
   label: string;
