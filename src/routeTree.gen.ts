@@ -27,6 +27,7 @@ import { Route as AuthenticatedInventoryMovementsRouteImport } from './routes/_a
 import { Route as AuthenticatedInventoryStocktakesRouteImport } from './routes/_authenticated/inventory.stocktakes'
 import { Route as AuthenticatedInventoryTransfersRouteImport } from './routes/_authenticated/inventory.transfers'
 import { Route as AuthenticatedOperationsIndexRouteImport } from './routes/_authenticated/operations.index'
+import { Route as AuthenticatedOperationsMyWorkRouteImport } from './routes/_authenticated/operations.my-work'
 import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenticated/orders.index'
 import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders.$id'
 import { Route as AuthenticatedOrdersExceptionsRouteImport } from './routes/_authenticated/orders.exceptions'
@@ -149,6 +150,12 @@ const AuthenticatedOperationsIndexRoute =
   AuthenticatedOperationsIndexRouteImport.update({
     id: '/operations/',
     path: '/operations/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedOperationsMyWorkRoute =
+  AuthenticatedOperationsMyWorkRouteImport.update({
+    id: '/operations/my-work',
+    path: '/operations/my-work',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedOrdersIndexRoute =
@@ -307,6 +314,7 @@ export interface FileRoutesByFullPath {
   '/inventory/movements': typeof AuthenticatedInventoryMovementsRoute
   '/inventory/stocktakes': typeof AuthenticatedInventoryStocktakesRoute
   '/inventory/transfers': typeof AuthenticatedInventoryTransfersRoute
+  '/operations/my-work': typeof AuthenticatedOperationsMyWorkRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders/exceptions': typeof AuthenticatedOrdersExceptionsRoute
   '/orders/fulfillment': typeof AuthenticatedOrdersFulfillmentRoute
@@ -350,6 +358,7 @@ export interface FileRoutesByTo {
   '/inventory/movements': typeof AuthenticatedInventoryMovementsRoute
   '/inventory/stocktakes': typeof AuthenticatedInventoryStocktakesRoute
   '/inventory/transfers': typeof AuthenticatedInventoryTransfersRoute
+  '/operations/my-work': typeof AuthenticatedOperationsMyWorkRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders/exceptions': typeof AuthenticatedOrdersExceptionsRoute
   '/orders/fulfillment': typeof AuthenticatedOrdersFulfillmentRoute
@@ -395,6 +404,7 @@ export interface FileRoutesById {
   '/_authenticated/inventory/movements': typeof AuthenticatedInventoryMovementsRoute
   '/_authenticated/inventory/stocktakes': typeof AuthenticatedInventoryStocktakesRoute
   '/_authenticated/inventory/transfers': typeof AuthenticatedInventoryTransfersRoute
+  '/_authenticated/operations/my-work': typeof AuthenticatedOperationsMyWorkRoute
   '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/_authenticated/orders/exceptions': typeof AuthenticatedOrdersExceptionsRoute
   '/_authenticated/orders/fulfillment': typeof AuthenticatedOrdersFulfillmentRoute
@@ -440,6 +450,7 @@ export interface FileRouteTypes {
     | '/inventory/movements'
     | '/inventory/stocktakes'
     | '/inventory/transfers'
+    | '/operations/my-work'
     | '/orders/$id'
     | '/orders/exceptions'
     | '/orders/fulfillment'
@@ -483,6 +494,7 @@ export interface FileRouteTypes {
     | '/inventory/movements'
     | '/inventory/stocktakes'
     | '/inventory/transfers'
+    | '/operations/my-work'
     | '/orders/$id'
     | '/orders/exceptions'
     | '/orders/fulfillment'
@@ -527,6 +539,7 @@ export interface FileRouteTypes {
     | '/_authenticated/inventory/movements'
     | '/_authenticated/inventory/stocktakes'
     | '/_authenticated/inventory/transfers'
+    | '/_authenticated/operations/my-work'
     | '/_authenticated/orders/$id'
     | '/_authenticated/orders/exceptions'
     | '/_authenticated/orders/fulfillment'
@@ -692,6 +705,13 @@ declare module '@tanstack/react-router' {
       path: '/operations'
       fullPath: '/operations/'
       preLoaderRoute: typeof AuthenticatedOperationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/operations/my-work': {
+      id: '/_authenticated/operations/my-work'
+      path: '/operations/my-work'
+      fullPath: '/operations/my-work'
+      preLoaderRoute: typeof AuthenticatedOperationsMyWorkRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/orders/': {
@@ -875,6 +895,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInventoryMovementsRoute: typeof AuthenticatedInventoryMovementsRoute
   AuthenticatedInventoryStocktakesRoute: typeof AuthenticatedInventoryStocktakesRoute
   AuthenticatedInventoryTransfersRoute: typeof AuthenticatedInventoryTransfersRoute
+  AuthenticatedOperationsMyWorkRoute: typeof AuthenticatedOperationsMyWorkRoute
   AuthenticatedOrdersIdRoute: typeof AuthenticatedOrdersIdRoute
   AuthenticatedOrdersExceptionsRoute: typeof AuthenticatedOrdersExceptionsRoute
   AuthenticatedOrdersFulfillmentRoute: typeof AuthenticatedOrdersFulfillmentRoute
@@ -914,6 +935,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedInventoryMovementsRoute: AuthenticatedInventoryMovementsRoute,
   AuthenticatedInventoryStocktakesRoute: AuthenticatedInventoryStocktakesRoute,
   AuthenticatedInventoryTransfersRoute: AuthenticatedInventoryTransfersRoute,
+  AuthenticatedOperationsMyWorkRoute: AuthenticatedOperationsMyWorkRoute,
   AuthenticatedOrdersIdRoute: AuthenticatedOrdersIdRoute,
   AuthenticatedOrdersExceptionsRoute: AuthenticatedOrdersExceptionsRoute,
   AuthenticatedOrdersFulfillmentRoute: AuthenticatedOrdersFulfillmentRoute,
