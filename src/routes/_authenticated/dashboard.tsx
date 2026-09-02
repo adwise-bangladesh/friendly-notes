@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getVerificationQueue } from "@/lib/verification";
-import { getFulfillmentQueue } from "@/lib/fulfillment";
-import { FULFILLMENT_STATUS_LABELS } from "@/types/fulfillment";
+import { getFulfillmentStatusCounts } from "@/lib/fulfillment-records";
 import {
   AlertTriangle,
   Activity,
@@ -111,7 +110,7 @@ function ProcessingQueue() {
   if (isLoading) {
     return <p className="px-3 py-3 text-[12.5px] text-muted-foreground">Loading…</p>;
   }
-  const total = Object.values(counts ?? {}).reduce((sum, n) => sum + n, 0);
+  const total = Object.values(counts ?? {}).reduce<number>((sum, n) => sum + (n ?? 0), 0);
   if (total === 0) {
     return (
       <EmptyState
