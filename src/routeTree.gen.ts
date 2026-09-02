@@ -52,6 +52,7 @@ import { Route as AuthenticatedProductsBrandsRouteImport } from './routes/_authe
 import { Route as AuthenticatedProductsCategoriesRouteImport } from './routes/_authenticated/products.categories'
 import { Route as AuthenticatedProductsNewRouteImport } from './routes/_authenticated/products.new'
 import { Route as AuthenticatedReturnsIdRouteImport } from './routes/_authenticated/returns_.$id'
+import { Route as AuthenticatedStoresIndexRouteImport } from './routes/_authenticated/stores.index'
 import { Route as AuthenticatedSuppliersIndexRouteImport } from './routes/_authenticated/suppliers.index'
 import { Route as AuthenticatedSuppliersIdRouteImport } from './routes/_authenticated/suppliers.$id'
 import { Route as AuthenticatedAiBrainRunsIdRouteImport } from './routes/_authenticated/ai-brain.runs.$id'
@@ -311,6 +312,12 @@ const AuthenticatedReturnsIdRoute = AuthenticatedReturnsIdRouteImport.update({
   path: '/returns/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedStoresIndexRoute =
+  AuthenticatedStoresIndexRouteImport.update({
+    id: '/stores/',
+    path: '/stores/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSuppliersIndexRoute =
   AuthenticatedSuppliersIndexRouteImport.update({
     id: '/suppliers/',
@@ -434,6 +441,7 @@ export interface FileRoutesByFullPath {
   '/operations/': typeof AuthenticatedOperationsIndexRoute
   '/orders/': typeof AuthenticatedOrdersIndexRoute
   '/products/': typeof AuthenticatedProductsIndexRoute
+  '/stores/': typeof AuthenticatedStoresIndexRoute
   '/suppliers/': typeof AuthenticatedSuppliersIndexRoute
   '/ai-brain/runs/$id': typeof AuthenticatedAiBrainRunsIdRoute
   '/finance/courier-settlements/$id': typeof AuthenticatedFinanceCourierSettlementsIdRoute
@@ -491,6 +499,7 @@ export interface FileRoutesByTo {
   '/operations': typeof AuthenticatedOperationsIndexRoute
   '/orders': typeof AuthenticatedOrdersIndexRoute
   '/products': typeof AuthenticatedProductsIndexRoute
+  '/stores': typeof AuthenticatedStoresIndexRoute
   '/suppliers': typeof AuthenticatedSuppliersIndexRoute
   '/ai-brain/runs/$id': typeof AuthenticatedAiBrainRunsIdRoute
   '/finance/courier-settlements/$id': typeof AuthenticatedFinanceCourierSettlementsIdRoute
@@ -550,6 +559,7 @@ export interface FileRoutesById {
   '/_authenticated/operations/': typeof AuthenticatedOperationsIndexRoute
   '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
   '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
+  '/_authenticated/stores/': typeof AuthenticatedStoresIndexRoute
   '/_authenticated/suppliers/': typeof AuthenticatedSuppliersIndexRoute
   '/_authenticated/ai-brain/runs/$id': typeof AuthenticatedAiBrainRunsIdRoute
   '/_authenticated/finance/courier-settlements_/$id': typeof AuthenticatedFinanceCourierSettlementsIdRoute
@@ -609,6 +619,7 @@ export interface FileRouteTypes {
     | '/operations/'
     | '/orders/'
     | '/products/'
+    | '/stores/'
     | '/suppliers/'
     | '/ai-brain/runs/$id'
     | '/finance/courier-settlements/$id'
@@ -666,6 +677,7 @@ export interface FileRouteTypes {
     | '/operations'
     | '/orders'
     | '/products'
+    | '/stores'
     | '/suppliers'
     | '/ai-brain/runs/$id'
     | '/finance/courier-settlements/$id'
@@ -724,6 +736,7 @@ export interface FileRouteTypes {
     | '/_authenticated/operations/'
     | '/_authenticated/orders/'
     | '/_authenticated/products/'
+    | '/_authenticated/stores/'
     | '/_authenticated/suppliers/'
     | '/_authenticated/ai-brain/runs/$id'
     | '/_authenticated/finance/courier-settlements_/$id'
@@ -1051,6 +1064,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReturnsIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/stores/': {
+      id: '/_authenticated/stores/'
+      path: '/stores'
+      fullPath: '/stores/'
+      preLoaderRoute: typeof AuthenticatedStoresIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/suppliers/': {
       id: '/_authenticated/suppliers/'
       path: '/suppliers'
@@ -1184,6 +1204,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOperationsIndexRoute: typeof AuthenticatedOperationsIndexRoute
   AuthenticatedOrdersIndexRoute: typeof AuthenticatedOrdersIndexRoute
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
+  AuthenticatedStoresIndexRoute: typeof AuthenticatedStoresIndexRoute
   AuthenticatedSuppliersIndexRoute: typeof AuthenticatedSuppliersIndexRoute
   AuthenticatedAiBrainRunsIdRoute: typeof AuthenticatedAiBrainRunsIdRoute
   AuthenticatedFinanceCourierSettlementsIdRoute: typeof AuthenticatedFinanceCourierSettlementsIdRoute
@@ -1239,6 +1260,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOperationsIndexRoute: AuthenticatedOperationsIndexRoute,
   AuthenticatedOrdersIndexRoute: AuthenticatedOrdersIndexRoute,
   AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
+  AuthenticatedStoresIndexRoute: AuthenticatedStoresIndexRoute,
   AuthenticatedSuppliersIndexRoute: AuthenticatedSuppliersIndexRoute,
   AuthenticatedAiBrainRunsIdRoute: AuthenticatedAiBrainRunsIdRoute,
   AuthenticatedFinanceCourierSettlementsIdRoute:
