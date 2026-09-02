@@ -1,6 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import type {
+  CourierAccount,
   CourierProvider,
+  CourierProviderEvent,
   CourierServiceType,
   Shipment,
   ShipmentAction,
@@ -36,7 +38,11 @@ const SHIPMENT_COLUMNS = `
   cash_on_delivery_amount, declared_value, weight, package_count,
   hold_reason, failure_reason, notes, internal_notes,
   booked_at, picked_up_at, delivered_at, cancelled_at,
-  created_by, updated_by, created_at, updated_at
+  created_by, updated_by, created_at, updated_at,
+  courier_account_id, provider_status, provider_status_slug, provider_status_at,
+  last_synced_at, quoted_delivery_fee, booked_delivery_fee,
+  return_tracking_number, return_reason, partial_delivery_note,
+  provider_recipient_city_id, provider_recipient_zone_id, provider_recipient_area_id
 `;
 
 /* ---------- Courier providers ---------- */
@@ -53,6 +59,39 @@ export async function getCourierProviders(
   const { data, error } = await query;
   if (error) throw error;
   return data ?? [];
+}
+
+/**
+ * Courier accounts for a provider. Credentials live in a separate table with no
+ * client grants at all, so nothing sensitive can be selected from the browser.
+ */
+export async function getCourierAccounts(providerId?: string): Promise<CourierAccount[]> {
+  let query = supabase
+    .from("courier_accounts")
+    .select("id, provider_id, name, code, environment, external_store_id, base_url, status, is_default, settings, created_by, updated_by, created_at, updated_at")
+    .eq("status", "active")
+    .order("is_default", { ascending: false })
+    .order("name", { ascending: true });
+  if (providerId) query = query.eq("provider_id", providerId);
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data ?? []) as CourierAccount[];
+}
+
+/** Raw provider events for one shipment — the courier's own words, kept for audit. */
+export async function getShipmentCourierEvents(
+  shipmentId: string,
+): Promise<CourierProviderEvent[]> {
+  const { data, error } = await supabase
+    .from("courier_provider_events")
+    .select(
+      "id, provider_id, account_id, shipment_id, source, fingerprint, provider_event, provider_status, consignment_id, merchant_order_id, provider_event_at, payload, processing_status, processing_note, received_at",
+    )
+    .eq("shipment_id", shipmentId)
+    .order("received_at", { ascending: false })
+    .limit(25);
+  if (error) throw error;
+  return (data ?? []) as CourierProviderEvent[];
 }
 
 /* ---------- Shippable quantities ---------- */
@@ -107,6 +146,7 @@ export async function getShipmentById(id: string): Promise<ShipmentWithDetails |
     .select(
       `${SHIPMENT_COLUMNS},
        provider:courier_providers(id, name, code, status),
+       account:courier_accounts(id, name, code, environment),
        order:orders(id, order_number, status, customer_name, customer_phone, payment_method, grand_total, due_amount),
        fulfillment:order_fulfillments(id, fulfillment_number, status),
        items:shipment_items(id, shipment_id, order_item_id, fulfillment_item_id, quantity, created_at,
@@ -273,11 +313,13 @@ export async function assignShipmentCourier(args: {
   shipmentId: string;
   providerId: string;
   serviceType?: CourierServiceType | null;
+  accountId?: string | null;
 }): Promise<Shipment> {
   const { data, error } = await supabase.rpc("assign_shipment_courier", {
     _shipment_id: args.shipmentId,
     _provider_id: args.providerId,
     ...(args.serviceType ? { _service_type: args.serviceType } : {}),
+    ...(args.accountId ? { _account_id: args.accountId } : {}),
   });
   if (error) throw error;
   return data as unknown as Shipment;
@@ -327,6 +369,23 @@ export async function setShipmentState(args: {
     ...(args.failureReason ? { _failure_reason: args.failureReason } : {}),
     ...(tracking ? { _tracking_number: tracking } : {}),
     ...(consignment ? { _external_consignment_id: consignment } : {}),
+  });
+  if (error) throw error;
+  return data as unknown as Shipment;
+}
+
+/** Records a courier return leg. Return tracking is separate from forward tracking. */
+export async function setShipmentReturnTracking(args: {
+  shipmentId: string;
+  returnTrackingNumber?: string | null;
+  returnReason?: string | null;
+}): Promise<Shipment> {
+  const tracking = args.returnTrackingNumber?.trim();
+  const reason = args.returnReason?.trim();
+  const { data, error } = await supabase.rpc("set_shipment_return_tracking", {
+    _shipment_id: args.shipmentId,
+    _return_tracking_number: tracking ?? "",
+    ...(reason ? { _return_reason: reason } : {}),
   });
   if (error) throw error;
   return data as unknown as Shipment;
