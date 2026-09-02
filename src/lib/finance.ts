@@ -80,7 +80,7 @@ export async function createFinancialAdjustment(
   input: CreateAdjustmentInput,
 ): Promise<OrderFinancialAdjustment> {
   if (!(input.amount > 0)) throw new Error("Amount must be greater than zero");
-  const { data, error } = await supabase.rpc("create_financial_adjustment", {
+  const { data, error } = await supabase.rpc("create_financial_adjustment", rpcArgs({
     _order_id: input.orderId,
     _adjustment_type: input.type,
     _direction: input.direction,
