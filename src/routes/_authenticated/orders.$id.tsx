@@ -17,6 +17,7 @@ import { FulfillmentPanel } from "@/components/orders/FulfillmentPanel";
 import { OrderFulfillmentsPanel } from "@/components/orders/OrderFulfillmentsPanel";
 import { OrderShipmentsPanel } from "@/components/orders/OrderShipmentsPanel";
 import { OrderReturnsPanel } from "@/components/orders/OrderReturnsPanel";
+import { OrderFinancialsPanel } from "@/components/orders/OrderFinancialsPanel";
 
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import { formatMoney } from "@/lib/currency";
