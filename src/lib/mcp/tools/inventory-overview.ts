@@ -26,7 +26,12 @@ export default defineTool({
       .limit(limit ?? 50);
     if (error) throw new Error(error.message);
 
-    let rows = data ?? [];
+    type Row = {
+      available_quantity: number | null;
+      low_stock_threshold: number | null;
+      location?: { code?: string | null } | null;
+    };
+    let rows = ((data ?? []) as unknown as Row[]).slice();
     if (location_code) {
       const code = location_code.toLowerCase();
       rows = rows.filter((r) => r.location?.code?.toLowerCase() === code);
