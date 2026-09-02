@@ -14,6 +14,258 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_analysis_runs: {
+        Row: {
+          analysis_type: Database["public"]["Enums"]["ai_analysis_type"]
+          completed_at: string | null
+          context_summary: Json
+          created_at: string
+          duration_ms: number | null
+          entity_id: string | null
+          entity_type: string
+          error_message: string | null
+          id: string
+          insight_count: number
+          model: string | null
+          provider: string | null
+          recommendation_count: number
+          requested_by: string
+          source: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["ai_run_status"]
+          summary: string | null
+        }
+        Insert: {
+          analysis_type: Database["public"]["Enums"]["ai_analysis_type"]
+          completed_at?: string | null
+          context_summary?: Json
+          created_at?: string
+          duration_ms?: number | null
+          entity_id?: string | null
+          entity_type: string
+          error_message?: string | null
+          id?: string
+          insight_count?: number
+          model?: string | null
+          provider?: string | null
+          recommendation_count?: number
+          requested_by?: string
+          source?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["ai_run_status"]
+          summary?: string | null
+        }
+        Update: {
+          analysis_type?: Database["public"]["Enums"]["ai_analysis_type"]
+          completed_at?: string | null
+          context_summary?: Json
+          created_at?: string
+          duration_ms?: number | null
+          entity_id?: string | null
+          entity_type?: string
+          error_message?: string | null
+          id?: string
+          insight_count?: number
+          model?: string | null
+          provider?: string | null
+          recommendation_count?: number
+          requested_by?: string
+          source?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["ai_run_status"]
+          summary?: string | null
+        }
+        Relationships: []
+      }
+      ai_brain_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          insight_id: string | null
+          message: string
+          recommendation_id: string | null
+          run_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          insight_id?: string | null
+          message: string
+          recommendation_id?: string | null
+          run_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          insight_id?: string | null
+          message?: string
+          recommendation_id?: string | null
+          run_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_brain_events_insight_id_fkey"
+            columns: ["insight_id"]
+            isOneToOne: false
+            referencedRelation: "ai_insights"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_brain_events_recommendation_id_fkey"
+            columns: ["recommendation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_recommendations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_brain_events_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "ai_analysis_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_insights: {
+        Row: {
+          analysis_run_id: string
+          category: Database["public"]["Enums"]["ai_insight_category"]
+          confidence: number
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          evidence: Json
+          expires_at: string | null
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          severity: Database["public"]["Enums"]["ai_insight_severity"]
+          status: Database["public"]["Enums"]["ai_insight_status"]
+          summary: string
+          title: string
+        }
+        Insert: {
+          analysis_run_id: string
+          category: Database["public"]["Enums"]["ai_insight_category"]
+          confidence?: number
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          evidence?: Json
+          expires_at?: string | null
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          severity: Database["public"]["Enums"]["ai_insight_severity"]
+          status?: Database["public"]["Enums"]["ai_insight_status"]
+          summary: string
+          title: string
+        }
+        Update: {
+          analysis_run_id?: string
+          category?: Database["public"]["Enums"]["ai_insight_category"]
+          confidence?: number
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          evidence?: Json
+          expires_at?: string | null
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          severity?: Database["public"]["Enums"]["ai_insight_severity"]
+          status?: Database["public"]["Enums"]["ai_insight_status"]
+          summary?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_insights_analysis_run_id_fkey"
+            columns: ["analysis_run_id"]
+            isOneToOne: false
+            referencedRelation: "ai_analysis_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_recommendations: {
+        Row: {
+          action_target: string | null
+          analysis_run_id: string
+          confidence: number
+          created_at: string
+          description: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          insight_id: string | null
+          priority: Database["public"]["Enums"]["ai_recommendation_priority"]
+          recommendation_type: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["ai_recommendation_status"]
+          suggested_action: string | null
+          title: string
+        }
+        Insert: {
+          action_target?: string | null
+          analysis_run_id: string
+          confidence?: number
+          created_at?: string
+          description: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          insight_id?: string | null
+          priority?: Database["public"]["Enums"]["ai_recommendation_priority"]
+          recommendation_type: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["ai_recommendation_status"]
+          suggested_action?: string | null
+          title: string
+        }
+        Update: {
+          action_target?: string | null
+          analysis_run_id?: string
+          confidence?: number
+          created_at?: string
+          description?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          insight_id?: string | null
+          priority?: Database["public"]["Enums"]["ai_recommendation_priority"]
+          recommendation_type?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["ai_recommendation_status"]
+          suggested_action?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_recommendations_analysis_run_id_fkey"
+            columns: ["analysis_run_id"]
+            isOneToOne: false
+            referencedRelation: "ai_analysis_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_recommendations_insight_id_fkey"
+            columns: ["insight_id"]
+            isOneToOne: false
+            referencedRelation: "ai_insights"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       automation_notes: {
         Row: {
           created_at: string
@@ -4218,6 +4470,161 @@ export type Database = {
         }
         Returns: undefined
       }
+      ai_brain_overview: { Args: never; Returns: Json }
+      ai_complete_analysis_run: {
+        Args: { _payload: Json; _run_id: string }
+        Returns: {
+          analysis_type: Database["public"]["Enums"]["ai_analysis_type"]
+          completed_at: string | null
+          context_summary: Json
+          created_at: string
+          duration_ms: number | null
+          entity_id: string | null
+          entity_type: string
+          error_message: string | null
+          id: string
+          insight_count: number
+          model: string | null
+          provider: string | null
+          recommendation_count: number
+          requested_by: string
+          source: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["ai_run_status"]
+          summary: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ai_analysis_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      ai_fail_analysis_run: {
+        Args: { _error: string; _run_id: string }
+        Returns: {
+          analysis_type: Database["public"]["Enums"]["ai_analysis_type"]
+          completed_at: string | null
+          context_summary: Json
+          created_at: string
+          duration_ms: number | null
+          entity_id: string | null
+          entity_type: string
+          error_message: string | null
+          id: string
+          insight_count: number
+          model: string | null
+          provider: string | null
+          recommendation_count: number
+          requested_by: string
+          source: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["ai_run_status"]
+          summary: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ai_analysis_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      ai_set_insight_status: {
+        Args: {
+          _insight_id: string
+          _status: Database["public"]["Enums"]["ai_insight_status"]
+        }
+        Returns: {
+          analysis_run_id: string
+          category: Database["public"]["Enums"]["ai_insight_category"]
+          confidence: number
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          evidence: Json
+          expires_at: string | null
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          severity: Database["public"]["Enums"]["ai_insight_severity"]
+          status: Database["public"]["Enums"]["ai_insight_status"]
+          summary: string
+          title: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ai_insights"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      ai_set_recommendation_status: {
+        Args: {
+          _recommendation_id: string
+          _status: Database["public"]["Enums"]["ai_recommendation_status"]
+        }
+        Returns: {
+          action_target: string | null
+          analysis_run_id: string
+          confidence: number
+          created_at: string
+          description: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          insight_id: string | null
+          priority: Database["public"]["Enums"]["ai_recommendation_priority"]
+          recommendation_type: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["ai_recommendation_status"]
+          suggested_action: string | null
+          title: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ai_recommendations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      ai_start_analysis_run: {
+        Args: {
+          _analysis_type: Database["public"]["Enums"]["ai_analysis_type"]
+          _context_summary?: Json
+          _entity_id?: string
+          _entity_type: string
+          _model?: string
+          _provider?: string
+          _source?: string
+        }
+        Returns: {
+          analysis_type: Database["public"]["Enums"]["ai_analysis_type"]
+          completed_at: string | null
+          context_summary: Json
+          created_at: string
+          duration_ms: number | null
+          entity_id: string | null
+          entity_type: string
+          error_message: string | null
+          id: string
+          insight_count: number
+          model: string | null
+          provider: string | null
+          recommendation_count: number
+          requested_by: string
+          source: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["ai_run_status"]
+          summary: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ai_analysis_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       analytics_bucket: {
         Args: { _grain: string; _ts: string }
         Returns: string
@@ -6857,6 +7264,36 @@ export type Database = {
       }
     }
     Enums: {
+      ai_analysis_type:
+        | "operations_summary"
+        | "order_review"
+        | "customer_review"
+        | "inventory_review"
+        | "delivery_review"
+        | "courier_review"
+        | "procurement_review"
+        | "financial_review"
+      ai_insight_category:
+        | "operations"
+        | "order"
+        | "customer"
+        | "inventory"
+        | "delivery"
+        | "courier"
+        | "procurement"
+        | "financial"
+        | "verification"
+        | "general"
+      ai_insight_severity: "info" | "low" | "medium" | "high" | "critical"
+      ai_insight_status: "active" | "acknowledged" | "dismissed" | "expired"
+      ai_recommendation_priority: "low" | "medium" | "high" | "urgent"
+      ai_recommendation_status:
+        | "pending"
+        | "accepted"
+        | "dismissed"
+        | "executed"
+        | "expired"
+      ai_run_status: "queued" | "running" | "completed" | "failed" | "cancelled"
       app_role: "owner" | "admin" | "staff" | "viewer"
       automation_action_type:
         | "set_verification_priority"
@@ -7380,6 +7817,39 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      ai_analysis_type: [
+        "operations_summary",
+        "order_review",
+        "customer_review",
+        "inventory_review",
+        "delivery_review",
+        "courier_review",
+        "procurement_review",
+        "financial_review",
+      ],
+      ai_insight_category: [
+        "operations",
+        "order",
+        "customer",
+        "inventory",
+        "delivery",
+        "courier",
+        "procurement",
+        "financial",
+        "verification",
+        "general",
+      ],
+      ai_insight_severity: ["info", "low", "medium", "high", "critical"],
+      ai_insight_status: ["active", "acknowledged", "dismissed", "expired"],
+      ai_recommendation_priority: ["low", "medium", "high", "urgent"],
+      ai_recommendation_status: [
+        "pending",
+        "accepted",
+        "dismissed",
+        "executed",
+        "expired",
+      ],
+      ai_run_status: ["queued", "running", "completed", "failed", "cancelled"],
       app_role: ["owner", "admin", "staff", "viewer"],
       automation_action_type: [
         "set_verification_priority",

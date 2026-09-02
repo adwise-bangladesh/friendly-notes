@@ -11,6 +11,7 @@ import {
   RotateCcw,
   Zap,
   Plug,
+  Brain,
   Settings,
   type LucideIcon,
 } from "lucide-react";
@@ -114,6 +115,15 @@ export const NAV_ITEMS: NavItem[] = [
     children: [
       { label: "Overview", to: "/integrations" },
       { label: "Activity", to: "/integrations/logs" },
+    ],
+  },
+  {
+    label: "AI Brain",
+    to: "/ai-brain",
+    icon: Brain,
+    children: [
+      { label: "Overview", to: "/ai-brain" },
+      { label: "Analysis History", to: "/ai-brain/history" },
     ],
   },
   { label: "Settings", to: "/settings", icon: Settings },

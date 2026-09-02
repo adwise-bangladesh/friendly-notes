@@ -27,6 +27,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { FormSection } from "@/components/commerce/FormSection";
+import { AIEntityPanel } from "@/components/ai/AIEntityPanel";
 import { CustomerFormDialog } from "@/components/customers/CustomerFormDialog";
 import { CustomerIndicators } from "@/components/customers/CustomerIndicators";
 import { useCommercePermissions } from "@/hooks/use-permissions";
@@ -304,6 +305,7 @@ function Page() {
           <TabsTrigger value="financial">Financial</TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="notes">Notes</TabsTrigger>
+          <TabsTrigger value="ai">AI Brain</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -715,6 +717,9 @@ function Page() {
               </ul>
             </FormSection>
           )}
+        </TabsContent>
+        <TabsContent value="ai">
+          <AIEntityPanel entityType="customer" entityId={customer.id} analysisType="customer_review" />
         </TabsContent>
       </Tabs>
 
