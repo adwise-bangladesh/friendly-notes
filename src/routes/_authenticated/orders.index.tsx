@@ -66,16 +66,18 @@ function Page() {
   const { canManage } = useCommercePermissions();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<OrderStatus | "all">("all");
+  const [deliveryStatus, setDeliveryStatus] = useState<DeliveryStatus | "all">("all");
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | "all">("all");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
 
   const { data: orders = [], isLoading } = useQuery({
-    queryKey: ["orders", search, status, paymentStatus, from, to],
+    queryKey: ["orders", search, status, deliveryStatus, paymentStatus, from, to],
     queryFn: () =>
       getOrders({
         search,
         status,
+        deliveryStatus,
         paymentStatus,
         ...(from ? { from: new Date(`${from}T00:00:00`).toISOString() } : {}),
         ...(to ? { to: new Date(`${to}T23:59:59`).toISOString() } : {}),
