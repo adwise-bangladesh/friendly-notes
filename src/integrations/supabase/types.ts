@@ -414,8 +414,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      brand_product_counts: {
+        Args: never
+        Returns: {
+          brand_id: string
+          product_count: number
+        }[]
+      }
       can_manage_commerce: { Args: { _user_id: string }; Returns: boolean }
       can_read_commerce: { Args: { _user_id: string }; Returns: boolean }
+      category_product_counts: {
+        Args: never
+        Returns: {
+          category_id: string
+          product_count: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
