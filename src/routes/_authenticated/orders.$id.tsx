@@ -12,6 +12,7 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { FormSection } from "@/components/commerce/FormSection";
+import { VerificationPanel } from "@/components/orders/VerificationPanel";
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import { formatMoney } from "@/lib/currency";
 import { addOrderNote, cancelOrder, getOrderById } from "@/lib/orders";
@@ -226,6 +227,8 @@ function Page() {
               </table>
             </div>
           </FormSection>
+
+          <VerificationPanel order={order} canManage={canManage} />
 
           <FormSection title="Notes" description="Append-only timeline.">
             <ol className="space-y-2">

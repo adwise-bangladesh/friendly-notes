@@ -14,7 +14,7 @@ export type OrderNote = Tables["order_notes"]["Row"];
 /* ---------- Independent status dimensions ---------- */
 
 export type OrderStatus = Enums["order_status"];
-export type VerificationStatus = Enums["order_verification_status"];
+export type { VerificationStatus } from "./verification";
 export type FulfillmentStatus = Enums["order_fulfillment_status"];
 export type DeliveryStatus = Enums["order_delivery_status"];
 export type FinancialStatus = Enums["order_financial_status"];
@@ -30,10 +30,8 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   cancelled: "Cancelled",
 };
 
-export const VERIFICATION_STATUS_LABELS: Record<VerificationStatus, string> = {
-  not_required: "Not required",
-  pending: "Pending",
-};
+export { VERIFICATION_STATUS_LABELS } from "./verification";
+
 
 export const FULFILLMENT_STATUS_LABELS: Record<FulfillmentStatus, string> = {
   unfulfilled: "Unfulfilled",
