@@ -1250,6 +1250,47 @@ export type Database = {
         }
         Relationships: []
       }
+      external_entity_mappings: {
+        Row: {
+          created_at: string
+          entity_type: Database["public"]["Enums"]["external_entity_type"]
+          external_id: string
+          external_reference: string | null
+          id: string
+          internal_id: string
+          sales_channel_account_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          entity_type: Database["public"]["Enums"]["external_entity_type"]
+          external_id: string
+          external_reference?: string | null
+          id?: string
+          internal_id: string
+          sales_channel_account_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          entity_type?: Database["public"]["Enums"]["external_entity_type"]
+          external_id?: string
+          external_reference?: string | null
+          id?: string
+          internal_id?: string
+          sales_channel_account_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "external_entity_mappings_sales_channel_account_id_fkey"
+            columns: ["sales_channel_account_id"]
+            isOneToOne: false
+            referencedRelation: "sales_channel_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       goods_receipt_items: {
         Row: {
           created_at: string
@@ -2875,6 +2916,7 @@ export type Database = {
           shipping_charge: number
           source: Database["public"]["Enums"]["order_source"]
           status: Database["public"]["Enums"]["order_status"]
+          store_id: string | null
           subtotal: number
           updated_at: string
           updated_by: string | null
@@ -2920,6 +2962,7 @@ export type Database = {
           shipping_charge?: number
           source?: Database["public"]["Enums"]["order_source"]
           status?: Database["public"]["Enums"]["order_status"]
+          store_id?: string | null
           subtotal?: number
           updated_at?: string
           updated_by?: string | null
@@ -2965,6 +3008,7 @@ export type Database = {
           shipping_charge?: number
           source?: Database["public"]["Enums"]["order_source"]
           status?: Database["public"]["Enums"]["order_status"]
+          store_id?: string | null
           subtotal?: number
           updated_at?: string
           updated_by?: string | null
@@ -2989,6 +3033,13 @@ export type Database = {
             columns: ["fulfillment_location_id"]
             isOneToOne: false
             referencedRelation: "inventory_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
             referencedColumns: ["id"]
           },
         ]
@@ -3615,6 +3666,168 @@ export type Database = {
           },
         ]
       }
+      sales_channel_accounts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          environment: Database["public"]["Enums"]["sales_channel_environment"]
+          external_store_id: string | null
+          external_store_name: string | null
+          id: string
+          last_error: string | null
+          last_successful_sync_at: string | null
+          last_sync_at: string | null
+          name: string
+          provider: Database["public"]["Enums"]["sales_channel_provider"]
+          status: Database["public"]["Enums"]["sales_channel_status"]
+          store_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          environment?: Database["public"]["Enums"]["sales_channel_environment"]
+          external_store_id?: string | null
+          external_store_name?: string | null
+          id?: string
+          last_error?: string | null
+          last_successful_sync_at?: string | null
+          last_sync_at?: string | null
+          name: string
+          provider: Database["public"]["Enums"]["sales_channel_provider"]
+          status?: Database["public"]["Enums"]["sales_channel_status"]
+          store_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          environment?: Database["public"]["Enums"]["sales_channel_environment"]
+          external_store_id?: string | null
+          external_store_name?: string | null
+          id?: string
+          last_error?: string | null
+          last_successful_sync_at?: string | null
+          last_sync_at?: string | null
+          name?: string
+          provider?: Database["public"]["Enums"]["sales_channel_provider"]
+          status?: Database["public"]["Enums"]["sales_channel_status"]
+          store_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_channel_accounts_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_channel_credentials: {
+        Row: {
+          account_id: string
+          api_version: string
+          consumer_key: string | null
+          consumer_secret: string | null
+          created_at: string
+          site_url: string | null
+          updated_at: string
+          webhook_secret: string | null
+        }
+        Insert: {
+          account_id: string
+          api_version?: string
+          consumer_key?: string | null
+          consumer_secret?: string | null
+          created_at?: string
+          site_url?: string | null
+          updated_at?: string
+          webhook_secret?: string | null
+        }
+        Update: {
+          account_id?: string
+          api_version?: string
+          consumer_key?: string | null
+          consumer_secret?: string | null
+          created_at?: string
+          site_url?: string | null
+          updated_at?: string
+          webhook_secret?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_channel_credentials_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: true
+            referencedRelation: "sales_channel_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_channel_sync_runs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_summary: string | null
+          id: string
+          initiated_by: string | null
+          records_created: number
+          records_failed: number
+          records_fetched: number
+          records_skipped: number
+          records_updated: number
+          sales_channel_account_id: string
+          started_at: string
+          status: Database["public"]["Enums"]["sales_channel_sync_status"]
+          sync_type: Database["public"]["Enums"]["sales_channel_sync_type"]
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_summary?: string | null
+          id?: string
+          initiated_by?: string | null
+          records_created?: number
+          records_failed?: number
+          records_fetched?: number
+          records_skipped?: number
+          records_updated?: number
+          sales_channel_account_id: string
+          started_at?: string
+          status?: Database["public"]["Enums"]["sales_channel_sync_status"]
+          sync_type: Database["public"]["Enums"]["sales_channel_sync_type"]
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_summary?: string | null
+          id?: string
+          initiated_by?: string | null
+          records_created?: number
+          records_failed?: number
+          records_fetched?: number
+          records_skipped?: number
+          records_updated?: number
+          sales_channel_account_id?: string
+          started_at?: string
+          status?: Database["public"]["Enums"]["sales_channel_sync_status"]
+          sync_type?: Database["public"]["Enums"]["sales_channel_sync_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_channel_sync_runs_sales_channel_account_id_fkey"
+            columns: ["sales_channel_account_id"]
+            isOneToOne: false
+            referencedRelation: "sales_channel_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shipment_events: {
         Row: {
           created_at: string
@@ -4168,6 +4381,65 @@ export type Database = {
           {
             foreignKeyName: "stocktakes_location_id_fkey"
             columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stores: {
+        Row: {
+          code: string
+          country: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          default_warehouse_id: string | null
+          id: string
+          name: string
+          order_number_prefix: string | null
+          slug: string
+          status: Database["public"]["Enums"]["store_status"]
+          timezone: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          code: string
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          default_warehouse_id?: string | null
+          id?: string
+          name: string
+          order_number_prefix?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["store_status"]
+          timezone?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          code?: string
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          default_warehouse_id?: string | null
+          id?: string
+          name?: string
+          order_number_prefix?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["store_status"]
+          timezone?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stores_default_warehouse_id_fkey"
+            columns: ["default_warehouse_id"]
             isOneToOne: false
             referencedRelation: "inventory_locations"
             referencedColumns: ["id"]
@@ -4906,6 +5178,7 @@ export type Database = {
           shipping_charge: number
           source: Database["public"]["Enums"]["order_source"]
           status: Database["public"]["Enums"]["order_status"]
+          store_id: string | null
           subtotal: number
           updated_at: string
           updated_by: string | null
@@ -5129,6 +5402,7 @@ export type Database = {
           shipping_charge: number
           source: Database["public"]["Enums"]["order_source"]
           status: Database["public"]["Enums"]["order_status"]
+          store_id: string | null
           subtotal: number
           updated_at: string
           updated_by: string | null
@@ -5194,6 +5468,7 @@ export type Database = {
           shipping_charge: number
           source: Database["public"]["Enums"]["order_source"]
           status: Database["public"]["Enums"]["order_status"]
+          store_id: string | null
           subtotal: number
           updated_at: string
           updated_by: string | null
@@ -5325,6 +5600,7 @@ export type Database = {
           shipping_charge: number
           source: Database["public"]["Enums"]["order_source"]
           status: Database["public"]["Enums"]["order_status"]
+          store_id: string | null
           subtotal: number
           updated_at: string
           updated_by: string | null
@@ -5599,6 +5875,40 @@ export type Database = {
           to: "customers"
           isOneToOne: false
           isSetofReturn: true
+        }
+      }
+      finish_sync_run: {
+        Args: {
+          _created?: number
+          _error_summary?: string
+          _failed?: number
+          _fetched?: number
+          _run_id: string
+          _skipped?: number
+          _status: Database["public"]["Enums"]["sales_channel_sync_status"]
+          _updated?: number
+        }
+        Returns: {
+          completed_at: string | null
+          created_at: string
+          error_summary: string | null
+          id: string
+          initiated_by: string | null
+          records_created: number
+          records_failed: number
+          records_fetched: number
+          records_skipped: number
+          records_updated: number
+          sales_channel_account_id: string
+          started_at: string
+          status: Database["public"]["Enums"]["sales_channel_sync_status"]
+          sync_type: Database["public"]["Enums"]["sales_channel_sync_type"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sales_channel_sync_runs"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       fulfillment_shippable_summary: {
@@ -6244,6 +6554,7 @@ export type Database = {
           shipping_charge: number
           source: Database["public"]["Enums"]["order_source"]
           status: Database["public"]["Enums"]["order_status"]
+          store_id: string | null
           subtotal: number
           updated_at: string
           updated_by: string | null
@@ -6310,6 +6621,7 @@ export type Database = {
           shipping_charge: number
           source: Database["public"]["Enums"]["order_source"]
           status: Database["public"]["Enums"]["order_status"]
+          store_id: string | null
           subtotal: number
           updated_at: string
           updated_by: string | null
@@ -6366,6 +6678,7 @@ export type Database = {
           shipping_charge: number
           source: Database["public"]["Enums"]["order_source"]
           status: Database["public"]["Enums"]["order_status"]
+          store_id: string | null
           subtotal: number
           updated_at: string
           updated_by: string | null
@@ -6430,6 +6743,10 @@ export type Database = {
         Args: { _reason: string; _receipt_id: string }
         Returns: undefined
       }
+      sales_channel_credentials_status: {
+        Args: { _account_id: string }
+        Returns: Json
+      }
       save_automation_rule: {
         Args: { _payload: Json }
         Returns: {
@@ -6482,6 +6799,57 @@ export type Database = {
         }
       }
       save_purchase_order: { Args: { _payload: Json }; Returns: string }
+      save_sales_channel_account: {
+        Args: { _payload: Json }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          environment: Database["public"]["Enums"]["sales_channel_environment"]
+          external_store_id: string | null
+          external_store_name: string | null
+          id: string
+          last_error: string | null
+          last_successful_sync_at: string | null
+          last_sync_at: string | null
+          name: string
+          provider: Database["public"]["Enums"]["sales_channel_provider"]
+          status: Database["public"]["Enums"]["sales_channel_status"]
+          store_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sales_channel_accounts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      save_store: {
+        Args: { _payload: Json }
+        Returns: {
+          code: string
+          country: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          default_warehouse_id: string | null
+          id: string
+          name: string
+          order_number_prefix: string | null
+          slug: string
+          status: Database["public"]["Enums"]["store_status"]
+          timezone: string
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "stores"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_automation_rule_status: {
         Args: {
           _rule_id: string
@@ -6725,6 +7093,62 @@ export type Database = {
           shipping_charge: number
           source: Database["public"]["Enums"]["order_source"]
           status: Database["public"]["Enums"]["order_status"]
+          store_id: string | null
+          subtotal: number
+          updated_at: string
+          updated_by: string | null
+          verification_attempt_count: number
+          verification_confirmed_at: string | null
+          verification_failure_reason: string | null
+          verification_last_attempt_at: string | null
+          verification_next_action_at: string | null
+          verification_priority: Database["public"]["Enums"]["verification_priority"]
+          verification_status: Database["public"]["Enums"]["order_verification_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_order_store: {
+        Args: { _order_id: string; _store_id: string }
+        Returns: {
+          adjustment: number
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_id: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_charge: number
+          delivery_status: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount: number | null
+          financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason: string | null
+          fulfillment_location_id: string | null
+          fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total: number
+          id: string
+          order_discount: number
+          order_number: string
+          packed_at: string | null
+          packing_charge: number
+          paid_amount: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          placed_at: string | null
+          product_discount: number
+          reservation_status: Database["public"]["Enums"]["reservation_status"]
+          reserved_at: string | null
+          risk_level: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason: string | null
+          shipping_charge: number
+          source: Database["public"]["Enums"]["order_source"]
+          status: Database["public"]["Enums"]["order_status"]
+          store_id: string | null
           subtotal: number
           updated_at: string
           updated_by: string | null
@@ -6782,6 +7206,7 @@ export type Database = {
           shipping_charge: number
           source: Database["public"]["Enums"]["order_source"]
           status: Database["public"]["Enums"]["order_status"]
+          store_id: string | null
           subtotal: number
           updated_at: string
           updated_by: string | null
@@ -6842,6 +7267,7 @@ export type Database = {
           shipping_charge: number
           source: Database["public"]["Enums"]["order_source"]
           status: Database["public"]["Enums"]["order_status"]
+          store_id: string | null
           subtotal: number
           updated_at: string
           updated_by: string | null
@@ -6900,6 +7326,49 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      set_sales_channel_account_state: {
+        Args: {
+          _account_id: string
+          _error?: string
+          _status: Database["public"]["Enums"]["sales_channel_status"]
+          _successful?: boolean
+          _touch_sync?: boolean
+        }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          environment: Database["public"]["Enums"]["sales_channel_environment"]
+          external_store_id: string | null
+          external_store_name: string | null
+          id: string
+          last_error: string | null
+          last_successful_sync_at: string | null
+          last_sync_at: string | null
+          name: string
+          provider: Database["public"]["Enums"]["sales_channel_provider"]
+          status: Database["public"]["Enums"]["sales_channel_status"]
+          store_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sales_channel_accounts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_sales_channel_credentials: {
+        Args: {
+          _account_id: string
+          _api_version?: string
+          _consumer_key: string
+          _consumer_secret: string
+          _site_url: string
+          _webhook_secret?: string
+        }
+        Returns: boolean
       }
       set_settlement_status: {
         Args: {
@@ -7088,6 +7557,34 @@ export type Database = {
         Args: { _lines: Json; _stocktake_id: string }
         Returns: undefined
       }
+      set_store_status: {
+        Args: {
+          _status: Database["public"]["Enums"]["store_status"]
+          _store_id: string
+        }
+        Returns: {
+          code: string
+          country: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          default_warehouse_id: string | null
+          id: string
+          name: string
+          order_number_prefix: string | null
+          slug: string
+          status: Database["public"]["Enums"]["store_status"]
+          timezone: string
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "stores"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_transfer_items: {
         Args: { _lines: Json; _transfer_id: string }
         Returns: undefined
@@ -7146,6 +7643,7 @@ export type Database = {
           shipping_charge: number
           source: Database["public"]["Enums"]["order_source"]
           status: Database["public"]["Enums"]["order_status"]
+          store_id: string | null
           subtotal: number
           updated_at: string
           updated_by: string | null
@@ -7165,6 +7663,35 @@ export type Database = {
         }
       }
       start_stocktake: { Args: { _stocktake_id: string }; Returns: undefined }
+      start_sync_run: {
+        Args: {
+          _account_id: string
+          _sync_type: Database["public"]["Enums"]["sales_channel_sync_type"]
+        }
+        Returns: {
+          completed_at: string | null
+          created_at: string
+          error_summary: string | null
+          id: string
+          initiated_by: string | null
+          records_created: number
+          records_failed: number
+          records_fetched: number
+          records_skipped: number
+          records_updated: number
+          sales_channel_account_id: string
+          started_at: string
+          status: Database["public"]["Enums"]["sales_channel_sync_status"]
+          sync_type: Database["public"]["Enums"]["sales_channel_sync_type"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sales_channel_sync_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      store_list: { Args: never; Returns: Json }
       supplier_summaries: {
         Args: never
         Returns: {
@@ -7250,6 +7777,31 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "shipments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      upsert_external_mapping: {
+        Args: {
+          _account_id: string
+          _entity_type: Database["public"]["Enums"]["external_entity_type"]
+          _external_id: string
+          _external_reference?: string
+          _internal_id: string
+        }
+        Returns: {
+          created_at: string
+          entity_type: Database["public"]["Enums"]["external_entity_type"]
+          external_id: string
+          external_reference: string | null
+          id: string
+          internal_id: string
+          sales_channel_account_id: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "external_entity_mappings"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -7364,6 +7916,7 @@ export type Database = {
       customer_status: "active" | "inactive" | "blocked"
       entity_status: "active" | "inactive" | "archived"
       entity_visibility: "visible" | "hidden"
+      external_entity_type: "order" | "product" | "variant" | "customer"
       financial_adjustment_direction: "income" | "expense"
       financial_adjustment_type:
         | "packing_cost"
@@ -7576,6 +8129,24 @@ export type Database = {
         | "damaged"
         | "missing"
         | "unusable"
+      sales_channel_environment: "production" | "sandbox"
+      sales_channel_provider:
+        | "manual"
+        | "woocommerce"
+        | "shopify"
+        | "custom_api"
+        | "facebook"
+        | "tiktok"
+        | "daraz"
+        | "other"
+      sales_channel_status: "active" | "disabled" | "error" | "disconnected"
+      sales_channel_sync_status:
+        | "pending"
+        | "running"
+        | "completed"
+        | "failed"
+        | "partial"
+      sales_channel_sync_type: "orders" | "products" | "customers" | "full"
       shipment_event_type:
         | "shipment_created"
         | "ready_for_booking"
@@ -7652,6 +8223,7 @@ export type Database = {
         | "lost"
         | "cancelled"
       stocktake_status: "draft" | "in_progress" | "completed" | "cancelled"
+      store_status: "active" | "inactive" | "archived"
       supply_model: "in_stock" | "local_sourcing" | "preorder" | "group_buy"
       variant_status: "active" | "inactive"
       verification_attempt_outcome:
@@ -7927,6 +8499,7 @@ export const Constants = {
       customer_status: ["active", "inactive", "blocked"],
       entity_status: ["active", "inactive", "archived"],
       entity_visibility: ["visible", "hidden"],
+      external_entity_type: ["order", "product", "variant", "customer"],
       financial_adjustment_direction: ["income", "expense"],
       financial_adjustment_type: [
         "packing_cost",
@@ -8160,6 +8733,26 @@ export const Constants = {
         "missing",
         "unusable",
       ],
+      sales_channel_environment: ["production", "sandbox"],
+      sales_channel_provider: [
+        "manual",
+        "woocommerce",
+        "shopify",
+        "custom_api",
+        "facebook",
+        "tiktok",
+        "daraz",
+        "other",
+      ],
+      sales_channel_status: ["active", "disabled", "error", "disconnected"],
+      sales_channel_sync_status: [
+        "pending",
+        "running",
+        "completed",
+        "failed",
+        "partial",
+      ],
+      sales_channel_sync_type: ["orders", "products", "customers", "full"],
       shipment_event_type: [
         "shipment_created",
         "ready_for_booking",
@@ -8242,6 +8835,7 @@ export const Constants = {
         "cancelled",
       ],
       stocktake_status: ["draft", "in_progress", "completed", "cancelled"],
+      store_status: ["active", "inactive", "archived"],
       supply_model: ["in_stock", "local_sourcing", "preorder", "group_buy"],
       variant_status: ["active", "inactive"],
       verification_attempt_outcome: [
