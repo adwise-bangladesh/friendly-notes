@@ -14,6 +14,161 @@ export type Database = {
   }
   public: {
     Tables: {
+      automation_notes: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_type: string
+          execution_id: string | null
+          id: string
+          note: string
+          rule_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          execution_id?: string | null
+          id?: string
+          note: string
+          rule_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          execution_id?: string | null
+          id?: string
+          note?: string
+          rule_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_notes_execution_id_fkey"
+            columns: ["execution_id"]
+            isOneToOne: false
+            referencedRelation: "automation_rule_executions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_notes_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "automation_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_rule_executions: {
+        Row: {
+          automation_depth: number
+          completed_at: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          error_message: string | null
+          event_type: Database["public"]["Enums"]["automation_trigger_type"]
+          id: string
+          input_snapshot: Json
+          result: Json | null
+          rule_id: string
+          source_event_id: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["automation_execution_status"]
+        }
+        Insert: {
+          automation_depth?: number
+          completed_at?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          error_message?: string | null
+          event_type: Database["public"]["Enums"]["automation_trigger_type"]
+          id?: string
+          input_snapshot?: Json
+          result?: Json | null
+          rule_id: string
+          source_event_id: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["automation_execution_status"]
+        }
+        Update: {
+          automation_depth?: number
+          completed_at?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          error_message?: string | null
+          event_type?: Database["public"]["Enums"]["automation_trigger_type"]
+          id?: string
+          input_snapshot?: Json
+          result?: Json | null
+          rule_id?: string
+          source_event_id?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["automation_execution_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_rule_executions_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "automation_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automation_rules: {
+        Row: {
+          action_config: Json
+          action_type: Database["public"]["Enums"]["automation_action_type"]
+          condition_mode: Database["public"]["Enums"]["automation_condition_mode"]
+          conditions: Json
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          priority: Database["public"]["Enums"]["automation_rule_priority"]
+          status: Database["public"]["Enums"]["automation_rule_status"]
+          trigger_type: Database["public"]["Enums"]["automation_trigger_type"]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          action_config?: Json
+          action_type: Database["public"]["Enums"]["automation_action_type"]
+          condition_mode?: Database["public"]["Enums"]["automation_condition_mode"]
+          conditions?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          priority?: Database["public"]["Enums"]["automation_rule_priority"]
+          status?: Database["public"]["Enums"]["automation_rule_status"]
+          trigger_type: Database["public"]["Enums"]["automation_trigger_type"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          action_config?: Json
+          action_type?: Database["public"]["Enums"]["automation_action_type"]
+          condition_mode?: Database["public"]["Enums"]["automation_condition_mode"]
+          conditions?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          priority?: Database["public"]["Enums"]["automation_rule_priority"]
+          status?: Database["public"]["Enums"]["automation_rule_status"]
+          trigger_type?: Database["public"]["Enums"]["automation_trigger_type"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       brands: {
         Row: {
           banner_url: string | null
@@ -4472,6 +4627,48 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      automation_emit_event: {
+        Args: {
+          _entity_id: string
+          _entity_type: string
+          _event_type: Database["public"]["Enums"]["automation_trigger_type"]
+          _origin?: Database["public"]["Enums"]["automation_event_origin"]
+          _payload: Json
+          _source_event_id: string
+        }
+        Returns: undefined
+      }
+      automation_evaluate_conditions: {
+        Args: {
+          _conditions: Json
+          _ctx: Json
+          _mode: Database["public"]["Enums"]["automation_condition_mode"]
+          _trigger: Database["public"]["Enums"]["automation_trigger_type"]
+        }
+        Returns: boolean
+      }
+      automation_execute_action: {
+        Args: {
+          _ctx: Json
+          _execution_id: string
+          _rule: Database["public"]["Tables"]["automation_rules"]["Row"]
+        }
+        Returns: Json
+      }
+      automation_max_depth: { Args: never; Returns: number }
+      automation_order_context: { Args: { _order_id: string }; Returns: Json }
+      automation_registry: { Args: never; Returns: Json }
+      automation_sanitize_error: { Args: { _msg: string }; Returns: string }
+      automation_validate_rule: {
+        Args: {
+          _action: Database["public"]["Enums"]["automation_action_type"]
+          _conditions: Json
+          _config: Json
+          _mode: Database["public"]["Enums"]["automation_condition_mode"]
+          _trigger: Database["public"]["Enums"]["automation_trigger_type"]
+        }
+        Returns: undefined
+      }
       brand_product_counts: {
         Args: never
         Returns: {
@@ -5767,6 +5964,31 @@ export type Database = {
         Args: { _reason: string; _receipt_id: string }
         Returns: undefined
       }
+      save_automation_rule: {
+        Args: { _payload: Json }
+        Returns: {
+          action_config: Json
+          action_type: Database["public"]["Enums"]["automation_action_type"]
+          condition_mode: Database["public"]["Enums"]["automation_condition_mode"]
+          conditions: Json
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          priority: Database["public"]["Enums"]["automation_rule_priority"]
+          status: Database["public"]["Enums"]["automation_rule_status"]
+          trigger_type: Database["public"]["Enums"]["automation_trigger_type"]
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "automation_rules"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       save_customer: {
         Args: { _payload: Json }
         Returns: {
@@ -5794,6 +6016,34 @@ export type Database = {
         }
       }
       save_purchase_order: { Args: { _payload: Json }; Returns: string }
+      set_automation_rule_status: {
+        Args: {
+          _rule_id: string
+          _status: Database["public"]["Enums"]["automation_rule_status"]
+        }
+        Returns: {
+          action_config: Json
+          action_type: Database["public"]["Enums"]["automation_action_type"]
+          condition_mode: Database["public"]["Enums"]["automation_condition_mode"]
+          conditions: Json
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          priority: Database["public"]["Enums"]["automation_rule_priority"]
+          status: Database["public"]["Enums"]["automation_rule_status"]
+          trigger_type: Database["public"]["Enums"]["automation_trigger_type"]
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "automation_rules"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_customer_manual_flag: {
         Args: {
           _active: boolean
@@ -6521,6 +6771,42 @@ export type Database = {
     }
     Enums: {
       app_role: "owner" | "admin" | "staff" | "viewer"
+      automation_action_type:
+        | "set_verification_priority"
+        | "move_to_manual_review"
+        | "assign_operational_work"
+        | "create_internal_note"
+      automation_condition_mode: "all" | "any"
+      automation_event_origin: "human" | "system" | "automation"
+      automation_execution_status:
+        | "pending"
+        | "running"
+        | "completed"
+        | "skipped"
+        | "failed"
+      automation_rule_priority: "low" | "normal" | "high"
+      automation_rule_status: "active" | "paused" | "archived"
+      automation_trigger_type:
+        | "order.created"
+        | "order.cancelled"
+        | "verification.pending"
+        | "verification.manual_review"
+        | "verification.unreachable"
+        | "verification.confirmed"
+        | "verification.failed"
+        | "fulfillment.shortage"
+        | "fulfillment.qc_failed"
+        | "fulfillment.on_hold"
+        | "fulfillment.handover"
+        | "shipment.created"
+        | "shipment.on_hold"
+        | "shipment.delivery_failed"
+        | "shipment.delivered"
+        | "shipment.returned"
+        | "inventory.low_stock"
+        | "inventory.out_of_stock"
+        | "purchase_order.pending_approval"
+        | "purchase_order.partially_received"
       brand_type: "standard" | "own_brand" | "generic"
       cost_change_source: "manual" | "purchase_receipt" | "correction"
       courier_environment: "sandbox" | "production"
@@ -7008,6 +7294,45 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["owner", "admin", "staff", "viewer"],
+      automation_action_type: [
+        "set_verification_priority",
+        "move_to_manual_review",
+        "assign_operational_work",
+        "create_internal_note",
+      ],
+      automation_condition_mode: ["all", "any"],
+      automation_event_origin: ["human", "system", "automation"],
+      automation_execution_status: [
+        "pending",
+        "running",
+        "completed",
+        "skipped",
+        "failed",
+      ],
+      automation_rule_priority: ["low", "normal", "high"],
+      automation_rule_status: ["active", "paused", "archived"],
+      automation_trigger_type: [
+        "order.created",
+        "order.cancelled",
+        "verification.pending",
+        "verification.manual_review",
+        "verification.unreachable",
+        "verification.confirmed",
+        "verification.failed",
+        "fulfillment.shortage",
+        "fulfillment.qc_failed",
+        "fulfillment.on_hold",
+        "fulfillment.handover",
+        "shipment.created",
+        "shipment.on_hold",
+        "shipment.delivery_failed",
+        "shipment.delivered",
+        "shipment.returned",
+        "inventory.low_stock",
+        "inventory.out_of_stock",
+        "purchase_order.pending_approval",
+        "purchase_order.partially_received",
+      ],
       brand_type: ["standard", "own_brand", "generic"],
       cost_change_source: ["manual", "purchase_receipt", "correction"],
       courier_environment: ["sandbox", "production"],
