@@ -16,6 +16,7 @@ import { VerificationPanel } from "@/components/orders/VerificationPanel";
 import { FulfillmentPanel } from "@/components/orders/FulfillmentPanel";
 import { OrderFulfillmentsPanel } from "@/components/orders/OrderFulfillmentsPanel";
 import { OrderShipmentsPanel } from "@/components/orders/OrderShipmentsPanel";
+import { OrderReturnsPanel } from "@/components/orders/OrderReturnsPanel";
 
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import { formatMoney } from "@/lib/currency";
@@ -258,6 +259,10 @@ function Page() {
           <OrderFulfillmentsPanel order={order} canManage={canManage} />
 
           <OrderShipmentsPanel order={order} canManage={canManage} />
+
+          <OrderReturnsPanel order={order} canManage={canManage} />
+
+
 
 
 
