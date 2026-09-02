@@ -19,6 +19,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticated/returns'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as AuthenticatedFinanceCourierSettlementsRouteImport } from './routes/_authenticated/finance.courier-settlements'
 import { Route as AuthenticatedInventoryIndexRouteImport } from './routes/_authenticated/inventory.index'
 import { Route as AuthenticatedInventoryLocationsRouteImport } from './routes/_authenticated/inventory.locations'
 import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenticated/orders.index'
@@ -88,6 +89,12 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedFinanceCourierSettlementsRoute =
+  AuthenticatedFinanceCourierSettlementsRouteImport.update({
+    id: '/finance/courier-settlements',
+    path: '/finance/courier-settlements',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedInventoryIndexRoute =
   AuthenticatedInventoryIndexRouteImport.update({
     id: '/inventory/',
@@ -203,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/returns': typeof AuthenticatedReturnsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
   '/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders/exceptions': typeof AuthenticatedOrdersExceptionsRoute
@@ -232,6 +240,7 @@ export interface FileRoutesByTo {
   '/returns': typeof AuthenticatedReturnsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
   '/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders/exceptions': typeof AuthenticatedOrdersExceptionsRoute
@@ -263,6 +272,7 @@ export interface FileRoutesById {
   '/_authenticated/returns': typeof AuthenticatedReturnsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/_authenticated/finance/courier-settlements': typeof AuthenticatedFinanceCourierSettlementsRoute
   '/_authenticated/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
   '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/_authenticated/orders/exceptions': typeof AuthenticatedOrdersExceptionsRoute
@@ -294,6 +304,7 @@ export interface FileRouteTypes {
     | '/returns'
     | '/settings'
     | '/.lovable/oauth/consent'
+    | '/finance/courier-settlements'
     | '/inventory/locations'
     | '/orders/$id'
     | '/orders/exceptions'
@@ -323,6 +334,7 @@ export interface FileRouteTypes {
     | '/returns'
     | '/settings'
     | '/.lovable/oauth/consent'
+    | '/finance/courier-settlements'
     | '/inventory/locations'
     | '/orders/$id'
     | '/orders/exceptions'
@@ -353,6 +365,7 @@ export interface FileRouteTypes {
     | '/_authenticated/returns'
     | '/_authenticated/settings'
     | '/.lovable/oauth/consent'
+    | '/_authenticated/finance/courier-settlements'
     | '/_authenticated/inventory/locations'
     | '/_authenticated/orders/$id'
     | '/_authenticated/orders/exceptions'
@@ -454,6 +467,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/.lovable/oauth/consent'
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/finance/courier-settlements': {
+      id: '/_authenticated/finance/courier-settlements'
+      path: '/finance/courier-settlements'
+      fullPath: '/finance/courier-settlements'
+      preLoaderRoute: typeof AuthenticatedFinanceCourierSettlementsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/inventory/': {
       id: '/_authenticated/inventory/'
@@ -589,6 +609,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedReturnsRoute: typeof AuthenticatedReturnsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedFinanceCourierSettlementsRoute: typeof AuthenticatedFinanceCourierSettlementsRoute
   AuthenticatedInventoryLocationsRoute: typeof AuthenticatedInventoryLocationsRoute
   AuthenticatedOrdersIdRoute: typeof AuthenticatedOrdersIdRoute
   AuthenticatedOrdersExceptionsRoute: typeof AuthenticatedOrdersExceptionsRoute
@@ -613,6 +634,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedReturnsRoute: AuthenticatedReturnsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedFinanceCourierSettlementsRoute:
+    AuthenticatedFinanceCourierSettlementsRoute,
   AuthenticatedInventoryLocationsRoute: AuthenticatedInventoryLocationsRoute,
   AuthenticatedOrdersIdRoute: AuthenticatedOrdersIdRoute,
   AuthenticatedOrdersExceptionsRoute: AuthenticatedOrdersExceptionsRoute,
