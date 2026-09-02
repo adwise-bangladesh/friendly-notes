@@ -20,6 +20,8 @@ import { OrderProductPicker } from "@/components/orders/OrderProductPicker";
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import { formatMoney } from "@/lib/currency";
 import { createOrder, isPlausibleBdPhone } from "@/lib/orders";
+import { findCustomersByPhone, normalizeBdPhone } from "@/lib/customers";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import {
   PAYMENT_METHODS,
   PAYMENT_METHOD_LABELS,
@@ -58,6 +60,17 @@ function Page() {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
+  const [customerId, setCustomerId] = useState<string | null>(null);
+
+  // Existing-customer lookup: the same phone must never create a second identity.
+  const normalizedPhone = normalizeBdPhone(customerPhone);
+  const { data: matches = [] } = useQuery({
+    queryKey: ["customer-lookup", normalizedPhone],
+    queryFn: () => findCustomersByPhone(customerPhone),
+    enabled: !!normalizedPhone && normalizedPhone.length >= 11,
+  });
+  const selectedCustomer = matches.find((c) => c.id === customerId) ?? null;
+  const blocked = selectedCustomer?.status === "blocked";
 
   const [recipientName, setRecipientName] = useState("");
   const [addressPhone, setAddressPhone] = useState("");
@@ -93,6 +106,7 @@ function Page() {
     mutationFn: (status: "draft" | "created") =>
       createOrder({
         status,
+        customerId,
         customerName: customerName.trim(),
         customerPhone: customerPhone.trim(),
         customerEmail: customerEmail.trim() || null,
@@ -128,6 +142,9 @@ function Page() {
     if (!customerName.trim()) return "Customer name is required.";
     if (!customerPhone.trim()) return "Customer phone is required.";
     if (!isPlausibleBdPhone(customerPhone)) return "Enter a valid Bangladesh mobile number.";
+    if (blocked) return "This customer is blocked. An administrator must unblock them first.";
+    if (matches.length > 1 && !customerId)
+      return "Several customers share this phone number. Select the right one first.";
     if (!addressLine.trim()) return "Shipping address is required.";
     if (items.length === 0) return "Add at least one product.";
     if (items.some((i) => i.quantity < 1)) return "Quantity must be at least 1.";
@@ -196,7 +213,10 @@ function Page() {
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-4">
-          <FormSection title="Customer" description="Stored as a snapshot on this order.">
+          <FormSection
+            title="Customer"
+            description="Matched to an existing customer by phone; the order still keeps its own snapshot."
+          >
             <div className="grid gap-3 sm:grid-cols-3">
               <Field label="Name" required>
                 <Input
@@ -222,6 +242,51 @@ function Page() {
                 />
               </Field>
             </div>
+
+            {matches.length > 0 && (
+              <div className="mt-3 space-y-2 rounded border border-border bg-muted/30 p-2.5">
+                <p className="text-[12px] text-muted-foreground">
+                  {matches.length} existing customer{matches.length === 1 ? "" : "s"} with this
+                  number. Select one to reuse their history.
+                </p>
+                {matches.map((c) => (
+                  <div key={c.id} className="flex flex-wrap items-center gap-2 text-[13px]">
+                    <span className="font-medium">{c.name}</span>
+                    <span className="text-muted-foreground">{c.primary_phone}</span>
+                    {c.status === "blocked" && <StatusBadge tone="danger">Blocked</StatusBadge>}
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={customerId === c.id ? "secondary" : "outline"}
+                      className="ml-auto"
+                      onClick={() => {
+                        setCustomerId(customerId === c.id ? null : c.id);
+                        if (customerId !== c.id) {
+                          setCustomerName(c.name);
+                          setCustomerEmail(c.email ?? "");
+                        }
+                      }}
+                    >
+                      {customerId === c.id ? "Selected" : "Use this customer"}
+                    </Button>
+                    <Link
+                      to="/customers/$id"
+                      params={{ id: c.id }}
+                      className="text-[12px] text-primary hover:underline"
+                    >
+                      View profile
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {blocked && (
+              <p className="mt-2 rounded border border-destructive/30 bg-destructive/10 px-2.5 py-2 text-[12.5px] text-destructive">
+                This customer is blocked. Orders cannot be created until an administrator unblocks
+                them.
+              </p>
+            )}
           </FormSection>
 
           <FormSection
