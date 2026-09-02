@@ -18,6 +18,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticated/returns'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as AuthenticatedAnalyticsIndexRouteImport } from './routes/_authenticated/analytics.index'
 import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers.index'
 import { Route as AuthenticatedCustomersIdRouteImport } from './routes/_authenticated/customers_.$id'
 import { Route as AuthenticatedFinanceCourierSettlementsRouteImport } from './routes/_authenticated/finance.courier-settlements'
@@ -98,6 +99,12 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAnalyticsIndexRoute =
+  AuthenticatedAnalyticsIndexRouteImport.update({
+    id: '/analytics/',
+    path: '/analytics/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCustomersIndexRoute =
   AuthenticatedCustomersIndexRouteImport.update({
     id: '/customers/',
@@ -327,6 +334,7 @@ export interface FileRoutesByFullPath {
   '/products/new': typeof AuthenticatedProductsNewRoute
   '/returns/$id': typeof AuthenticatedReturnsIdRoute
   '/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
+  '/analytics/': typeof AuthenticatedAnalyticsIndexRoute
   '/customers/': typeof AuthenticatedCustomersIndexRoute
   '/inventory/': typeof AuthenticatedInventoryIndexRoute
   '/operations/': typeof AuthenticatedOperationsIndexRoute
@@ -371,6 +379,7 @@ export interface FileRoutesByTo {
   '/products/new': typeof AuthenticatedProductsNewRoute
   '/returns/$id': typeof AuthenticatedReturnsIdRoute
   '/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
+  '/analytics': typeof AuthenticatedAnalyticsIndexRoute
   '/customers': typeof AuthenticatedCustomersIndexRoute
   '/inventory': typeof AuthenticatedInventoryIndexRoute
   '/operations': typeof AuthenticatedOperationsIndexRoute
@@ -417,6 +426,7 @@ export interface FileRoutesById {
   '/_authenticated/products/new': typeof AuthenticatedProductsNewRoute
   '/_authenticated/returns_/$id': typeof AuthenticatedReturnsIdRoute
   '/_authenticated/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
+  '/_authenticated/analytics/': typeof AuthenticatedAnalyticsIndexRoute
   '/_authenticated/customers/': typeof AuthenticatedCustomersIndexRoute
   '/_authenticated/inventory/': typeof AuthenticatedInventoryIndexRoute
   '/_authenticated/operations/': typeof AuthenticatedOperationsIndexRoute
@@ -463,6 +473,7 @@ export interface FileRouteTypes {
     | '/products/new'
     | '/returns/$id'
     | '/suppliers/$id'
+    | '/analytics/'
     | '/customers/'
     | '/inventory/'
     | '/operations/'
@@ -507,6 +518,7 @@ export interface FileRouteTypes {
     | '/products/new'
     | '/returns/$id'
     | '/suppliers/$id'
+    | '/analytics'
     | '/customers'
     | '/inventory'
     | '/operations'
@@ -552,6 +564,7 @@ export interface FileRouteTypes {
     | '/_authenticated/products/new'
     | '/_authenticated/returns_/$id'
     | '/_authenticated/suppliers/$id'
+    | '/_authenticated/analytics/'
     | '/_authenticated/customers/'
     | '/_authenticated/inventory/'
     | '/_authenticated/operations/'
@@ -643,6 +656,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/.lovable/oauth/consent'
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/analytics/': {
+      id: '/_authenticated/analytics/'
+      path: '/analytics'
+      fullPath: '/analytics/'
+      preLoaderRoute: typeof AuthenticatedAnalyticsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/customers/': {
       id: '/_authenticated/customers/'
@@ -908,6 +928,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProductsNewRoute: typeof AuthenticatedProductsNewRoute
   AuthenticatedReturnsIdRoute: typeof AuthenticatedReturnsIdRoute
   AuthenticatedSuppliersIdRoute: typeof AuthenticatedSuppliersIdRoute
+  AuthenticatedAnalyticsIndexRoute: typeof AuthenticatedAnalyticsIndexRoute
   AuthenticatedCustomersIndexRoute: typeof AuthenticatedCustomersIndexRoute
   AuthenticatedInventoryIndexRoute: typeof AuthenticatedInventoryIndexRoute
   AuthenticatedOperationsIndexRoute: typeof AuthenticatedOperationsIndexRoute
@@ -948,6 +969,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProductsNewRoute: AuthenticatedProductsNewRoute,
   AuthenticatedReturnsIdRoute: AuthenticatedReturnsIdRoute,
   AuthenticatedSuppliersIdRoute: AuthenticatedSuppliersIdRoute,
+  AuthenticatedAnalyticsIndexRoute: AuthenticatedAnalyticsIndexRoute,
   AuthenticatedCustomersIndexRoute: AuthenticatedCustomersIndexRoute,
   AuthenticatedInventoryIndexRoute: AuthenticatedInventoryIndexRoute,
   AuthenticatedOperationsIndexRoute: AuthenticatedOperationsIndexRoute,
