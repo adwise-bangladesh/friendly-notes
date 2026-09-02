@@ -2,11 +2,11 @@ import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 interface EmptyStateProps {
-  icon?: LucideIcon;
+  icon?: LucideIcon | undefined;
   title: string;
-  description?: string;
-  action?: ReactNode;
-  compact?: boolean;
+  description?: string | undefined;
+  action?: ReactNode | undefined;
+  compact?: boolean | undefined;
 }
 
 export function EmptyState({ icon: Icon, title, description, action, compact }: EmptyStateProps) {
