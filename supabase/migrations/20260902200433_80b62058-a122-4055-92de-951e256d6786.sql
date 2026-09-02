@@ -1,0 +1,28 @@
+revoke all on function public.save_store(jsonb) from public;
+revoke all on function public.set_store_status(uuid, public.store_status) from public;
+revoke all on function public.save_sales_channel_account(jsonb) from public;
+revoke all on function public.set_sales_channel_account_state(uuid, public.sales_channel_status, text, boolean, boolean) from public;
+revoke all on function public.set_sales_channel_credentials(uuid, text, text, text, text, text) from public;
+revoke all on function public.sales_channel_credentials_status(uuid) from public;
+revoke all on function public.upsert_external_mapping(uuid, public.external_entity_type, uuid, text, text) from public;
+revoke all on function public.start_sync_run(uuid, public.sales_channel_sync_type) from public;
+revoke all on function public.finish_sync_run(uuid, public.sales_channel_sync_status, integer, integer, integer, integer, integer, text) from public;
+revoke all on function public.set_order_store(uuid, uuid) from public;
+revoke all on function public.store_list() from public;
+revoke all on function public.guard_sales_channel_write() from public;
+revoke all on function public.guard_sync_run_history() from public;
+
+grant execute on function public.save_store(jsonb) to authenticated;
+grant execute on function public.set_store_status(uuid, public.store_status) to authenticated;
+grant execute on function public.save_sales_channel_account(jsonb) to authenticated;
+grant execute on function public.set_sales_channel_account_state(uuid, public.sales_channel_status, text, boolean, boolean) to authenticated;
+grant execute on function public.set_sales_channel_credentials(uuid, text, text, text, text, text) to authenticated;
+grant execute on function public.sales_channel_credentials_status(uuid) to authenticated;
+grant execute on function public.upsert_external_mapping(uuid, public.external_entity_type, uuid, text, text) to authenticated;
+grant execute on function public.start_sync_run(uuid, public.sales_channel_sync_type) to authenticated;
+grant execute on function public.finish_sync_run(uuid, public.sales_channel_sync_status, integer, integer, integer, integer, integer, text) to authenticated;
+grant execute on function public.set_order_store(uuid, uuid) to authenticated;
+grant execute on function public.store_list() to authenticated;
+grant execute on function public.save_store(jsonb) to service_role;
+grant execute on function public.set_sales_channel_account_state(uuid, public.sales_channel_status, text, boolean, boolean) to service_role;
+grant execute on function public.upsert_external_mapping(uuid, public.external_entity_type, uuid, text, text) to service_role;
