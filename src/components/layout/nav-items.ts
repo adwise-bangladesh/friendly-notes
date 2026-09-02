@@ -11,6 +11,8 @@ import {
   RotateCcw,
   Zap,
   Plug,
+  Store,
+
   Brain,
   Settings,
   type LucideIcon,
