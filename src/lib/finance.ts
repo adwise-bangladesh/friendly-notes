@@ -305,7 +305,7 @@ export interface SettlementActualsInput {
 export async function recordSettlementActuals(
   input: SettlementActualsInput,
 ): Promise<CourierSettlementItem> {
-  const { data, error } = await supabase.rpc("record_settlement_actuals", {
+  const { data, error } = await supabase.rpc("record_settlement_actuals", rpcArgs({
     _item_id: input.itemId,
     _actual_collected_amount: input.actualCollectedAmount ?? undefined,
     _delivery_charge: input.deliveryCharge ?? undefined,
