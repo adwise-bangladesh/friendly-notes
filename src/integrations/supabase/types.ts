@@ -1019,6 +1019,7 @@ export type Database = {
           reference_type: string | null
           reserved_after: number | null
           reserved_before: number | null
+          seq: number
         }
         Insert: {
           created_at?: string
@@ -1041,6 +1042,7 @@ export type Database = {
           reference_type?: string | null
           reserved_after?: number | null
           reserved_before?: number | null
+          seq?: number
         }
         Update: {
           created_at?: string
@@ -1063,6 +1065,7 @@ export type Database = {
           reference_type?: string | null
           reserved_after?: number | null
           reserved_before?: number | null
+          seq?: number
         }
         Relationships: [
           {
