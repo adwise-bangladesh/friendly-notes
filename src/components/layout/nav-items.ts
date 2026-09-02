@@ -96,5 +96,14 @@ export const NAV_ITEMS: NavItem[] = [
   },
   { label: "Customers", to: "/customers", icon: Users },
   { label: "Returns", to: "/returns", icon: RotateCcw },
+  {
+    label: "Automation",
+    to: "/automation",
+    icon: Zap,
+    children: [
+      { label: "Rules", to: "/automation" },
+      { label: "History", to: "/automation/executions" },
+    ],
+  },
   { label: "Settings", to: "/settings", icon: Settings },
 ];
