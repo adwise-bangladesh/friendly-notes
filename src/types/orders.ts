@@ -40,9 +40,50 @@ export {
 } from "./fulfillment";
 
 
+/**
+ * Order-level delivery state. This is a projection derived by the database from
+ * the order's shipments — never set by the browser. See
+ * `refresh_order_delivery_status` for the aggregation rules.
+ */
+export const DELIVERY_STATUSES: DeliveryStatus[] = [
+  "not_shipped",
+  "partially_shipped",
+  "shipped",
+  "in_transit",
+  "on_hold",
+  "partially_delivered",
+  "delivered",
+  "delivery_failed",
+  "partially_returned",
+  "returned",
+];
+
 export const DELIVERY_STATUS_LABELS: Record<DeliveryStatus, string> = {
   not_shipped: "Not shipped",
+  partially_shipped: "Partially shipped",
+  shipped: "Shipped",
+  in_transit: "In transit",
+  on_hold: "On hold",
+  partially_delivered: "Partially delivered",
+  delivered: "Delivered",
+  delivery_failed: "Delivery failed",
+  partially_returned: "Partially returned",
+  returned: "Returned",
 };
+
+export const DELIVERY_STATUS_TONE: Record<DeliveryStatus, "neutral" | "info" | "success" | "warning" | "danger"> = {
+  not_shipped: "neutral",
+  partially_shipped: "info",
+  shipped: "info",
+  in_transit: "info",
+  on_hold: "warning",
+  partially_delivered: "warning",
+  delivered: "success",
+  delivery_failed: "danger",
+  partially_returned: "warning",
+  returned: "danger",
+};
+
 
 export const FINANCIAL_STATUS_LABELS: Record<FinancialStatus, string> = {
   not_applicable: "Not applicable",
