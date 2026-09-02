@@ -565,6 +565,207 @@ export type Database = {
           },
         ]
       }
+      order_fulfillment_events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          event_type: Database["public"]["Enums"]["fulfillment_event_type"]
+          from_status:
+            | Database["public"]["Enums"]["fulfillment_record_status"]
+            | null
+          fulfillment_id: string
+          id: string
+          message: string
+          metadata: Json | null
+          order_id: string
+          to_status:
+            | Database["public"]["Enums"]["fulfillment_record_status"]
+            | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          event_type: Database["public"]["Enums"]["fulfillment_event_type"]
+          from_status?:
+            | Database["public"]["Enums"]["fulfillment_record_status"]
+            | null
+          fulfillment_id: string
+          id?: string
+          message: string
+          metadata?: Json | null
+          order_id: string
+          to_status?:
+            | Database["public"]["Enums"]["fulfillment_record_status"]
+            | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          event_type?: Database["public"]["Enums"]["fulfillment_event_type"]
+          from_status?:
+            | Database["public"]["Enums"]["fulfillment_record_status"]
+            | null
+          fulfillment_id?: string
+          id?: string
+          message?: string
+          metadata?: Json | null
+          order_id?: string
+          to_status?:
+            | Database["public"]["Enums"]["fulfillment_record_status"]
+            | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_fulfillment_events_fulfillment_id_fkey"
+            columns: ["fulfillment_id"]
+            isOneToOne: false
+            referencedRelation: "order_fulfillments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_fulfillment_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_fulfillment_items: {
+        Row: {
+          created_at: string
+          fulfillment_id: string
+          id: string
+          order_item_id: string
+          packed_quantity: number
+          picked_quantity: number
+          qc_note: string | null
+          qc_status: Database["public"]["Enums"]["fulfillment_qc_status"]
+          quantity: number
+          shortage_reason:
+            | Database["public"]["Enums"]["fulfillment_shortage_reason"]
+            | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          fulfillment_id: string
+          id?: string
+          order_item_id: string
+          packed_quantity?: number
+          picked_quantity?: number
+          qc_note?: string | null
+          qc_status?: Database["public"]["Enums"]["fulfillment_qc_status"]
+          quantity: number
+          shortage_reason?:
+            | Database["public"]["Enums"]["fulfillment_shortage_reason"]
+            | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          fulfillment_id?: string
+          id?: string
+          order_item_id?: string
+          packed_quantity?: number
+          picked_quantity?: number
+          qc_note?: string | null
+          qc_status?: Database["public"]["Enums"]["fulfillment_qc_status"]
+          quantity?: number
+          shortage_reason?:
+            | Database["public"]["Enums"]["fulfillment_shortage_reason"]
+            | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_fulfillment_items_fulfillment_id_fkey"
+            columns: ["fulfillment_id"]
+            isOneToOne: false
+            referencedRelation: "order_fulfillments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_fulfillment_items_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_fulfillments: {
+        Row: {
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          fulfillment_number: number
+          hold_reason: string | null
+          id: string
+          location_id: string | null
+          notes: string | null
+          order_id: string
+          packed_at: string | null
+          picked_at: string | null
+          ready_for_handover_at: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["fulfillment_record_status"]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          cancelled_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          fulfillment_number: number
+          hold_reason?: string | null
+          id?: string
+          location_id?: string | null
+          notes?: string | null
+          order_id: string
+          packed_at?: string | null
+          picked_at?: string | null
+          ready_for_handover_at?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["fulfillment_record_status"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          cancelled_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          fulfillment_number?: number
+          hold_reason?: string | null
+          id?: string
+          location_id?: string | null
+          notes?: string | null
+          order_id?: string
+          packed_at?: string | null
+          picked_at?: string | null
+          ready_for_handover_at?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["fulfillment_record_status"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_fulfillments_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_fulfillments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           compare_at_price: number | null
@@ -1598,10 +1799,49 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      create_order_fulfillment: {
+        Args: {
+          _items: Json
+          _location_id: string
+          _notes?: string
+          _order_id: string
+        }
+        Returns: {
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          fulfillment_number: number
+          hold_reason: string | null
+          id: string
+          location_id: string | null
+          notes: string | null
+          order_id: string
+          packed_at: string | null
+          picked_at: string | null
+          ready_for_handover_at: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["fulfillment_record_status"]
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_fulfillments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       fulfillment_transition_allowed: {
         Args: {
           _from: Database["public"]["Enums"]["order_fulfillment_status"]
           _to: Database["public"]["Enums"]["order_fulfillment_status"]
+        }
+        Returns: boolean
+      }
+      fulfillment_transition_valid: {
+        Args: {
+          _from: Database["public"]["Enums"]["fulfillment_record_status"]
+          _to: Database["public"]["Enums"]["fulfillment_record_status"]
         }
         Returns: boolean
       }
@@ -1613,7 +1853,55 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      log_fulfillment_event: {
+        Args: {
+          _event: Database["public"]["Enums"]["fulfillment_event_type"]
+          _from: Database["public"]["Enums"]["fulfillment_record_status"]
+          _fulfillment_id: string
+          _message: string
+          _metadata?: Json
+          _order_id: string
+          _to: Database["public"]["Enums"]["fulfillment_record_status"]
+        }
+        Returns: undefined
+      }
       next_order_number: { Args: never; Returns: string }
+      order_fulfillment_summary: {
+        Args: { _order_id: string }
+        Returns: {
+          fulfilled: number
+          order_item_id: string
+          ordered: number
+          remaining: number
+        }[]
+      }
+      record_fulfillment_picks: {
+        Args: { _fulfillment_id: string; _items: Json }
+        Returns: {
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          fulfillment_number: number
+          hold_reason: string | null
+          id: string
+          location_id: string | null
+          notes: string | null
+          order_id: string
+          packed_at: string | null
+          picked_at: string | null
+          ready_for_handover_at: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["fulfillment_record_status"]
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_fulfillments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       record_verification_attempt: {
         Args: {
           _duration_seconds?: number
@@ -1786,6 +2074,64 @@ export type Database = {
       set_default_inventory_location: {
         Args: { _location_id: string }
         Returns: string
+      }
+      set_fulfillment_item_qc: {
+        Args: {
+          _item_id: string
+          _note?: string
+          _qc_status: Database["public"]["Enums"]["fulfillment_qc_status"]
+        }
+        Returns: {
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          fulfillment_number: number
+          hold_reason: string | null
+          id: string
+          location_id: string | null
+          notes: string | null
+          order_id: string
+          packed_at: string | null
+          picked_at: string | null
+          ready_for_handover_at: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["fulfillment_record_status"]
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_fulfillments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_fulfillment_state: {
+        Args: { _action: string; _fulfillment_id: string; _reason?: string }
+        Returns: {
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          fulfillment_number: number
+          hold_reason: string | null
+          id: string
+          location_id: string | null
+          notes: string | null
+          order_id: string
+          packed_at: string | null
+          picked_at: string | null
+          ready_for_handover_at: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["fulfillment_record_status"]
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_fulfillments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       set_order_fulfillment_state: {
         Args: { _action: string; _order_id: string; _reason?: string }
@@ -2025,6 +2371,39 @@ export type Database = {
       brand_type: "standard" | "own_brand" | "generic"
       entity_status: "active" | "inactive" | "archived"
       entity_visibility: "visible" | "hidden"
+      fulfillment_event_type:
+        | "fulfillment_created"
+        | "picking_started"
+        | "item_picked"
+        | "picking_completed"
+        | "packing_started"
+        | "qc_started"
+        | "qc_passed"
+        | "qc_failed"
+        | "packed"
+        | "ready_for_handover"
+        | "put_on_hold"
+        | "hold_released"
+        | "fulfillment_cancelled"
+      fulfillment_qc_status: "pending" | "passed" | "failed"
+      fulfillment_record_status:
+        | "unfulfilled"
+        | "ready_to_pick"
+        | "picking"
+        | "picked"
+        | "packing"
+        | "qc_pending"
+        | "qc_failed"
+        | "packed"
+        | "ready_for_handover"
+        | "on_hold"
+        | "cancelled"
+      fulfillment_shortage_reason:
+        | "out_of_stock"
+        | "damaged"
+        | "missing"
+        | "wrong_item"
+        | "other"
       group_buy_status:
         | "draft"
         | "scheduled"
@@ -2267,6 +2646,42 @@ export const Constants = {
       brand_type: ["standard", "own_brand", "generic"],
       entity_status: ["active", "inactive", "archived"],
       entity_visibility: ["visible", "hidden"],
+      fulfillment_event_type: [
+        "fulfillment_created",
+        "picking_started",
+        "item_picked",
+        "picking_completed",
+        "packing_started",
+        "qc_started",
+        "qc_passed",
+        "qc_failed",
+        "packed",
+        "ready_for_handover",
+        "put_on_hold",
+        "hold_released",
+        "fulfillment_cancelled",
+      ],
+      fulfillment_qc_status: ["pending", "passed", "failed"],
+      fulfillment_record_status: [
+        "unfulfilled",
+        "ready_to_pick",
+        "picking",
+        "picked",
+        "packing",
+        "qc_pending",
+        "qc_failed",
+        "packed",
+        "ready_for_handover",
+        "on_hold",
+        "cancelled",
+      ],
+      fulfillment_shortage_reason: [
+        "out_of_stock",
+        "damaged",
+        "missing",
+        "wrong_item",
+        "other",
+      ],
       group_buy_status: [
         "draft",
         "scheduled",
