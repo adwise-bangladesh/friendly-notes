@@ -186,6 +186,28 @@ export function OrderFulfillmentsPanel({
         )}
       </div>
 
+      {timeline.length > 0 && (
+        <div className="space-y-1">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            Fulfillment timeline
+          </p>
+          <ol className="space-y-1">
+            {timeline.map((event) => (
+              <li key={event.id} className="border-l-2 border-border pl-2 text-[12px]">
+                <span className="font-medium">
+                  Fulfillment #{event.fulfillment?.fulfillment_number ?? "?"} ·{" "}
+                  {FULFILLMENT_EVENT_LABELS[event.event_type]}
+                </span>
+                <span className="block text-muted-foreground">
+                  {event.message} · {new Date(event.created_at).toLocaleString()}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+
       {canManage && eligible && remainingLines.length > 0 && (
         <Button size="sm" variant="outline" className="h-8" onClick={openDialog}>
           <PackagePlus className="mr-1 h-3.5 w-3.5" /> Create fulfillment
