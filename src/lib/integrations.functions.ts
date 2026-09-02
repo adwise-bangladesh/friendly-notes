@@ -37,27 +37,20 @@ async function assertCanManage(supabase: unknown, userId: string) {
 }
 
 async function assertIsAdmin(supabase: unknown, userId: string) {
-  // `is_admin` is not executable by authenticated users by design, so the role
-  // is read through the user's own RLS-scoped row instead.
+  // `is_admin` is intentionally not executable by authenticated users, so the
+  // role is read through the caller's own RLS-scoped user_roles rows.
   const client = supabase as {
     from: (t: string) => {
       select: (c: string) => {
-        eq: (
-          c: string,
-          v: string,
-        ) => {
-          eq: (c: string, v: string) => { maybeSingle: () => PromiseLike<{ data: unknown }> };
-        };
+        eq: (c: string, v: string) => PromiseLike<{ data: { role: string }[] | null }>;
       };
     };
   };
-  const { data } = await client
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .eq("role", "admin")
-    .maybeSingle();
-  if (!data) throw new Error("Only an administrator can change an integration account");
+  const { data } = await client.from("user_roles").select("role").eq("user_id", userId);
+  const roles = (data ?? []).map((r) => r.role);
+  if (!roles.includes("admin") && !roles.includes("owner")) {
+    throw new Error("Only an administrator can change an integration account");
+  }
 }
 
 /** Collapses any provider failure into an operator-safe sentence. */
