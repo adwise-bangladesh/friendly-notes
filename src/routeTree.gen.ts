@@ -14,11 +14,13 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedCustomersRouteImport } from './routes/_authenticated/customers'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
 import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticated/returns'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedInventoryIndexRouteImport } from './routes/_authenticated/inventory.index'
 import { Route as AuthenticatedInventoryLocationsRouteImport } from './routes/_authenticated/inventory.locations'
+import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenticated/orders.index'
+import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders.$id'
+import { Route as AuthenticatedOrdersNewRouteImport } from './routes/_authenticated/orders.new'
 import { Route as AuthenticatedProductsIndexRouteImport } from './routes/_authenticated/products.index'
 import { Route as AuthenticatedProductsIdRouteImport } from './routes/_authenticated/products.$id'
 import { Route as AuthenticatedProductsBrandsRouteImport } from './routes/_authenticated/products.brands'
@@ -49,11 +51,6 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedReturnsRoute = AuthenticatedReturnsRouteImport.update({
   id: '/returns',
   path: '/returns',
@@ -76,6 +73,22 @@ const AuthenticatedInventoryLocationsRoute =
     path: '/inventory/locations',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedOrdersIndexRoute =
+  AuthenticatedOrdersIndexRouteImport.update({
+    id: '/orders/',
+    path: '/orders/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedOrdersIdRoute = AuthenticatedOrdersIdRouteImport.update({
+  id: '/orders/$id',
+  path: '/orders/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOrdersNewRoute = AuthenticatedOrdersNewRouteImport.update({
+  id: '/orders/new',
+  path: '/orders/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedProductsIndexRoute =
   AuthenticatedProductsIndexRouteImport.update({
     id: '/products/',
@@ -111,15 +124,17 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/customers': typeof AuthenticatedCustomersRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/orders': typeof AuthenticatedOrdersRoute
   '/returns': typeof AuthenticatedReturnsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
+  '/orders/$id': typeof AuthenticatedOrdersIdRoute
+  '/orders/new': typeof AuthenticatedOrdersNewRoute
   '/products/$id': typeof AuthenticatedProductsIdRoute
   '/products/brands': typeof AuthenticatedProductsBrandsRoute
   '/products/categories': typeof AuthenticatedProductsCategoriesRoute
   '/products/new': typeof AuthenticatedProductsNewRoute
   '/inventory/': typeof AuthenticatedInventoryIndexRoute
+  '/orders/': typeof AuthenticatedOrdersIndexRoute
   '/products/': typeof AuthenticatedProductsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -127,15 +142,17 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/customers': typeof AuthenticatedCustomersRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/orders': typeof AuthenticatedOrdersRoute
   '/returns': typeof AuthenticatedReturnsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
+  '/orders/$id': typeof AuthenticatedOrdersIdRoute
+  '/orders/new': typeof AuthenticatedOrdersNewRoute
   '/products/$id': typeof AuthenticatedProductsIdRoute
   '/products/brands': typeof AuthenticatedProductsBrandsRoute
   '/products/categories': typeof AuthenticatedProductsCategoriesRoute
   '/products/new': typeof AuthenticatedProductsNewRoute
   '/inventory': typeof AuthenticatedInventoryIndexRoute
+  '/orders': typeof AuthenticatedOrdersIndexRoute
   '/products': typeof AuthenticatedProductsIndexRoute
 }
 export interface FileRoutesById {
@@ -145,15 +162,17 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/customers': typeof AuthenticatedCustomersRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/orders': typeof AuthenticatedOrdersRoute
   '/_authenticated/returns': typeof AuthenticatedReturnsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/inventory/locations': typeof AuthenticatedInventoryLocationsRoute
+  '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRoute
+  '/_authenticated/orders/new': typeof AuthenticatedOrdersNewRoute
   '/_authenticated/products/$id': typeof AuthenticatedProductsIdRoute
   '/_authenticated/products/brands': typeof AuthenticatedProductsBrandsRoute
   '/_authenticated/products/categories': typeof AuthenticatedProductsCategoriesRoute
   '/_authenticated/products/new': typeof AuthenticatedProductsNewRoute
   '/_authenticated/inventory/': typeof AuthenticatedInventoryIndexRoute
+  '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
   '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
 }
 export interface FileRouteTypes {
@@ -163,15 +182,17 @@ export interface FileRouteTypes {
     | '/auth'
     | '/customers'
     | '/dashboard'
-    | '/orders'
     | '/returns'
     | '/settings'
     | '/inventory/locations'
+    | '/orders/$id'
+    | '/orders/new'
     | '/products/$id'
     | '/products/brands'
     | '/products/categories'
     | '/products/new'
     | '/inventory/'
+    | '/orders/'
     | '/products/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -179,15 +200,17 @@ export interface FileRouteTypes {
     | '/auth'
     | '/customers'
     | '/dashboard'
-    | '/orders'
     | '/returns'
     | '/settings'
     | '/inventory/locations'
+    | '/orders/$id'
+    | '/orders/new'
     | '/products/$id'
     | '/products/brands'
     | '/products/categories'
     | '/products/new'
     | '/inventory'
+    | '/orders'
     | '/products'
   id:
     | '__root__'
@@ -196,15 +219,17 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/customers'
     | '/_authenticated/dashboard'
-    | '/_authenticated/orders'
     | '/_authenticated/returns'
     | '/_authenticated/settings'
     | '/_authenticated/inventory/locations'
+    | '/_authenticated/orders/$id'
+    | '/_authenticated/orders/new'
     | '/_authenticated/products/$id'
     | '/_authenticated/products/brands'
     | '/_authenticated/products/categories'
     | '/_authenticated/products/new'
     | '/_authenticated/inventory/'
+    | '/_authenticated/orders/'
     | '/_authenticated/products/'
   fileRoutesById: FileRoutesById
 }
@@ -251,13 +276,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/orders': {
-      id: '/_authenticated/orders'
-      path: '/orders'
-      fullPath: '/orders'
-      preLoaderRoute: typeof AuthenticatedOrdersRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/returns': {
       id: '/_authenticated/returns'
       path: '/returns'
@@ -284,6 +302,27 @@ declare module '@tanstack/react-router' {
       path: '/inventory/locations'
       fullPath: '/inventory/locations'
       preLoaderRoute: typeof AuthenticatedInventoryLocationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/orders/': {
+      id: '/_authenticated/orders/'
+      path: '/orders'
+      fullPath: '/orders/'
+      preLoaderRoute: typeof AuthenticatedOrdersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/orders/$id': {
+      id: '/_authenticated/orders/$id'
+      path: '/orders/$id'
+      fullPath: '/orders/$id'
+      preLoaderRoute: typeof AuthenticatedOrdersIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/orders/new': {
+      id: '/_authenticated/orders/new'
+      path: '/orders/new'
+      fullPath: '/orders/new'
+      preLoaderRoute: typeof AuthenticatedOrdersNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/products/': {
@@ -327,30 +366,34 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCustomersRoute: typeof AuthenticatedCustomersRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
   AuthenticatedReturnsRoute: typeof AuthenticatedReturnsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedInventoryLocationsRoute: typeof AuthenticatedInventoryLocationsRoute
+  AuthenticatedOrdersIdRoute: typeof AuthenticatedOrdersIdRoute
+  AuthenticatedOrdersNewRoute: typeof AuthenticatedOrdersNewRoute
   AuthenticatedProductsIdRoute: typeof AuthenticatedProductsIdRoute
   AuthenticatedProductsBrandsRoute: typeof AuthenticatedProductsBrandsRoute
   AuthenticatedProductsCategoriesRoute: typeof AuthenticatedProductsCategoriesRoute
   AuthenticatedProductsNewRoute: typeof AuthenticatedProductsNewRoute
   AuthenticatedInventoryIndexRoute: typeof AuthenticatedInventoryIndexRoute
+  AuthenticatedOrdersIndexRoute: typeof AuthenticatedOrdersIndexRoute
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCustomersRoute: AuthenticatedCustomersRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
   AuthenticatedReturnsRoute: AuthenticatedReturnsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedInventoryLocationsRoute: AuthenticatedInventoryLocationsRoute,
+  AuthenticatedOrdersIdRoute: AuthenticatedOrdersIdRoute,
+  AuthenticatedOrdersNewRoute: AuthenticatedOrdersNewRoute,
   AuthenticatedProductsIdRoute: AuthenticatedProductsIdRoute,
   AuthenticatedProductsBrandsRoute: AuthenticatedProductsBrandsRoute,
   AuthenticatedProductsCategoriesRoute: AuthenticatedProductsCategoriesRoute,
   AuthenticatedProductsNewRoute: AuthenticatedProductsNewRoute,
   AuthenticatedInventoryIndexRoute: AuthenticatedInventoryIndexRoute,
+  AuthenticatedOrdersIndexRoute: AuthenticatedOrdersIndexRoute,
   AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
 }
 
