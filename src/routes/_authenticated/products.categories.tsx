@@ -392,7 +392,9 @@ function CategoriesPage() {
         }
         confirmLabel="Archive"
         destructive
-        onConfirm={() => archiveTarget && archiveMutation.mutate(archiveTarget.id)}
+        onConfirm={() => {
+          if (archiveTarget) archiveMutation.mutate(archiveTarget.id);
+        }}
       />
     </>
   );
