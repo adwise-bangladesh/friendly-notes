@@ -13,6 +13,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { FormSection } from "@/components/commerce/FormSection";
 import { VerificationPanel } from "@/components/orders/VerificationPanel";
+import { FulfillmentPanel } from "@/components/orders/FulfillmentPanel";
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import { formatMoney } from "@/lib/currency";
 import { addOrderNote, cancelOrder, getOrderById } from "@/lib/orders";
@@ -30,6 +31,12 @@ import {
   orderEditingRule,
 } from "@/types/orders";
 import type { OrderStatus, PaymentStatus } from "@/types/orders";
+import {
+  isStockCommitted,
+  FULFILLMENT_STATUS_TONE,
+  RESERVATION_STATUS_LABELS,
+  RESERVATION_STATUS_TONE,
+} from "@/types/fulfillment";
 
 const DESCRIPTION = "Order snapshot, items, payment and operational notes.";
 
@@ -62,7 +69,7 @@ const PAYMENT_TONE: Record<PaymentStatus, StatusTone> = {
 function Page() {
   const { id } = useParams({ from: "/_authenticated/orders/$id" });
   const queryClient = useQueryClient();
-  const { canManage, canRead } = useCommercePermissions();
+  const { canManage, canRead, canDelete } = useCommercePermissions();
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [noteDraft, setNoteDraft] = useState("");
 
@@ -72,7 +79,12 @@ function Page() {
   });
 
   const cancelMutation = useMutation({
-    mutationFn: () => cancelOrder(id, "Cancelled from the order details page"),
+    mutationFn: () =>
+      cancelOrder(
+        id,
+        "Cancelled from the order details page",
+        !!order && isStockCommitted(order.fulfillment_status) && canDelete,
+      ),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["order", id] });
       void queryClient.invalidateQueries({ queryKey: ["orders"] });
@@ -142,7 +154,12 @@ function Page() {
           Payment · {PAYMENT_STATUS_LABELS[order.payment_status]}
         </StatusBadge>
         <StatusBadge>Verification · {VERIFICATION_STATUS_LABELS[order.verification_status]}</StatusBadge>
-        <StatusBadge>Fulfillment · {FULFILLMENT_STATUS_LABELS[order.fulfillment_status]}</StatusBadge>
+        <StatusBadge tone={FULFILLMENT_STATUS_TONE[order.fulfillment_status]}>
+          Warehouse · {FULFILLMENT_STATUS_LABELS[order.fulfillment_status]}
+        </StatusBadge>
+        <StatusBadge tone={RESERVATION_STATUS_TONE[order.reservation_status]}>
+          Stock · {RESERVATION_STATUS_LABELS[order.reservation_status]}
+        </StatusBadge>
         <StatusBadge>Delivery · {DELIVERY_STATUS_LABELS[order.delivery_status]}</StatusBadge>
         <StatusBadge>Settlement · {FINANCIAL_STATUS_LABELS[order.financial_status]}</StatusBadge>
         <span className="text-[12px] text-muted-foreground">
@@ -229,6 +246,8 @@ function Page() {
           </FormSection>
 
           <VerificationPanel order={order} canManage={canManage} />
+
+          <FulfillmentPanel order={order} canManage={canManage} />
 
           <FormSection title="Notes" description="Append-only timeline.">
             <ol className="space-y-2">

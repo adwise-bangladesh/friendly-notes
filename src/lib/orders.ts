@@ -233,14 +233,25 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
   return data as unknown as Order;
 }
 
-export async function cancelOrder(orderId: string, reason?: string): Promise<Order> {
+/**
+ * Cancels an order. After the warehouse has packed it, stock has already left
+ * on hand — the database then requires `force` (owner/admin only) and never
+ * silently puts the stock back.
+ */
+export async function cancelOrder(
+  orderId: string,
+  reason?: string,
+  force = false,
+): Promise<Order> {
   const { data, error } = await supabase.rpc("cancel_order", {
     _order_id: orderId,
+    _force: force,
     ...(reason ? { _reason: reason } : {}),
   });
   if (error) throw error;
   return data as unknown as Order;
 }
+
 
 export async function addOrderNote(orderId: string, note: string): Promise<OrderNote> {
   const { data: auth } = await supabase.auth.getUser();

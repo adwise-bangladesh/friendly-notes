@@ -14,6 +14,7 @@ export type InventoryMovementType = Enums["inventory_movement_type"];
 
 export type InventoryLocationStatus = EntityStatus;
 
+/** Movement types an operator may pick manually. `fulfillment_out` is system only. */
 export const MOVEMENT_TYPES: InventoryMovementType[] = [
   "initial",
   "adjustment_in",
@@ -32,6 +33,7 @@ export const MOVEMENT_TYPE_LABELS: Record<InventoryMovementType, string> = {
   return_in: "Return In",
   reservation: "Reservation",
   release_reservation: "Release Reservation",
+  fulfillment_out: "Fulfilled / Packed Out",
 };
 
 export const MOVEMENT_TYPE_HELP: Record<InventoryMovementType, string> = {
@@ -42,6 +44,7 @@ export const MOVEMENT_TYPE_HELP: Record<InventoryMovementType, string> = {
   return_in: "Stock returned by a customer and put back on the shelf.",
   reservation: "Holds stock for an order. Reduces available, not on hand.",
   release_reservation: "Frees previously reserved stock back to available.",
+  fulfillment_out: "Packed for a customer order — reserved stock leaves on hand permanently.",
 };
 
 /** Movements that increase on hand. */
