@@ -3,6 +3,7 @@ import {
   ShoppingCart,
   Package,
   Boxes,
+  Banknote,
   Users,
   RotateCcw,
   Settings,
