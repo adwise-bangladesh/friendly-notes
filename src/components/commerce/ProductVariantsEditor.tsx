@@ -86,7 +86,7 @@ export function ProductVariantsEditor({ value, onChange, disabled }: Props) {
               <div className="sm:col-span-2">
                 <Select
                   value={v.status}
-                  disabled={disabled}
+                  disabled={disabled ?? false}
                   onValueChange={(s) => update(v.key, { status: s as ProductVariantDraft["status"] })}
                 >
                   <SelectTrigger className="h-8 text-[12.5px]">
