@@ -18,6 +18,8 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticated/returns'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as AuthenticatedAiBrainIndexRouteImport } from './routes/_authenticated/ai-brain.index'
+import { Route as AuthenticatedAiBrainHistoryRouteImport } from './routes/_authenticated/ai-brain.history'
 import { Route as AuthenticatedAnalyticsIndexRouteImport } from './routes/_authenticated/analytics.index'
 import { Route as AuthenticatedAnalyticsCustomersRouteImport } from './routes/_authenticated/analytics.customers'
 import { Route as AuthenticatedAnalyticsOperationsRouteImport } from './routes/_authenticated/analytics.operations'
@@ -52,6 +54,7 @@ import { Route as AuthenticatedProductsNewRouteImport } from './routes/_authenti
 import { Route as AuthenticatedReturnsIdRouteImport } from './routes/_authenticated/returns_.$id'
 import { Route as AuthenticatedSuppliersIndexRouteImport } from './routes/_authenticated/suppliers.index'
 import { Route as AuthenticatedSuppliersIdRouteImport } from './routes/_authenticated/suppliers.$id'
+import { Route as AuthenticatedAiBrainRunsIdRouteImport } from './routes/_authenticated/ai-brain.runs.$id'
 import { Route as AuthenticatedFinanceCourierSettlementsIdRouteImport } from './routes/_authenticated/finance.courier-settlements_.$id'
 import { Route as AuthenticatedIntegrationsCouriersIdRouteImport } from './routes/_authenticated/integrations.couriers.$id'
 import { Route as AuthenticatedInventoryStocktakesIdRouteImport } from './routes/_authenticated/inventory.stocktakes_.$id'
@@ -108,6 +111,18 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAiBrainIndexRoute =
+  AuthenticatedAiBrainIndexRouteImport.update({
+    id: '/ai-brain/',
+    path: '/ai-brain/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAiBrainHistoryRoute =
+  AuthenticatedAiBrainHistoryRouteImport.update({
+    id: '/ai-brain/history',
+    path: '/ai-brain/history',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAnalyticsIndexRoute =
   AuthenticatedAnalyticsIndexRouteImport.update({
     id: '/analytics/',
@@ -308,6 +323,12 @@ const AuthenticatedSuppliersIdRoute =
     path: '/suppliers/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAiBrainRunsIdRoute =
+  AuthenticatedAiBrainRunsIdRouteImport.update({
+    id: '/ai-brain/runs/$id',
+    path: '/ai-brain/runs/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFinanceCourierSettlementsIdRoute =
   AuthenticatedFinanceCourierSettlementsIdRouteImport.update({
     id: '/finance/courier-settlements_/$id',
@@ -378,6 +399,7 @@ export interface FileRoutesByFullPath {
   '/returns': typeof AuthenticatedReturnsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/ai-brain/history': typeof AuthenticatedAiBrainHistoryRoute
   '/analytics/customers': typeof AuthenticatedAnalyticsCustomersRoute
   '/analytics/operations': typeof AuthenticatedAnalyticsOperationsRoute
   '/analytics/procurement': typeof AuthenticatedAnalyticsProcurementRoute
@@ -403,6 +425,7 @@ export interface FileRoutesByFullPath {
   '/products/new': typeof AuthenticatedProductsNewRoute
   '/returns/$id': typeof AuthenticatedReturnsIdRoute
   '/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
+  '/ai-brain/': typeof AuthenticatedAiBrainIndexRoute
   '/analytics/': typeof AuthenticatedAnalyticsIndexRoute
   '/automation/': typeof AuthenticatedAutomationIndexRoute
   '/customers/': typeof AuthenticatedCustomersIndexRoute
@@ -412,6 +435,7 @@ export interface FileRoutesByFullPath {
   '/orders/': typeof AuthenticatedOrdersIndexRoute
   '/products/': typeof AuthenticatedProductsIndexRoute
   '/suppliers/': typeof AuthenticatedSuppliersIndexRoute
+  '/ai-brain/runs/$id': typeof AuthenticatedAiBrainRunsIdRoute
   '/finance/courier-settlements/$id': typeof AuthenticatedFinanceCourierSettlementsIdRoute
   '/integrations/couriers/$id': typeof AuthenticatedIntegrationsCouriersIdRoute
   '/inventory/stocktakes/$id': typeof AuthenticatedInventoryStocktakesIdRoute
@@ -432,6 +456,7 @@ export interface FileRoutesByTo {
   '/returns': typeof AuthenticatedReturnsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/ai-brain/history': typeof AuthenticatedAiBrainHistoryRoute
   '/analytics/customers': typeof AuthenticatedAnalyticsCustomersRoute
   '/analytics/operations': typeof AuthenticatedAnalyticsOperationsRoute
   '/analytics/procurement': typeof AuthenticatedAnalyticsProcurementRoute
@@ -457,6 +482,7 @@ export interface FileRoutesByTo {
   '/products/new': typeof AuthenticatedProductsNewRoute
   '/returns/$id': typeof AuthenticatedReturnsIdRoute
   '/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
+  '/ai-brain': typeof AuthenticatedAiBrainIndexRoute
   '/analytics': typeof AuthenticatedAnalyticsIndexRoute
   '/automation': typeof AuthenticatedAutomationIndexRoute
   '/customers': typeof AuthenticatedCustomersIndexRoute
@@ -466,6 +492,7 @@ export interface FileRoutesByTo {
   '/orders': typeof AuthenticatedOrdersIndexRoute
   '/products': typeof AuthenticatedProductsIndexRoute
   '/suppliers': typeof AuthenticatedSuppliersIndexRoute
+  '/ai-brain/runs/$id': typeof AuthenticatedAiBrainRunsIdRoute
   '/finance/courier-settlements/$id': typeof AuthenticatedFinanceCourierSettlementsIdRoute
   '/integrations/couriers/$id': typeof AuthenticatedIntegrationsCouriersIdRoute
   '/inventory/stocktakes/$id': typeof AuthenticatedInventoryStocktakesIdRoute
@@ -488,6 +515,7 @@ export interface FileRoutesById {
   '/_authenticated/returns': typeof AuthenticatedReturnsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/_authenticated/ai-brain/history': typeof AuthenticatedAiBrainHistoryRoute
   '/_authenticated/analytics/customers': typeof AuthenticatedAnalyticsCustomersRoute
   '/_authenticated/analytics/operations': typeof AuthenticatedAnalyticsOperationsRoute
   '/_authenticated/analytics/procurement': typeof AuthenticatedAnalyticsProcurementRoute
@@ -513,6 +541,7 @@ export interface FileRoutesById {
   '/_authenticated/products/new': typeof AuthenticatedProductsNewRoute
   '/_authenticated/returns_/$id': typeof AuthenticatedReturnsIdRoute
   '/_authenticated/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
+  '/_authenticated/ai-brain/': typeof AuthenticatedAiBrainIndexRoute
   '/_authenticated/analytics/': typeof AuthenticatedAnalyticsIndexRoute
   '/_authenticated/automation/': typeof AuthenticatedAutomationIndexRoute
   '/_authenticated/customers/': typeof AuthenticatedCustomersIndexRoute
@@ -522,6 +551,7 @@ export interface FileRoutesById {
   '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
   '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
   '/_authenticated/suppliers/': typeof AuthenticatedSuppliersIndexRoute
+  '/_authenticated/ai-brain/runs/$id': typeof AuthenticatedAiBrainRunsIdRoute
   '/_authenticated/finance/courier-settlements_/$id': typeof AuthenticatedFinanceCourierSettlementsIdRoute
   '/_authenticated/integrations/couriers/$id': typeof AuthenticatedIntegrationsCouriersIdRoute
   '/_authenticated/inventory/stocktakes_/$id': typeof AuthenticatedInventoryStocktakesIdRoute
@@ -544,6 +574,7 @@ export interface FileRouteTypes {
     | '/returns'
     | '/settings'
     | '/.lovable/oauth/consent'
+    | '/ai-brain/history'
     | '/analytics/customers'
     | '/analytics/operations'
     | '/analytics/procurement'
@@ -569,6 +600,7 @@ export interface FileRouteTypes {
     | '/products/new'
     | '/returns/$id'
     | '/suppliers/$id'
+    | '/ai-brain/'
     | '/analytics/'
     | '/automation/'
     | '/customers/'
@@ -578,6 +610,7 @@ export interface FileRouteTypes {
     | '/orders/'
     | '/products/'
     | '/suppliers/'
+    | '/ai-brain/runs/$id'
     | '/finance/courier-settlements/$id'
     | '/integrations/couriers/$id'
     | '/inventory/stocktakes/$id'
@@ -598,6 +631,7 @@ export interface FileRouteTypes {
     | '/returns'
     | '/settings'
     | '/.lovable/oauth/consent'
+    | '/ai-brain/history'
     | '/analytics/customers'
     | '/analytics/operations'
     | '/analytics/procurement'
@@ -623,6 +657,7 @@ export interface FileRouteTypes {
     | '/products/new'
     | '/returns/$id'
     | '/suppliers/$id'
+    | '/ai-brain'
     | '/analytics'
     | '/automation'
     | '/customers'
@@ -632,6 +667,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/products'
     | '/suppliers'
+    | '/ai-brain/runs/$id'
     | '/finance/courier-settlements/$id'
     | '/integrations/couriers/$id'
     | '/inventory/stocktakes/$id'
@@ -653,6 +689,7 @@ export interface FileRouteTypes {
     | '/_authenticated/returns'
     | '/_authenticated/settings'
     | '/.lovable/oauth/consent'
+    | '/_authenticated/ai-brain/history'
     | '/_authenticated/analytics/customers'
     | '/_authenticated/analytics/operations'
     | '/_authenticated/analytics/procurement'
@@ -678,6 +715,7 @@ export interface FileRouteTypes {
     | '/_authenticated/products/new'
     | '/_authenticated/returns_/$id'
     | '/_authenticated/suppliers/$id'
+    | '/_authenticated/ai-brain/'
     | '/_authenticated/analytics/'
     | '/_authenticated/automation/'
     | '/_authenticated/customers/'
@@ -687,6 +725,7 @@ export interface FileRouteTypes {
     | '/_authenticated/orders/'
     | '/_authenticated/products/'
     | '/_authenticated/suppliers/'
+    | '/_authenticated/ai-brain/runs/$id'
     | '/_authenticated/finance/courier-settlements_/$id'
     | '/_authenticated/integrations/couriers/$id'
     | '/_authenticated/inventory/stocktakes_/$id'
@@ -773,6 +812,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/.lovable/oauth/consent'
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/ai-brain/': {
+      id: '/_authenticated/ai-brain/'
+      path: '/ai-brain'
+      fullPath: '/ai-brain/'
+      preLoaderRoute: typeof AuthenticatedAiBrainIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ai-brain/history': {
+      id: '/_authenticated/ai-brain/history'
+      path: '/ai-brain/history'
+      fullPath: '/ai-brain/history'
+      preLoaderRoute: typeof AuthenticatedAiBrainHistoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/analytics/': {
       id: '/_authenticated/analytics/'
@@ -1012,6 +1065,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSuppliersIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/ai-brain/runs/$id': {
+      id: '/_authenticated/ai-brain/runs/$id'
+      path: '/ai-brain/runs/$id'
+      fullPath: '/ai-brain/runs/$id'
+      preLoaderRoute: typeof AuthenticatedAiBrainRunsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/finance/courier-settlements_/$id': {
       id: '/_authenticated/finance/courier-settlements_/$id'
       path: '/finance/courier-settlements/$id'
@@ -1089,6 +1149,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedReturnsRoute: typeof AuthenticatedReturnsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedAiBrainHistoryRoute: typeof AuthenticatedAiBrainHistoryRoute
   AuthenticatedAnalyticsCustomersRoute: typeof AuthenticatedAnalyticsCustomersRoute
   AuthenticatedAnalyticsOperationsRoute: typeof AuthenticatedAnalyticsOperationsRoute
   AuthenticatedAnalyticsProcurementRoute: typeof AuthenticatedAnalyticsProcurementRoute
@@ -1114,6 +1175,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProductsNewRoute: typeof AuthenticatedProductsNewRoute
   AuthenticatedReturnsIdRoute: typeof AuthenticatedReturnsIdRoute
   AuthenticatedSuppliersIdRoute: typeof AuthenticatedSuppliersIdRoute
+  AuthenticatedAiBrainIndexRoute: typeof AuthenticatedAiBrainIndexRoute
   AuthenticatedAnalyticsIndexRoute: typeof AuthenticatedAnalyticsIndexRoute
   AuthenticatedAutomationIndexRoute: typeof AuthenticatedAutomationIndexRoute
   AuthenticatedCustomersIndexRoute: typeof AuthenticatedCustomersIndexRoute
@@ -1123,6 +1185,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOrdersIndexRoute: typeof AuthenticatedOrdersIndexRoute
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
   AuthenticatedSuppliersIndexRoute: typeof AuthenticatedSuppliersIndexRoute
+  AuthenticatedAiBrainRunsIdRoute: typeof AuthenticatedAiBrainRunsIdRoute
   AuthenticatedFinanceCourierSettlementsIdRoute: typeof AuthenticatedFinanceCourierSettlementsIdRoute
   AuthenticatedIntegrationsCouriersIdRoute: typeof AuthenticatedIntegrationsCouriersIdRoute
   AuthenticatedInventoryStocktakesIdRoute: typeof AuthenticatedInventoryStocktakesIdRoute
@@ -1138,6 +1201,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedReturnsRoute: AuthenticatedReturnsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedAiBrainHistoryRoute: AuthenticatedAiBrainHistoryRoute,
   AuthenticatedAnalyticsCustomersRoute: AuthenticatedAnalyticsCustomersRoute,
   AuthenticatedAnalyticsOperationsRoute: AuthenticatedAnalyticsOperationsRoute,
   AuthenticatedAnalyticsProcurementRoute:
@@ -1166,6 +1230,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProductsNewRoute: AuthenticatedProductsNewRoute,
   AuthenticatedReturnsIdRoute: AuthenticatedReturnsIdRoute,
   AuthenticatedSuppliersIdRoute: AuthenticatedSuppliersIdRoute,
+  AuthenticatedAiBrainIndexRoute: AuthenticatedAiBrainIndexRoute,
   AuthenticatedAnalyticsIndexRoute: AuthenticatedAnalyticsIndexRoute,
   AuthenticatedAutomationIndexRoute: AuthenticatedAutomationIndexRoute,
   AuthenticatedCustomersIndexRoute: AuthenticatedCustomersIndexRoute,
@@ -1175,6 +1240,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOrdersIndexRoute: AuthenticatedOrdersIndexRoute,
   AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
   AuthenticatedSuppliersIndexRoute: AuthenticatedSuppliersIndexRoute,
+  AuthenticatedAiBrainRunsIdRoute: AuthenticatedAiBrainRunsIdRoute,
   AuthenticatedFinanceCourierSettlementsIdRoute:
     AuthenticatedFinanceCourierSettlementsIdRoute,
   AuthenticatedIntegrationsCouriersIdRoute:
