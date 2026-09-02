@@ -9,6 +9,7 @@ import {
   Truck,
   Users,
   RotateCcw,
+  Zap,
   Settings,
   type LucideIcon,
 } from "lucide-react";
