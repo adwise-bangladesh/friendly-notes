@@ -9438,6 +9438,10 @@ export type Database = {
         }
       }
       variant_has_history: { Args: { _variant_id: string }; Returns: boolean }
+      verification_claim_block_reason: {
+        Args: { _order_id: string }
+        Returns: string
+      }
       verification_max_attempts: { Args: never; Returns: number }
       verification_transition_allowed: {
         Args: {

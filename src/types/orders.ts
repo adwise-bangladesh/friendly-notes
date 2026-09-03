@@ -118,6 +118,28 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   other: "Other",
 };
 
+export const ORDER_SOURCES: OrderSource[] = [
+  "admin",
+  "web",
+  "mobile",
+  "facebook",
+  "whatsapp",
+  "phone",
+  "import",
+  "api",
+];
+export const FULFILLMENT_STATUSES: FulfillmentStatus[] = [
+  "not_started",
+  "on_hold",
+  "ready",
+  "picking",
+  "picked",
+  "packing",
+  "packed",
+  "ready_for_courier",
+  "partially_fulfilled",
+  "fulfilled",
+];
 export const ORDER_SOURCE_LABELS: Record<OrderSource, string> = {
   admin: "Admin",
   web: "Website",
