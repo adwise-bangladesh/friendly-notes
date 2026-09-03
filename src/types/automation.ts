@@ -69,12 +69,11 @@ export interface AutomationExecution {
   completed_at: string | null;
 }
 
-export interface AutomationReplayResult {
-  execution_id: string;
-  status: AutomationExecutionStatus;
-  replay_attempt: number;
-  error_message?: string | null;
-}
+/**
+ * automation_replay_execution returns the newly inserted execution row, so the
+ * replay result has the same shape as any other execution record.
+ */
+export type AutomationReplayResult = AutomationExecution;
 
 export interface AutomationTriggerDefinition {
   entity_type: string;
