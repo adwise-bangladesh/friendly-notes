@@ -9,6 +9,11 @@ import type {
   SettlementItemWithContext,
   SettlementStatus,
   SettlementWithContext,
+  SettlementDiscrepancy,
+  DiscrepancyStatus,
+  DiscrepancyResolution,
+  DiscrepancyWithContext,
+  ReturnFinancialSummary,
 } from "@/types/finance";
 
 /**
@@ -329,4 +334,143 @@ export async function setSettlementStatus(
   }));
   if (error) throw error;
   return data as unknown as CourierSettlement;
+}
+
+/* ---------- Settlement discrepancies ---------- */
+
+const DISCREPANCY_SELECT = `
+  id, settlement_id, settlement_item_id, shipment_id, order_id,
+  expected_amount, settled_amount, difference, direction, status,
+  resolution, resolution_note, adjustment_id, resolved_at, resolved_by,
+  created_by, created_at, updated_at,
+  settlement:courier_settlements(id, settlement_reference, status, settlement_date, courier_account_id),
+  shipment:shipments(id, shipment_number),
+  order:orders(id, order_number)
+`;
+
+type DiscrepancyRow = SettlementDiscrepancy & {
+  settlement: DiscrepancyWithContext["settlement"];
+  shipment: DiscrepancyWithContext["shipment"];
+  order: DiscrepancyWithContext["order"];
+};
+
+/** Attaches courier account and provider names without a second source of truth. */
+async function withCourierContext(rows: DiscrepancyRow[]): Promise<DiscrepancyWithContext[]> {
+  const accountIds = [
+    ...new Set(rows.map((r) => r.settlement?.courier_account_id).filter(Boolean)),
+  ] as string[];
+  const accounts = new Map<string, { name: string; provider_id: string }>();
+  if (accountIds.length > 0) {
+    const { data } = await supabase
+      .from("courier_accounts")
+      .select("id, name, provider_id")
+      .in("id", accountIds);
+    for (const a of data ?? []) accounts.set(a.id, { name: a.name, provider_id: a.provider_id });
+  }
+  const providerIds = [...new Set([...accounts.values()].map((a) => a.provider_id))];
+  const providers = new Map<string, string>();
+  if (providerIds.length > 0) {
+    const { data } = await supabase.from("courier_providers").select("id, name").in("id", providerIds);
+    for (const p of data ?? []) providers.set(p.id, p.name);
+  }
+  return rows.map((r) => {
+    const account = r.settlement ? accounts.get(r.settlement.courier_account_id) : undefined;
+    return {
+      ...r,
+      account_name: account?.name ?? null,
+      provider_name: account ? (providers.get(account.provider_id) ?? null) : null,
+    };
+  });
+}
+
+export async function getSettlementDiscrepancies(
+  filters: { status?: DiscrepancyStatus | "all"; settlementId?: string } = {},
+): Promise<DiscrepancyWithContext[]> {
+  let query = supabase
+    .from("courier_settlement_discrepancies")
+    .select(DISCREPANCY_SELECT)
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (filters.status && filters.status !== "all") query = query.eq("status", filters.status);
+  if (filters.settlementId) query = query.eq("settlement_id", filters.settlementId);
+
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+  return withCourierContext((data ?? []) as unknown as DiscrepancyRow[]);
+}
+
+export async function getSettlementDiscrepancy(
+  id: string,
+): Promise<DiscrepancyWithContext | null> {
+  const { data, error } = await supabase
+    .from("courier_settlement_discrepancies")
+    .select(DISCREPANCY_SELECT)
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data) return null;
+  const [row] = await withCourierContext([data as unknown as DiscrepancyRow]);
+  return row ?? null;
+}
+
+export async function resolveSettlementDiscrepancy(input: {
+  discrepancyId: string;
+  resolution: DiscrepancyResolution;
+  note?: string | undefined;
+}): Promise<SettlementDiscrepancy> {
+  const { data, error } = await supabase.rpc("resolve_settlement_discrepancy", rpcArgs({
+    _discrepancy_id: input.discrepancyId,
+    _resolution: input.resolution,
+    _note: input.note?.trim() ? input.note.trim() : undefined,
+  }));
+  if (error) throw new Error(financialErrorMessage(error.message));
+  return data as unknown as SettlementDiscrepancy;
+}
+
+/* ---------- Return financial outcome ---------- */
+
+export async function getReturnFinancialSummary(
+  returnId: string,
+): Promise<ReturnFinancialSummary> {
+  const { data, error } = await supabase.rpc("return_financial_summary", {
+    _return_id: returnId,
+  });
+  if (error) throw new Error(financialErrorMessage(error.message));
+  return data as unknown as ReturnFinancialSummary;
+}
+
+export async function recordReturnFinancialOutcome(input: {
+  returnId: string;
+  refundAmount: number;
+  retainedAmount?: number | undefined;
+  note?: string | undefined;
+}): Promise<void> {
+  if (!(input.refundAmount >= 0)) throw new Error("Enter a refund amount of zero or more.");
+  const { error } = await supabase.rpc("record_return_financial_outcome", rpcArgs({
+    _return_id: input.returnId,
+    _refund_amount: input.refundAmount,
+    _retained_amount: input.retainedAmount ?? undefined,
+    _note: input.note?.trim() ? input.note.trim() : undefined,
+  }));
+  if (error) throw new Error(financialErrorMessage(error.message));
+}
+
+/**
+ * The controlled financial functions already raise readable business messages;
+ * this only rewrites the few low-level errors a user could otherwise hit.
+ */
+export function financialErrorMessage(raw: string): string {
+  const text = raw || "";
+  if (/permission denied|not permitted|row-level security|violates row-level/i.test(text)) {
+    return "You do not have permission to perform this financial action.";
+  }
+  if (/only be changed through/i.test(text)) {
+    return "This record can only be changed through the controlled financial workflow.";
+  }
+  if (/already resolved/i.test(text)) return "This discrepancy has already been resolved.";
+  if (/already recorded for this return/i.test(text)) return text;
+  if (/JWT|fetch failed|Failed to fetch/i.test(text)) {
+    return "Could not reach the server. Check your connection and try again.";
+  }
+  return text || "Something went wrong. Please try again.";
 }

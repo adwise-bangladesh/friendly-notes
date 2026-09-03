@@ -7798,6 +7798,7 @@ export type Database = {
         Args: { _return_id: string }
         Returns: undefined
       }
+      return_financial_summary: { Args: { _return_id: string }; Returns: Json }
       return_transition_valid: {
         Args: {
           _from: Database["public"]["Enums"]["order_return_status"]

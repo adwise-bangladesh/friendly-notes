@@ -13,6 +13,7 @@ export type CourierSettlementItem = Tables["courier_settlement_items"]["Row"];
 export type FinancialAdjustmentType = Enums["financial_adjustment_type"];
 export type FinancialAdjustmentDirection = Enums["financial_adjustment_direction"];
 export type SettlementStatus = Enums["courier_settlement_status"];
+export type PaymentStatus = Enums["payment_status"];
 
 /** Derived, never stored: how much of the financial picture is real money. */
 export type FinancialCompleteness = "estimated" | "partially_actual" | "actual";
@@ -125,7 +126,32 @@ export interface OrderFinancialSnapshot {
     packing_cost: number;
     adjustment_income: number;
     adjustment_expense: number;
+    refunded_amount: number;
+    settlement_discrepancy: number;
     profit: number;
+  };
+  payment: {
+    expected_amount: number;
+    paid_amount: number;
+    refunded_amount: number;
+    net_retained: number;
+    due_amount: number;
+    status: PaymentStatus;
+  };
+  returns: {
+    returned_units: number;
+    cost_recovered: boolean;
+    retained_amount: number;
+    unresolved: number;
+  };
+  realization: {
+    units_ordered: number;
+    units_shipped: number;
+    fully_realized: boolean;
+  };
+  settlement: {
+    open_discrepancies: number;
+    open_discrepancy_amount: number;
   };
   shipping_margin: number;
   shipment_count: number;
@@ -143,3 +169,110 @@ export interface SettlementWithContext extends CourierSettlement {
   provider_name: string | null;
   item_count: number;
 }
+
+/* ---------- Settlement discrepancies ---------- */
+
+export type SettlementDiscrepancy = Tables["courier_settlement_discrepancies"]["Row"];
+export type DiscrepancyStatus = Enums["settlement_discrepancy_status"];
+export type DiscrepancyResolution = Enums["settlement_discrepancy_resolution"];
+
+export interface DiscrepancyWithContext extends SettlementDiscrepancy {
+  settlement: {
+    id: string;
+    settlement_reference: string;
+    status: SettlementStatus;
+    settlement_date: string | null;
+    courier_account_id: string;
+  } | null;
+  shipment: { id: string; shipment_number: string } | null;
+  order: { id: string; order_number: string } | null;
+  account_name: string | null;
+  provider_name: string | null;
+}
+
+export const DISCREPANCY_STATUS_LABELS: Record<DiscrepancyStatus, string> = {
+  open: "Open",
+  resolved: "Resolved",
+};
+
+export const DISCREPANCY_STATUS_TONE: Record<DiscrepancyStatus, StatusTone> = {
+  open: "warning",
+  resolved: "success",
+};
+
+/** Direction is stored as free text by the settlement workflow. */
+export function discrepancyDirectionLabel(direction: string | null): string {
+  if (direction === "shortfall") return "Shortfall";
+  if (direction === "overpayment") return "Overpayment";
+  return direction ?? "—";
+}
+
+export const DISCREPANCY_RESOLUTIONS: DiscrepancyResolution[] = [
+  "courier_corrected",
+  "settlement_received",
+  "merchant_adjustment",
+  "written_off",
+];
+
+export const DISCREPANCY_RESOLUTION_LABELS: Record<DiscrepancyResolution, string> = {
+  courier_corrected: "Courier corrected it",
+  settlement_received: "Money later received",
+  merchant_adjustment: "Absorb as merchant adjustment",
+  written_off: "Write off",
+};
+
+/**
+ * How each resolution touches profit. Only the two that post a financial
+ * adjustment change the money; the other two simply close the case because the
+ * courier fixed it or paid later.
+ */
+export const DISCREPANCY_RESOLUTION_EFFECT: Record<DiscrepancyResolution, string> = {
+  courier_corrected: "No financial adjustment. The open shortfall stops weighing on profit.",
+  settlement_received: "No financial adjustment. The open shortfall stops weighing on profit.",
+  merchant_adjustment: "Posts a permanent settlement adjustment on the order.",
+  written_off: "Posts a permanent settlement write-off on the order.",
+};
+
+export function postsAdjustment(resolution: DiscrepancyResolution): boolean {
+  return resolution === "merchant_adjustment" || resolution === "written_off";
+}
+
+/* ---------- Return financial outcome ---------- */
+
+export type ReturnFinancialOutcome = Enums["return_financial_outcome"];
+
+export const RETURN_OUTCOME_LABELS: Record<ReturnFinancialOutcome, string> = {
+  pending: "Not recorded",
+  refunded: "Fully refunded",
+  partially_refunded: "Partially refunded",
+  retained: "Money retained",
+};
+
+export const RETURN_OUTCOME_TONE: Record<ReturnFinancialOutcome, StatusTone> = {
+  pending: "warning",
+  refunded: "info",
+  partially_refunded: "info",
+  retained: "success",
+};
+
+/** Mirrors return_financial_summary(uuid). */
+export interface ReturnFinancialSummary {
+  return_id: string;
+  order_id: string;
+  status: string;
+  expected_units: number;
+  received_units: number;
+  accepted_units: number;
+  rejected_units: number;
+  received_value: number;
+  accepted_value: number;
+  max_refund: number;
+  can_record: boolean;
+  recorded: boolean;
+  recorded_at: string | null;
+  outcome: ReturnFinancialOutcome | null;
+  refund_amount: number;
+  retained_amount: number;
+  refund_adjustment_id: string | null;
+}
+
