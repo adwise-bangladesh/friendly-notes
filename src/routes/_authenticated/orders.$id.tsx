@@ -85,15 +85,27 @@ function Page() {
   const [correction, setCorrection] = useState<"customer" | "address" | null>(null);
   const [editingItems, setEditingItems] = useState(false);
 
-  const { data: order, isLoading } = useQuery({
+  // A malformed link must never reach the database: an unparseable id used to
+  // produce a raw 400 from PostgREST and a blank page.
+  const idIsValid = UUID_RE.test(id);
+
+  const {
+    data: order,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["order", id],
     queryFn: () => getOrderById(id),
+    enabled: idIsValid,
+    retry: false,
   });
 
   const { data: editBlockReason, isPending: editCheckPending } = useQuery({
     queryKey: ["order-edit-block", id],
     queryFn: () => getOrderEditBlockReason(id),
-    enabled: canManage,
+    enabled: canManage && idIsValid,
+    retry: false,
   });
 
   const cancelMutation = useMutation({
