@@ -253,9 +253,19 @@ async function importOrder(
   if (importError) {
     return { outcome: "failed", reason: `Order ${order.external_id}: ${importError.message.slice(0, 160)}` };
   }
-  const outcome = (result as { outcome?: string } | null)?.outcome;
-  if (outcome === "skipped") {
+  const parsed = result as { outcome?: string; message?: string } | null;
+  const outcome = parsed?.outcome;
+  // Explicit idempotency: an identical replay is "already imported"; a changed
+  // external payload is a conflict that leaves the existing order untouched and
+  // must be surfaced to the operator instead of looking like a silent skip.
+  if (outcome === "already_imported" || outcome === "skipped") {
     return { outcome: "skipped", reason: `Order ${order.external_id}: already imported` };
+  }
+  if (outcome === "conflict") {
+    return {
+      outcome: "failed",
+      reason: `Order ${order.external_id}: changed on the channel after import — needs review`,
+    };
   }
   return { outcome: "created" };
 }

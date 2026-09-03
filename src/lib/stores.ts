@@ -182,3 +182,38 @@ export async function setChannelStatus(
   if (error) throw error;
   return data as unknown as SalesChannelAccount;
 }
+
+/**
+ * Explicit activation for a sales channel.
+ *
+ * A newly created external channel is deliberately created `disconnected`: it
+ * must be activated on purpose, and the database refuses to activate a channel
+ * that has no credentials or whose store is not active. That keeps operators
+ * from believing synchronisation is running when the queue would silently
+ * refuse every job.
+ */
+export async function activateChannel(accountId: string): Promise<SalesChannelAccount> {
+  const { data, error } = await supabase.rpc("activate_sales_channel_account", {
+    _account_id: accountId,
+  });
+  if (error) throw error;
+  return data as unknown as SalesChannelAccount;
+}
+
+export interface ChannelReadiness {
+  account_id: string;
+  provider: string;
+  status: SalesChannelStatus;
+  credentials_configured: boolean;
+  can_activate: boolean;
+  operational: boolean;
+  blocking: string[];
+}
+
+export async function fetchChannelReadiness(accountId: string): Promise<ChannelReadiness> {
+  const { data, error } = await supabase.rpc("sales_channel_account_readiness", {
+    _account_id: accountId,
+  });
+  if (error) throw error;
+  return data as unknown as ChannelReadiness;
+}

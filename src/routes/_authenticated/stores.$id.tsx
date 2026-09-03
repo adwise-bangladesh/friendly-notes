@@ -37,6 +37,7 @@ import {
   getSyncRuns,
   saveChannel,
   setChannelStatus,
+  activateChannel,
   setStoreStatus,
 } from "@/lib/stores";
 import { syncChannelOrders, testChannelConnection } from "@/lib/stores.functions";
@@ -185,8 +186,13 @@ function Page() {
   });
 
   const channelStatusMutation = useMutation({
+    // Activation is an explicit, validated action: the database refuses to
+    // activate a channel without credentials or with an inactive store, so the
+    // operator never ends up with a channel that silently queues nothing.
     mutationFn: (input: { accountId: string; status: SalesChannelStatus }) =>
-      setChannelStatus(input.accountId, input.status),
+      input.status === "active"
+        ? activateChannel(input.accountId)
+        : setChannelStatus(input.accountId, input.status),
     onSuccess: () => {
       refresh();
       toast.success("Channel updated");
