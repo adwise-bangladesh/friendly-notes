@@ -24,6 +24,9 @@ export interface CourierPollOptions {
   timeBudgetMs?: number;
   workerId?: string;
   retrySweep?: number;
+  /** Stitches this run's diagnostics and courier API logs together. */
+  correlationId?: string;
+  workerRunId?: string;
 }
 
 export interface CourierPollSummary {
@@ -61,6 +64,9 @@ export async function runCourierTrackingPoll(
   };
 
   const { getCourierAdapter, courierCapability, logCourierCall } = await import("./registry.server");
+  const { recordFailure } = await import("@/lib/observability/diagnostics.server");
+  const correlationId = options.correlationId ?? null;
+  const workerRunId = options.workerRunId ?? null;
 
   const claim = await client.rpc("claim_courier_tracking_polls", {
     _limit: batchSize,
@@ -94,6 +100,7 @@ export async function runCourierTrackingPoll(
       continue;
     }
 
+    const callStartedAt = Date.now();
     try {
       const status = await adapter!.getStatus(candidate.account_id!, candidate.consignment_id!);
       summary.polled += 1;
@@ -121,6 +128,8 @@ export async function runCourierTrackingPoll(
         ...(candidate.account_id ? { accountId: candidate.account_id } : {}),
         operation: "poll_status",
         succeeded: true,
+        durationMs: Date.now() - callStartedAt,
+        ...(correlationId ? { correlationId } : {}),
       });
     } catch (error) {
       summary.failed += 1;
@@ -142,6 +151,22 @@ export async function runCourierTrackingPoll(
         operation: "poll_status",
         succeeded: false,
         safeMessage: message,
+        durationMs: Date.now() - callStartedAt,
+        failureStage: "external_request",
+        ...(correlationId ? { correlationId } : {}),
+      });
+      await recordFailure(client, error, {
+        subsystem: "courier",
+        operation: "poll_status",
+        stage: "external_request",
+        providerCode: code,
+        accountId: candidate.account_id,
+        entityType: "shipment",
+        entityId: candidate.shipment_id,
+        correlationId,
+        workerRunId,
+        durationMs: Date.now() - callStartedAt,
+        metadata: { shipment_number: candidate.shipment_number ?? "" },
       });
     }
   }

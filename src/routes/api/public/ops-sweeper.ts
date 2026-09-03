@@ -53,14 +53,37 @@ export const Route = createFileRoute("/api/public/ops-sweeper")({
         const prune = url.searchParams.get("prune") === "1";
 
         const { startWorkerRun, finishWorkerRun } = await import("@/lib/workers/run.server");
-        const runId = await startWorkerRun(client, "ops_sweeper", triggerSource);
+        const { correlationFromRequest } = await import("@/lib/observability/correlation");
+        const { recordFailure } = await import("@/lib/observability/diagnostics.server");
+
+        const correlationId = correlationFromRequest(request, "sweep");
+        const runId = await startWorkerRun(client, "ops_sweeper", triggerSource, correlationId);
 
         const call = async (fn: string, args?: Record<string, unknown>): Promise<SweepResult> => {
+          const startedAt = Date.now();
           try {
             const { data, error } = await client.rpc(fn, args);
-            if (error) return { ok: false, count: 0 };
+            if (error) {
+              await recordFailure(client, new Error(error.message), {
+                subsystem: "worker",
+                operation: fn,
+                stage: "database",
+                correlationId,
+                workerRunId: runId,
+                durationMs: Date.now() - startedAt,
+              });
+              return { ok: false, count: 0 };
+            }
             return { ok: true, count: Number(data ?? 0) || 0 };
-          } catch {
+          } catch (error) {
+            await recordFailure(client, error, {
+              subsystem: "worker",
+              operation: fn,
+              stage: "database",
+              correlationId,
+              workerRunId: runId,
+              durationMs: Date.now() - startedAt,
+            });
             return { ok: false, count: 0 };
           }
         };
@@ -70,6 +93,11 @@ export const Route = createFileRoute("/api/public/ops-sweeper")({
           _limit: retryLimit,
         });
         const prunedRuns = prune ? await call("prune_worker_runs") : { ok: true, count: 0 };
+        // Operational telemetry retention only: diagnostics and safe courier API
+        // logs older than 30 days. Authoritative domain history is never touched.
+        const prunedTelemetry = prune
+          ? await call("prune_operational_telemetry", { _days: 30 })
+          : { ok: true, count: 0 };
 
         // Operational incident detection reuses the existing telemetry and
         // operational tables; it never mutates business state.
@@ -94,6 +122,7 @@ export const Route = createFileRoute("/api/public/ops-sweeper")({
           staleSyncJobs,
           courierEventRetries,
           prunedRuns,
+          prunedTelemetry,
           { ok: detection.ok, count: 0 },
         ];
         const failed = steps.filter((s) => !s.ok).length;
@@ -108,6 +137,7 @@ export const Route = createFileRoute("/api/public/ops-sweeper")({
 
         return Response.json({
           run_id: runId,
+          correlation_id: correlationId,
           stale_sync_jobs_reclaimed: staleSyncJobs.count,
           courier_events_retried: courierEventRetries.count,
           worker_runs_pruned: prunedRuns.count,

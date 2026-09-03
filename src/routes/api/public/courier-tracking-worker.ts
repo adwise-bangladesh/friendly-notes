@@ -38,8 +38,11 @@ export const Route = createFileRoute("/api/public/courier-tracking-worker")({
         const { startWorkerRun, finishWorkerRun, classifyWorkerError } = await import(
           "@/lib/workers/run.server"
         );
+        const { correlationFromRequest } = await import("@/lib/observability/correlation");
+        const { recordFailure } = await import("@/lib/observability/diagnostics.server");
 
-        const runId = await startWorkerRun(client, "courier_tracking", triggerSource);
+        const correlationId = correlationFromRequest(request, "courier");
+        const runId = await startWorkerRun(client, "courier_tracking", triggerSource, correlationId);
 
         try {
           const summary = await runCourierTrackingPoll(
@@ -49,6 +52,8 @@ export const Route = createFileRoute("/api/public/courier-tracking-worker")({
               leaseSeconds: 120,
               timeBudgetMs: 25_000,
               workerId: triggerSource,
+              correlationId,
+              ...(runId ? { workerRunId: runId } : {}),
             },
           );
           await finishWorkerRun(client, runId, "succeeded", {
@@ -58,9 +63,17 @@ export const Route = createFileRoute("/api/public/courier-tracking-worker")({
             failed: summary.failed,
             skipped: Math.max(0, summary.claimed - summary.polled - summary.failed),
           });
-          return Response.json({ run_id: runId, ...summary });
+          return Response.json({ run_id: runId, correlation_id: correlationId, ...summary });
         } catch (error) {
           await finishWorkerRun(client, runId, "failed", {}, classifyWorkerError(error));
+          await recordFailure(client, error, {
+            subsystem: "worker",
+            operation: "courier_tracking_run",
+            severity: "critical",
+            stage: "recovery",
+            correlationId,
+            workerRunId: runId,
+          });
           return new Response("Worker run failed", { status: 500 });
         }
       },

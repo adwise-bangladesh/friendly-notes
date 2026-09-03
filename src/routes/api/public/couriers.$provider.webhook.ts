@@ -50,7 +50,13 @@ export const Route = createFileRoute("/api/public/couriers/$provider/webhook")({
         if (!matchedAccountId) return new Response("Unauthorized", { status: 401 });
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
+        const { correlationFromRequest } = await import("@/lib/observability/correlation");
+        const { recordDiagnostic, recordFailure } = await import(
+          "@/lib/observability/diagnostics.server"
+        );
+        const client = supabaseAdmin as unknown as Parameters<typeof recordDiagnostic>[0];
+        const correlationId = correlationFromRequest(request, "hook");
+        const receivedAt = Date.now();
 
         let payload: Record<string, unknown>;
         try {
@@ -82,6 +88,15 @@ export const Route = createFileRoute("/api/public/couriers/$provider/webhook")({
         });
 
         if (error) {
+          await recordFailure(client, new Error(error.message), {
+            subsystem: "webhook",
+            operation: "ingest_courier_event",
+            stage: "database",
+            providerCode,
+            accountId: matchedAccountId,
+            correlationId,
+            durationMs: Date.now() - receivedAt,
+          });
           // never echo provider or internal detail back to a public caller
           return new Response(JSON.stringify({ received: true }), {
             status: 202,
@@ -89,10 +104,31 @@ export const Route = createFileRoute("/api/public/couriers/$provider/webhook")({
           });
         }
 
+        const processing =
+          (event as { processing_status?: string } | null)?.processing_status ?? null;
+        if (processing && processing !== "applied" && processing !== "duplicate") {
+          // unmatched / stale / invalid transitions stay authoritative in
+          // courier_provider_events; this is only the operator-facing trail
+          await recordDiagnostic(client, {
+            subsystem: "webhook",
+            operation: "ingest_courier_event",
+            severity: "warning",
+            category: processing === "unmatched" ? "not_found" : "state_conflict",
+            stage: "mapping",
+            message: `Courier webhook event was recorded as ${processing}`,
+            retryable: processing === "unmatched",
+            providerCode,
+            accountId: matchedAccountId,
+            correlationId,
+            durationMs: Date.now() - receivedAt,
+            metadata: { processing_status: processing },
+          });
+        }
+
         return new Response(
           JSON.stringify({
             received: true,
-            processing: (event as { processing_status?: string } | null)?.processing_status ?? null,
+            processing,
           }),
           {
             status: 200,

@@ -42,7 +42,9 @@ export const runCourierTrackingNow = createServerFn({ method: "POST" })
     );
     const admin = supabaseAdmin as unknown as MinimalClient;
 
-    const runId = await startWorkerRun(admin, "courier_tracking", "manual");
+    const { newCorrelationId } = await import("./observability/correlation");
+    const correlationId = newCorrelationId("courier");
+    const runId = await startWorkerRun(admin, "courier_tracking", "manual", correlationId);
     try {
       const summary = await runCourierTrackingPoll(
         supabaseAdmin as unknown as Parameters<typeof runCourierTrackingPoll>[0],
@@ -50,6 +52,8 @@ export const runCourierTrackingNow = createServerFn({ method: "POST" })
           batchSize: data.batchSize,
           timeBudgetMs: 20_000,
           workerId: `operator:${context.userId.slice(0, 8)}`,
+          correlationId,
+          ...(runId ? { workerRunId: runId } : {}),
         },
       );
       await finishWorkerRun(admin, runId, "succeeded", {

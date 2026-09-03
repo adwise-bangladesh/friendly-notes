@@ -30,11 +30,13 @@ export async function startWorkerRun(
   client: RpcClient,
   worker: WorkerName,
   triggerSource: "scheduled" | "manual",
+  correlationId?: string | null,
 ): Promise<string | null> {
   try {
     const { data, error } = await client.rpc("start_worker_run", {
       _worker: worker,
       _trigger_source: triggerSource,
+      ...(correlationId ? { _correlation_id: correlationId } : {}),
     });
     if (error) return null;
     return typeof data === "string" ? data : null;
