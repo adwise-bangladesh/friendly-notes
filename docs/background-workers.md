@@ -61,3 +61,49 @@ without ever holding a worker secret.
 
 Note: the cron jobs target the **published** site, so newly deployed worker
 endpoints only start returning results after the next publish.
+
+## Operational incident detection (Step 20.9.2)
+
+Detection runs inside the existing hourly ops sweeper (`/api/public/ops-sweeper`
+and the operator-triggered sweep). It reads only authoritative operational data
+and writes deduplicated incidents to `operational_alerts` — there is no second
+event bus and no duplicate source of truth.
+
+### Signals and thresholds
+
+| Signal | Source | Warning | Critical |
+| --- | --- | --- | --- |
+| `worker_stale` | `worker_runs` | no success for 3× the schedule interval | 6× the interval, or never succeeded |
+| `worker_failures` | `worker_runs` (24h) | ≥ 3 failed runs | ≥ 10 failed runs |
+| `courier_events_dead_letter` | `courier_provider_events` | ≥ 1 | ≥ 10 |
+| `courier_events_retry_backlog` | `courier_provider_events` | retry overdue by > 30 min | — |
+| `booking_unknown` | `shipments.booking_outcome_unknown` | — | any (per shipment) |
+| `booking_stuck` | `shipments.booking_attempt_started_at` | attempt open > 15 min | — |
+| `tracking_poll_failures` | `courier_tracking_polls` | ≥ 3 consecutive failures | ≥ 10 shipments |
+| `tracking_polls_overdue` | `courier_tracking_polls` | poll due > 2 h, lease expired | — |
+| `settlement_discrepancies_open` | `courier_settlement_discrepancies` | any open | oldest > 7 days or ≥ 5,000 BDT |
+| `statement_import_attention` | `courier_statement_imports` | invalid/unmatched/ambiguous rows, or unfinished > 24 h | — |
+
+Scheduled intervals used for staleness: courier tracking 15 min, sync queue
+10 min, ops sweeper 60 min.
+
+### Lifecycle
+
+* One row per stable `fingerprint`; repeat detections update `last_detected_at`
+  and `detection_count` instead of creating duplicates.
+* Severity escalation is recorded in `peak_severity`.
+* Staff/admin/owner can acknowledge (`acknowledge_operational_alert`). An
+  acknowledgement expires after 24 hours or immediately on escalation.
+* When the condition is no longer detected, the incident is resolved
+  automatically; a recurrence starts a fresh incident window.
+* Nothing is auto-remediated — unknown booking outcomes still require the
+  operator decision defined in Step 20.8.3.1.
+
+### Access
+
+* `operational_health_overview()` — anyone with `can_read_commerce`.
+* `acknowledge_operational_alert()` — `can_manage_commerce`.
+* `detect_operational_alerts()` / `upsert_operational_alert()` — service role
+  only; the table rejects all direct writes.
+
+Surfaced in the UI on `/operations` and `/operations/jobs`.
