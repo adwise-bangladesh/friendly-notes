@@ -6829,6 +6829,15 @@ export type Database = {
           product_count: number
         }[]
       }
+      bulk_assign_shipment_courier: {
+        Args: {
+          _account_id?: string
+          _provider_id: string
+          _service_type?: Database["public"]["Enums"]["courier_service_type"]
+          _shipment_ids: string[]
+        }
+        Returns: Json
+      }
       bulk_claim_verification_work: {
         Args: { _note?: string; _order_ids: string[] }
         Returns: Json
@@ -7551,10 +7560,12 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      exception_quick_view: { Args: { _exception_id: string }; Returns: Json }
       exception_resolution_class: {
         Args: { _type: Database["public"]["Enums"]["shipment_exception_type"] }
         Returns: string
       }
+      exceptions_console_list: { Args: { _payload?: Json }; Returns: Json }
       external_order_fingerprint: { Args: { _payload: Json }; Returns: string }
       finalize_goods_receipt: {
         Args: { _receipt_id: string }
@@ -10113,6 +10124,7 @@ export type Database = {
         }[]
       }
       shipment_profitability: { Args: { _shipment_id: string }; Returns: Json }
+      shipment_quick_view: { Args: { _shipment_id: string }; Returns: Json }
       shipment_transition_valid: {
         Args: {
           _from: Database["public"]["Enums"]["shipment_status"]
@@ -10120,6 +10132,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      shipments_console_list: { Args: { _payload?: Json }; Returns: Json }
       stage_courier_statement_rows: {
         Args: { _import_id: string; _rows: Json }
         Returns: Json
