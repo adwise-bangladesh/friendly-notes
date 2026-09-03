@@ -165,6 +165,8 @@ function JobsPage() {
         }
       />
 
+      <OperationalAlertsPanel />
+
       <WorkerHealthPanel />
 
       <div className="mb-3 grid gap-3 sm:grid-cols-3 lg:grid-cols-7">
