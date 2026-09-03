@@ -114,7 +114,7 @@ export const bookShipmentWithCourier = createServerFn({ method: "POST" })
     const { data: shipment } = await supabaseAdmin
       .from("shipments")
       .select(
-        "id, shipment_number, status, provider_id, service_type, courier_account_id, external_consignment_id, recipient_name, recipient_phone, delivery_address, delivery_city, delivery_zone, cash_on_delivery_amount, weight, notes, provider_recipient_city_id, provider_recipient_zone_id, provider_recipient_area_id, provider:courier_providers(code, name), account:courier_accounts(id, label, environment)",
+        "id, shipment_number, status, provider_id, service_type, courier_account_id, external_consignment_id, recipient_name, recipient_phone, delivery_address, delivery_city, delivery_zone, cash_on_delivery_amount, weight, notes, provider_recipient_city_id, provider_recipient_zone_id, provider_recipient_area_id, provider:courier_providers(code, name), account:courier_accounts(id, name, code, environment, store_id, is_default, store:stores(id, name))",
       )
       .eq("id", data.shipmentId)
       .maybeSingle();
@@ -141,8 +141,12 @@ export const bookShipmentWithCourier = createServerFn({ method: "POST" })
 
     const account = shipment.account as {
       id: string;
-      label: string | null;
+      name: string | null;
+      code: string | null;
       environment: string | null;
+      store_id: string | null;
+      is_default: boolean | null;
+      store: { id: string; name: string } | null;
     } | null;
 
     try {
@@ -169,7 +173,14 @@ export const bookShipmentWithCourier = createServerFn({ method: "POST" })
         provider_code: code,
         provider_name: (shipment.provider as { name?: string } | null)?.name ?? null,
         account_id: account?.id ?? null,
-        account_label: account?.label ?? null,
+        account_name: account?.name ?? null,
+        account_code: account?.code ?? null,
+        // scope is captured so an old booking stays interpretable even after
+        // the account is later re-scoped, re-defaulted or disabled
+        account_scope: account?.store_id ? "store" : "organization",
+        account_store_id: account?.store_id ?? null,
+        account_store_name: account?.store?.name ?? null,
+        account_was_default: account?.is_default ?? null,
         environment: account?.environment ?? null,
         service_type: shipment.service_type,
         merchant_order_id: shipment.shipment_number,

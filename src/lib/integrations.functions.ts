@@ -20,6 +20,22 @@ const stateInput = z.object({
   accountId: z.string().uuid(),
   status: z.enum(["active", "inactive", "disabled"]),
 });
+const scopeInput = z.object({
+  accountId: z.string().uuid(),
+  storeId: z.string().uuid().nullable(),
+  isDefault: z.boolean(),
+});
+// A blank field means "leave unchanged" — secrets are never echoed back, so the
+// UI cannot pre-fill them and must not clear them by omission.
+const credentialsInput = z.object({
+  accountId: z.string().uuid(),
+  clientId: z.string().trim().max(200).optional(),
+  username: z.string().trim().max(200).optional(),
+  clientSecret: z.string().max(2000).optional(),
+  password: z.string().max(2000).optional(),
+  webhookSecret: z.string().max(2000).optional(),
+});
+
 
 export interface IntegrationActionResult {
   ok: boolean;
@@ -215,4 +231,80 @@ export const refreshIntegrationLocations = createServerFn({ method: "POST" })
       });
       return { ok: false, message };
     }
+  });
+
+/**
+ * Scope an account to one store, or leave it organization-wide (`storeId: null`).
+ * The database enforces "one active default per provider per scope"; a clash is
+ * reported as a readable sentence rather than a constraint error.
+ */
+export const setIntegrationAccountScope = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => scopeInput.parse(input))
+  .handler(async ({ data, context }): Promise<IntegrationActionResult> => {
+    await assertIsAdmin(context.supabase, context.userId);
+    const account = await loadAccount(data.accountId);
+
+    const { error } = await (context.supabase as RpcClient).rpc("set_courier_account_scope", {
+      _account_id: data.accountId,
+      _store_id: data.storeId,
+      _is_default: data.isDefault,
+    });
+    if (error) {
+      throw new Error(
+        safeMessage(error, "The integration account scope could not be updated"),
+      );
+    }
+
+    const { logCourierCall } = await import("./couriers/registry.server");
+    await logCourierCall({
+      providerId: account.provider_id,
+      accountId: account.id,
+      operation: "account_state_change",
+      succeeded: true,
+      safeMessage: data.storeId
+        ? `Scoped to a single store${data.isDefault ? " as default" : ""}`
+        : `Organization-wide${data.isDefault ? " default" : ""}`,
+    });
+    return { ok: true, message: "Integration account scope updated." };
+  });
+
+/**
+ * Writes credentials into the encrypted vault through the service-role-only
+ * function. Nothing secret is returned; the response only says what is now
+ * configured. Blank fields are left untouched.
+ */
+export const saveIntegrationCredentials = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => credentialsInput.parse(input))
+  .handler(async ({ data, context }): Promise<IntegrationActionResult> => {
+    await assertIsAdmin(context.supabase, context.userId);
+    const account = await loadAccount(data.accountId);
+
+    const { setCourierCredentials } = await import("./couriers/credentials.server");
+    try {
+      await setCourierCredentials({
+        accountId: data.accountId,
+        clientId: data.clientId ?? null,
+        username: data.username ?? null,
+        clientSecret: data.clientSecret ?? null,
+        password: data.password ?? null,
+        webhookSecret: data.webhookSecret ?? null,
+      });
+    } catch (error) {
+      throw new Error(safeMessage(error, "The credentials could not be saved"));
+    }
+
+    const { logCourierCall } = await import("./couriers/registry.server");
+    await logCourierCall({
+      providerId: account.provider_id,
+      accountId: account.id,
+      operation: "account_state_change",
+      succeeded: true,
+      safeMessage: "Credentials updated",
+    });
+    return {
+      ok: true,
+      message: "Credentials stored securely. Existing cached tokens were cleared.",
+    };
   });

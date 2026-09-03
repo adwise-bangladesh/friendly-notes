@@ -16,6 +16,8 @@ import {
   deriveConnectionStatus,
   formatDateTime,
   getIntegrationAccount,
+  getIntegrationCredentialStatus,
+  getIntegrationStoreOptions,
   getIntegrationAccountHealth,
   getIntegrationActivity,
   getIntegrationWebhookOverview,
@@ -24,9 +26,22 @@ import {
 import { getIntegrationProvider } from "@/lib/integrations-registry";
 import {
   refreshIntegrationLocations,
+  saveIntegrationCredentials,
+  setIntegrationAccountScope,
   setIntegrationAccountState,
   testIntegrationConnection,
 } from "@/lib/integrations.functions";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { useState } from "react";
 import {
   INTEGRATION_ACTIVITY_LABELS,
   INTEGRATION_ACTIVITY_TONE,
@@ -34,7 +49,10 @@ import {
   INTEGRATION_CONNECTION_LABELS,
   INTEGRATION_CONNECTION_TONE,
 } from "@/types/integrations";
-import type { IntegrationActivityEntry } from "@/types/integrations";
+import type {
+  IntegrationActivityEntry,
+  IntegrationCredentialStatus,
+} from "@/types/integrations";
 
 const TITLE = "Courier Integration · Commerce Operations";
 const DESCRIPTION =
@@ -62,6 +80,8 @@ function CourierIntegrationPage() {
   const testConnection = useServerFn(testIntegrationConnection);
   const setState = useServerFn(setIntegrationAccountState);
   const refreshLocations = useServerFn(refreshIntegrationLocations);
+  const saveScope = useServerFn(setIntegrationAccountScope);
+  const saveCredentials = useServerFn(saveIntegrationCredentials);
 
   const account = useQuery({
     queryKey: ["integrations", "account", id],
@@ -74,6 +94,14 @@ function CourierIntegrationPage() {
   const webhooks = useQuery({
     queryKey: ["integrations", "webhooks"],
     queryFn: getIntegrationWebhookOverview,
+  });
+  const credentials = useQuery({
+    queryKey: ["integrations", "credentials", id],
+    queryFn: () => getIntegrationCredentialStatus(id),
+  });
+  const stores = useQuery({
+    queryKey: ["integrations", "stores"],
+    queryFn: getIntegrationStoreOptions,
   });
   const activity = useQuery({
     queryKey: ["integrations", "activity", "account", id],
@@ -106,6 +134,31 @@ function CourierIntegrationPage() {
 
   const toggle = useMutation({
     mutationFn: (status: "active" | "disabled") => setState({ data: { accountId: id, status } }),
+    onSuccess: (result) => {
+      toast.success(result.message);
+      invalidate();
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const scope = useMutation({
+    mutationFn: (input: { storeId: string | null; isDefault: boolean }) =>
+      saveScope({ data: { accountId: id, ...input } }),
+    onSuccess: (result) => {
+      toast.success(result.message);
+      invalidate();
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const creds = useMutation({
+    mutationFn: (input: {
+      clientId?: string;
+      username?: string;
+      clientSecret?: string;
+      password?: string;
+      webhookSecret?: string;
+    }) => saveCredentials({ data: { accountId: id, ...input } }),
     onSuccess: (result) => {
       toast.success(result.message);
       invalidate();
@@ -229,6 +282,10 @@ function CourierIntegrationPage() {
               {data.isDefault ? <StatusBadge tone="info">Default</StatusBadge> : null}
             </div>
             <Row label="Account code" value={data.code} />
+            <Row
+              label="Scope"
+              value={data.scope === "store" ? (data.storeName ?? "One store") : "Organization-wide"}
+            />
             <Row label="Store ID" value={data.externalStoreId ?? "—"} />
             <Row
               label="Credentials"
@@ -291,6 +348,23 @@ function CourierIntegrationPage() {
         </Card>
       </div>
 
+      {canManage ? (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <ScopeCard
+            storeId={data.storeId}
+            isDefault={data.isDefault}
+            stores={stores.data ?? []}
+            saving={scope.isPending}
+            onSave={(input) => scope.mutate(input)}
+          />
+          <CredentialsCard
+            status={credentials.data ?? null}
+            saving={creds.isPending}
+            onSave={(input) => creds.mutate(input)}
+          />
+        </div>
+      ) : null}
+
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-muted-foreground">Recent activity</h2>
         <DataTable
@@ -303,6 +377,147 @@ function CourierIntegrationPage() {
         />
       </section>
     </div>
+  );
+}
+
+const ORG_SCOPE = "__organization__";
+
+function ScopeCard({
+  storeId,
+  isDefault,
+  stores,
+  saving,
+  onSave,
+}: {
+  storeId: string | null;
+  isDefault: boolean;
+  stores: { id: string; name: string }[];
+  saving: boolean;
+  onSave: (input: { storeId: string | null; isDefault: boolean }) => void;
+}) {
+  const [store, setStore] = useState(storeId ?? ORG_SCOPE);
+  const [asDefault, setAsDefault] = useState(isDefault);
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm">Account scope</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3 text-sm">
+        <p className="text-xs text-muted-foreground">
+          A store-scoped account is used only for that store&apos;s orders. Organization-wide
+          accounts are the fallback for every other store. Only one active default is allowed per
+          courier in each scope.
+        </p>
+        <div className="space-y-1.5">
+          <Label className="text-xs">Used by</Label>
+          <Select value={store} onValueChange={setStore}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ORG_SCOPE}>Every store (organization-wide)</SelectItem>
+              {stores.map((s) => (
+                <SelectItem key={s.id} value={s.id}>
+                  {s.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center justify-between">
+          <Label className="text-xs">Default for this courier in that scope</Label>
+          <Switch checked={asDefault} onCheckedChange={setAsDefault} />
+        </div>
+        <Button
+          size="sm"
+          disabled={saving}
+          onClick={() =>
+            onSave({ storeId: store === ORG_SCOPE ? null : store, isDefault: asDefault })
+          }
+        >
+          {saving ? "Saving…" : "Save scope"}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CredentialsCard({
+  status,
+  saving,
+  onSave,
+}: {
+  status: IntegrationCredentialStatus | null;
+  saving: boolean;
+  onSave: (input: Record<string, string>) => void;
+}) {
+  const [values, setValues] = useState<Record<string, string>>({});
+  const set = (key: string) => (event: React.ChangeEvent<HTMLInputElement>) =>
+    setValues((prev) => ({ ...prev, [key]: event.target.value }));
+
+  const fields = [
+    { key: "clientId", label: "Client ID", secret: false, configured: status?.has_client_id },
+    { key: "username", label: "Username", secret: false, configured: status?.has_username },
+    {
+      key: "clientSecret",
+      label: "Client secret",
+      secret: true,
+      configured: status?.has_client_secret,
+    },
+    { key: "password", label: "Password", secret: true, configured: status?.has_password },
+    {
+      key: "webhookSecret",
+      label: "Webhook shared secret",
+      secret: true,
+      configured: status?.has_webhook_secret,
+    },
+  ];
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm">Credentials</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3 text-sm">
+        <p className="text-xs text-muted-foreground">
+          Secrets are encrypted and never readable again — not by this page, not by any API
+          response. Leave a field blank to keep the stored value. Changing a secret clears the
+          cached provider token.
+        </p>
+        {fields.map((field) => (
+          <div key={field.key} className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs">{field.label}</Label>
+              <span className="text-[11px] text-muted-foreground">
+                {field.configured ? "Configured" : "Not set"}
+              </span>
+            </div>
+            <Input
+              type={field.secret ? "password" : "text"}
+              autoComplete="off"
+              placeholder={field.configured ? "Unchanged" : "Not set"}
+              value={values[field.key] ?? ""}
+              onChange={set(field.key)}
+            />
+          </div>
+        ))}
+        <Button
+          size="sm"
+          disabled={saving || Object.values(values).every((v) => v.trim() === "")}
+          onClick={() => {
+            const payload: Record<string, string> = {};
+            for (const [key, value] of Object.entries(values)) {
+              if (value.trim() !== "") payload[key] = value;
+            }
+            onSave(payload);
+            setValues({});
+          }}
+        >
+          {saving ? "Saving…" : "Save credentials"}
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
 

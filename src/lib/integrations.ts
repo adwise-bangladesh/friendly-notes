@@ -15,12 +15,13 @@ import type {
   IntegrationAccountHealth,
   IntegrationActivityEntry,
   IntegrationConnectionStatus,
+  IntegrationCredentialStatus,
   IntegrationWebhookOverviewRow,
 } from "@/types/integrations";
 import type { CourierEnvironment, CourierProvider, CourierProviderStatus } from "@/types/shipping";
 
 const ACCOUNT_COLUMNS =
-  "id, provider_id, name, code, environment, external_store_id, status, is_default, created_at, updated_at";
+  "id, provider_id, name, code, environment, external_store_id, store_id, status, is_default, created_at, updated_at, store:stores(id, name)";
 
 /** Courier providers as the Integrations Center sees them. */
 export async function getIntegrationProviders(): Promise<CourierProvider[]> {
@@ -41,6 +42,8 @@ interface AccountRow {
   code: string;
   environment: CourierEnvironment;
   external_store_id: string | null;
+  store_id: string | null;
+  store: { id: string; name: string } | null;
   status: CourierProviderStatus;
   is_default: boolean;
   created_at: string;
@@ -98,6 +101,9 @@ export async function getIntegrationAccounts(): Promise<IntegrationAccount[]> {
       code: row.code,
       environment: row.environment,
       externalStoreId: row.external_store_id,
+      storeId: row.store_id,
+      storeName: row.store?.name ?? null,
+      scope: row.store_id ? "store" : "organization",
       accountStatus: row.status,
       isDefault: row.is_default,
       capabilities: capabilitiesFor(providerKey),
@@ -127,6 +133,28 @@ export async function getIntegrationAccountHealth(
   if (error) throw error;
   const rows = (data ?? []) as unknown as IntegrationAccountHealth[];
   return rows[0] ?? null;
+}
+
+/** Secret-free credential configuration state for one account. */
+export async function getIntegrationCredentialStatus(
+  accountId: string,
+): Promise<IntegrationCredentialStatus | null> {
+  const { data, error } = await supabase.rpc("courier_credential_status", {
+    _account_id: accountId,
+  });
+  if (error) throw error;
+  return (data as unknown as IntegrationCredentialStatus | null) ?? null;
+}
+
+/** Stores available as a scope target for a courier account. */
+export async function getIntegrationStoreOptions(): Promise<{ id: string; name: string }[]> {
+  const { data, error } = await supabase
+    .from("stores")
+    .select("id, name")
+    .order("name", { ascending: true })
+    .returns<{ id: string; name: string }[]>();
+  if (error) throw error;
+  return data ?? [];
 }
 
 export interface ActivityFilters {
