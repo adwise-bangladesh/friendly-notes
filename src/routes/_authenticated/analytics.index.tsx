@@ -42,22 +42,23 @@ export const Route = createFileRoute("/_authenticated/analytics/")({
 function AnalyticsOverviewPage() {
   const [preset, setPreset] = useState<DatePresetId>("30d");
   const [source, setSource] = useState<string | null>(null);
+  const [storeId, setStoreId] = useState<string | null>(null);
   const range = useMemo(() => rangeFromPreset(preset), [preset]);
   const prev = useMemo(() => previousRange(range), [range]);
   const [grain, setGrain] = useState<AnalyticsGrain | null>(null);
   const activeGrain = grain ?? suggestGrain(range);
 
   const overview = useQuery({
-    queryKey: ["analytics", "overview", preset, source],
-    queryFn: () => getOverview(range, source),
+    queryKey: ["analytics", "overview", preset, source, storeId],
+    queryFn: () => getOverview(range, source, storeId),
   });
   const baseline = useQuery({
-    queryKey: ["analytics", "overview-prev", preset, source],
-    queryFn: () => getOverview(prev, source),
+    queryKey: ["analytics", "overview-prev", preset, source, storeId],
+    queryFn: () => getOverview(prev, source, storeId),
   });
   const trend = useQuery({
-    queryKey: ["analytics", "sales-trend", preset, activeGrain, source],
-    queryFn: () => getSalesTrend(range, activeGrain, source),
+    queryKey: ["analytics", "sales-trend", preset, activeGrain, source, storeId],
+    queryFn: () => getSalesTrend(range, activeGrain, source, storeId),
   });
 
   const o = overview.data;
@@ -67,7 +68,7 @@ function AnalyticsOverviewPage() {
     <div className="space-y-6">
       <PageHeader
         title="Business Analytics"
-        description="All figures are derived from the authoritative order, shipment, return and financial records — nothing is stored separately or estimated."
+        description="All figures are derived from the authoritative order, shipment, return and financial records. Order-value metrics use the order date; delivery and collection metrics use the delivery date."
       />
 
       <AnalyticsFilters
@@ -77,6 +78,8 @@ function AnalyticsOverviewPage() {
         onGrainChange={setGrain}
         source={source}
         onSourceChange={setSource}
+        storeId={storeId}
+        onStoreChange={setStoreId}
       />
 
       {overview.isLoading ? (
@@ -89,29 +92,47 @@ function AnalyticsOverviewPage() {
         <>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <MetricCard
-              label="Order revenue"
+              label="Order value placed"
               value={formatMoney(o.order_revenue)}
               change={p ? percentChange(o.order_revenue, p.order_revenue) : null}
-              hint={`${formatNumber(o.live_orders)} live orders`}
+              hint={`${formatNumber(o.live_orders)} live orders · by order date`}
             />
             <MetricCard
-              label="Delivered revenue"
-              value={formatMoney(o.delivered_revenue)}
-              change={p ? percentChange(o.delivered_revenue, p.delivered_revenue) : null}
-              hint={`${formatNumber(o.delivered_orders)} delivered orders`}
+              label="Delivered merchandise value"
+              value={formatMoney(o.delivered_merchandise_value)}
+              change={
+                p
+                  ? percentChange(o.delivered_merchandise_value, p.delivered_merchandise_value)
+                  : null
+              }
+              hint={`${formatNumber(o.fully_delivered_orders)} fully · ${formatNumber(
+                o.partially_delivered_orders,
+              )} partly delivered · by delivery date`}
+            />
+            <MetricCard
+              label="Cash collected"
+              value={formatMoney(o.collected_revenue)}
+              change={p ? percentChange(o.collected_revenue, p.collected_revenue) : null}
+              hint="Recorded courier collections on this order cohort"
+            />
+            <MetricCard
+              label="Net collected"
+              value={formatMoney(o.net_collected_revenue)}
+              change={p ? percentChange(o.net_collected_revenue, p.net_collected_revenue) : null}
+              hint={`After ${formatMoney(o.refunded_amount)} refunded`}
             />
             <MetricCard
               label="Estimated profit"
               value={formatMoney(o.estimated_profit)}
               change={p ? percentChange(o.estimated_profit, p.estimated_profit) : null}
-              hint={`Margin ${formatPercent(o.profit_margin)}`}
+              hint={`Margin ${formatPercent(o.profit_margin)} · by order date`}
               badge="estimated"
             />
             <MetricCard
               label="Actual profit (settled)"
               value={formatMoney(o.actual_profit)}
               change={p ? percentChange(o.actual_profit, p.actual_profit) : null}
-              hint={`${o.completeness.actual} of ${o.live_orders} orders fully reconciled`}
+              hint={`Orders with a delivery in this period · ${o.completeness.actual} of ${o.live_orders} placed orders fully reconciled`}
               badge="actual"
             />
             <MetricCard
@@ -150,7 +171,7 @@ function AnalyticsOverviewPage() {
               ) : (
                 <TrendChart
                   title="Revenue trend"
-                  description="Order revenue is counted once per order on the day it was placed; delivered revenue is counted on the delivery date."
+                  description="Order value is counted once per order on the day it was placed. Delivered merchandise value counts only quantities on fully delivered shipments, on the delivery date."
                   data={(trend.data ?? []).map((pt) => ({
                     bucket: pt.bucket,
                     revenue: Number(pt.revenue),
@@ -159,7 +180,7 @@ function AnalyticsOverviewPage() {
                   }))}
                   series={[
                     { key: "revenue", label: "Order revenue", color: "hsl(var(--primary))" },
-                    { key: "delivered", label: "Delivered revenue", color: "hsl(142 71% 45%)" },
+                    { key: "delivered", label: "Delivered merchandise", color: "hsl(142 71% 45%)" },
                     { key: "cancelled", label: "Cancelled", color: "hsl(var(--destructive))" },
                   ]}
                   valueFormatter={(v) => formatMoney(v)}
