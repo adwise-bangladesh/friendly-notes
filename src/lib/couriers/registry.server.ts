@@ -4,18 +4,58 @@
  * Only providers with a real adapter appear here. Everything else stays a
  * manual, operator-driven courier: the shipment workflow still works, the
  * automated actions simply are not offered.
+ *
+ * Capabilities are never re-declared here. `capabilities.ts` is the single
+ * source of truth, and `courierCapability()` cross-checks it against the
+ * methods the adapter actually implements, so an over-claiming profile can
+ * never enable an action at runtime.
  */
 
 import type { CourierAdapter } from "@/types/couriers";
+import { courierCapabilityProfile } from "./capabilities";
 import { pathaoAdapter } from "./pathao.server";
+import { redxAdapter } from "./redx.server";
+import { steadfastAdapter } from "./steadfast.server";
 
 const ADAPTERS: Record<string, CourierAdapter> = {
   pathao: pathaoAdapter,
+  steadfast: steadfastAdapter,
+  redx: redxAdapter,
 };
 
 export function getCourierAdapter(providerCode: string): CourierAdapter | null {
-  return ADAPTERS[providerCode] ?? null;
+  return ADAPTERS[providerCode.toLowerCase()] ?? null;
 }
+
+export type CourierOperation = "book" | "status" | "quote" | "locations" | "cancel";
+
+/**
+ * True only when the declared profile AND the implemented adapter both support
+ * the operation. Callers gate every automated courier action on this.
+ */
+export function courierCapability(providerCode: string, operation: CourierOperation): boolean {
+  const adapter = getCourierAdapter(providerCode);
+  if (!adapter) return false;
+  const profile = courierCapabilityProfile(providerCode);
+  if (!profile?.hasAdapter || !profile.api[operation]) return false;
+  switch (operation) {
+    case "book":
+      return typeof adapter.bookShipment === "function";
+    case "status":
+      return typeof adapter.getStatus === "function";
+    case "quote":
+      return typeof adapter.quote === "function";
+    case "locations":
+      return (
+        typeof adapter.listCities === "function" ||
+        typeof adapter.listZones === "function" ||
+        typeof adapter.listAreas === "function"
+      );
+    case "cancel":
+      return typeof adapter.cancelShipment === "function";
+  }
+}
+
 
 /** Safe operational logging of a courier API call. Never receives secrets. */
 export async function logCourierCall(entry: {

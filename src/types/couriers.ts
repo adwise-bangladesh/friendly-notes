@@ -33,8 +33,8 @@ export const COURIER_INTEGRATION_LABELS: Record<CourierIntegrationLevel, string>
  */
 export const COURIER_INTEGRATION_STATUS: Record<string, CourierIntegrationLevel> = {
   pathao: "ready_for_api",
-  steadfast: "configured",
-  redx: "configured",
+  steadfast: "ready_for_api",
+  redx: "ready_for_api",
   paperfly: "configured",
 };
 

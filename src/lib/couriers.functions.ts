@@ -71,7 +71,9 @@ export const bookShipmentWithCourier = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<CourierActionResult> => {
     await assertCanManage(context.supabase as never, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { getCourierAdapter, logCourierCall } = await import("./couriers/registry.server");
+    const { getCourierAdapter, courierCapability, logCourierCall } = await import(
+      "./couriers/registry.server"
+    );
 
     // the caller's own client performs the claim, so auth.uid() and the
     // permission re-check inside the SQL function apply to the real operator
@@ -122,7 +124,7 @@ export const bookShipmentWithCourier = createServerFn({ method: "POST" })
 
     const code = (shipment.provider as { code: string } | null)?.code ?? "";
     const adapter = getCourierAdapter(code);
-    if (!adapter) {
+    if (!adapter || !courierCapability(code, "book")) {
       await supabaseAdmin.rpc("record_courier_booking_failure", {
         _shipment_id: shipment.id,
         _message: "No API integration exists for this courier yet.",
@@ -264,7 +266,9 @@ export const cancelShipmentWithCourier = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<CourierActionResult> => {
     await assertCanManage(context.supabase as never, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { getCourierAdapter, logCourierCall } = await import("./couriers/registry.server");
+    const { getCourierAdapter, courierCapability, logCourierCall } = await import(
+      "./couriers/registry.server"
+    );
 
     const { data: shipment } = await supabaseAdmin
       .from("shipments")
@@ -279,7 +283,7 @@ export const cancelShipmentWithCourier = createServerFn({ method: "POST" })
     }
     const code = (shipment.provider as { code: string } | null)?.code ?? "";
     const adapter = getCourierAdapter(code);
-    if (!adapter?.cancelShipment || !shipment.courier_account_id) {
+    if (!adapter?.cancelShipment || !courierCapability(code, "cancel") || !shipment.courier_account_id) {
       throw new Error(
         "This courier cannot be cancelled through the API yet. Cancel it with the courier directly, then cancel the shipment here.",
       );
@@ -330,7 +334,9 @@ export const refreshShipmentCourierStatus = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<CourierActionResult> => {
     await assertCanManage(context.supabase as never, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { getCourierAdapter, logCourierCall } = await import("./couriers/registry.server");
+    const { getCourierAdapter, courierCapability, logCourierCall } = await import(
+      "./couriers/registry.server"
+    );
 
     const { data: shipment } = await supabaseAdmin
       .from("shipments")
@@ -345,8 +351,8 @@ export const refreshShipmentCourierStatus = createServerFn({ method: "POST" })
     }
     const code = (shipment.provider as { code: string } | null)?.code ?? "";
     const adapter = getCourierAdapter(code);
-    if (!adapter || !shipment.courier_account_id) {
-      throw new Error("No API integration exists for this courier yet");
+    if (!adapter || !courierCapability(code, "status") || !shipment.courier_account_id) {
+      throw new Error("This courier cannot be tracked through the API yet");
     }
 
     try {
@@ -410,7 +416,9 @@ export const quoteShipmentDeliveryFee = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<CourierActionResult & { quote?: number }> => {
     await assertCanManage(context.supabase as never, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { getCourierAdapter, logCourierCall } = await import("./couriers/registry.server");
+    const { getCourierAdapter, courierCapability, logCourierCall } = await import(
+      "./couriers/registry.server"
+    );
 
     const { data: shipment } = await supabaseAdmin
       .from("shipments")
@@ -422,7 +430,7 @@ export const quoteShipmentDeliveryFee = createServerFn({ method: "POST" })
     if (!shipment) throw new Error("Shipment not found");
     const code = (shipment.provider as { code: string } | null)?.code ?? "";
     const adapter = getCourierAdapter(code);
-    if (!adapter?.quote || !shipment.courier_account_id) {
+    if (!adapter?.quote || !courierCapability(code, "quote") || !shipment.courier_account_id) {
       throw new Error("This courier cannot be asked for a quote yet");
     }
     if (!shipment.provider_recipient_city_id || !shipment.provider_recipient_zone_id) {
