@@ -17,6 +17,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
+import { ChannelListingCard } from "@/components/stores/ChannelListingCard";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useCommercePermissions } from "@/hooks/use-permissions";
@@ -32,18 +33,15 @@ import {
   getStoreProductListings,
   getStoreProductPriceHistory,
   saveChannelListing,
-  setChannelListingStatus,
   setStoreProductPrice,
   updateStoreProduct,
 } from "@/lib/store-catalog";
 import {
   CHANNEL_LISTING_EVENT_LABELS,
-  CHANNEL_LISTING_STATUS_LABELS,
   STORE_PRODUCT_STATUS_LABELS,
   STORE_PRODUCT_VISIBILITY_LABELS,
 } from "@/types/store-catalog";
 import type {
-  ChannelListingStatus,
   StoreProductStatus,
   StoreProductVisibility,
 } from "@/types/store-catalog";
@@ -70,14 +68,6 @@ const STATUS_TONE: Record<StoreProductStatus, StatusTone> = {
   draft: "neutral",
   active: "success",
   archived: "danger",
-};
-
-const LISTING_TONE: Record<ChannelListingStatus, StatusTone> = {
-  not_published: "neutral",
-  publishing: "info",
-  published: "success",
-  sync_failed: "danger",
-  archived: "warning",
 };
 
 function Page() {
@@ -211,16 +201,6 @@ function Page() {
       toast.success("Channel listing saved");
     },
     onError: (e: unknown) => fail(e, "Could not save the listing."),
-  });
-
-  const listingStatusMutation = useMutation({
-    mutationFn: (input: { listingId: string; status: ChannelListingStatus }) =>
-      setChannelListingStatus(input.listingId, input.status),
-    onSuccess: () => {
-      refresh();
-      toast.success("Listing status updated");
-    },
-    onError: (e: unknown) => fail(e, "Status change rejected."),
   });
 
   if (spQuery.isLoading) return <LoadingState rows={4} label="Loading store product" />;
@@ -458,7 +438,7 @@ function Page() {
             <EmptyState
               icon={Plug}
               title="No channel listings"
-              description="Map this store product to an external channel to track its publish state."
+              description="Map this store product to an external channel to publish and synchronise it."
             />
           ) : (
             <div className="space-y-3">
@@ -467,48 +447,16 @@ function Page() {
                   (item) => item.id === listing.sales_channel_account_id,
                 );
                 return (
-                  <div key={listing.id} className="rounded-lg border border-border p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div>
-                        <p className="text-sm font-medium">{channel?.name ?? "Channel"}</p>
-                        <p className="text-[12px] text-muted-foreground">
-                          {listing.external_product_id
-                            ? `External ID ${listing.external_product_id}`
-                            : "No external reference yet"}
-                          {listing.last_sync_error ? ` · ${listing.last_sync_error}` : ""}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <StatusBadge tone={LISTING_TONE[listing.listing_status]}>
-                          {CHANNEL_LISTING_STATUS_LABELS[listing.listing_status]}
-                        </StatusBadge>
-                        {perms.canArchive && listing.listing_status !== "archived" ? (
-                          <Select
-                            value={listing.listing_status}
-                            onValueChange={(value) =>
-                              listingStatusMutation.mutate({
-                                listingId: listing.id,
-                                status: value as ChannelListingStatus,
-                              })
-                            }
-                          >
-                            <SelectTrigger className="h-8 w-40 text-[13px]">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {(
-                                Object.keys(CHANNEL_LISTING_STATUS_LABELS) as ChannelListingStatus[]
-                              ).map((value) => (
-                                <SelectItem key={value} value={value}>
-                                  {CHANNEL_LISTING_STATUS_LABELS[value]}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : null}
-                      </div>
-                    </div>
-                  </div>
+                  <ChannelListingCard
+                    key={listing.id}
+                    listing={listing}
+                    channelName={channel?.name ?? "Channel"}
+                    provider={channel?.provider ?? "other"}
+                    channelStatus={channel?.status ?? "unknown"}
+                    canManage={perms.canManage}
+                    canArchive={perms.canArchive}
+                    onChanged={refresh}
+                  />
                 );
               })}
             </div>

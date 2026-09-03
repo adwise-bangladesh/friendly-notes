@@ -3831,11 +3831,16 @@ export type Database = {
           external_url: string | null
           external_variant_reference: string | null
           id: string
+          last_operation: string | null
+          last_success_at: string | null
           last_sync_error: string | null
           last_synced_at: string | null
           listing_status: Database["public"]["Enums"]["channel_listing_status"]
           sales_channel_account_id: string
           store_product_id: string
+          sync_started_at: string | null
+          synced_price: number | null
+          synced_qty: number | null
           updated_at: string
           updated_by: string | null
         }
@@ -3847,11 +3852,16 @@ export type Database = {
           external_url?: string | null
           external_variant_reference?: string | null
           id?: string
+          last_operation?: string | null
+          last_success_at?: string | null
           last_sync_error?: string | null
           last_synced_at?: string | null
           listing_status?: Database["public"]["Enums"]["channel_listing_status"]
           sales_channel_account_id: string
           store_product_id: string
+          sync_started_at?: string | null
+          synced_price?: number | null
+          synced_qty?: number | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -3863,11 +3873,16 @@ export type Database = {
           external_url?: string | null
           external_variant_reference?: string | null
           id?: string
+          last_operation?: string | null
+          last_success_at?: string | null
           last_sync_error?: string | null
           last_synced_at?: string | null
           listing_status?: Database["public"]["Enums"]["channel_listing_status"]
           sales_channel_account_id?: string
           store_product_id?: string
+          sync_started_at?: string | null
+          synced_price?: number | null
+          synced_qty?: number | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -3895,6 +3910,7 @@ export type Database = {
           error_summary: string | null
           id: string
           initiated_by: string | null
+          listing_id: string | null
           records_created: number
           records_failed: number
           records_fetched: number
@@ -3911,6 +3927,7 @@ export type Database = {
           error_summary?: string | null
           id?: string
           initiated_by?: string | null
+          listing_id?: string | null
           records_created?: number
           records_failed?: number
           records_fetched?: number
@@ -3927,6 +3944,7 @@ export type Database = {
           error_summary?: string | null
           id?: string
           initiated_by?: string | null
+          listing_id?: string | null
           records_created?: number
           records_failed?: number
           records_fetched?: number
@@ -3938,6 +3956,13 @@ export type Database = {
           sync_type?: Database["public"]["Enums"]["sales_channel_sync_type"]
         }
         Relationships: [
+          {
+            foreignKeyName: "sales_channel_sync_runs_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "sales_channel_product_listings"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sales_channel_sync_runs_sales_channel_account_id_fkey"
             columns: ["sales_channel_account_id"]
@@ -5658,6 +5683,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      begin_listing_operation: {
+        Args: {
+          _listing_id: string
+          _operation: Database["public"]["Enums"]["sales_channel_sync_type"]
+        }
+        Returns: Json
+      }
       brand_product_counts: {
         Args: never
         Returns: {
@@ -5740,6 +5772,10 @@ export type Database = {
           category_id: string
           product_count: number
         }[]
+      }
+      channel_listing_readiness: {
+        Args: { _listing_id: string }
+        Returns: Json
       }
       commit_order_inventory: {
         Args: { _order_id: string }
@@ -5887,11 +5923,16 @@ export type Database = {
           external_url: string | null
           external_variant_reference: string | null
           id: string
+          last_operation: string | null
+          last_success_at: string | null
           last_sync_error: string | null
           last_synced_at: string | null
           listing_status: Database["public"]["Enums"]["channel_listing_status"]
           sales_channel_account_id: string
           store_product_id: string
+          sync_started_at: string | null
+          synced_price: number | null
+          synced_qty: number | null
           updated_at: string
           updated_by: string | null
         }
@@ -6177,6 +6218,10 @@ export type Database = {
         Args: { _customer_id: string; _limit?: number; _offset?: number }
         Returns: Json
       }
+      effective_store_product_data: {
+        Args: { _store_product_id: string }
+        Returns: Json
+      }
       ensure_inventory_level_internal: {
         Args: { _location_id: string; _product_id: string; _variant_id: string }
         Returns: string
@@ -6215,6 +6260,47 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      finish_listing_operation: {
+        Args: {
+          _external_missing?: boolean
+          _external_product_id?: string
+          _external_url?: string
+          _listing_id: string
+          _message?: string
+          _ok: boolean
+          _operation: Database["public"]["Enums"]["sales_channel_sync_type"]
+          _run_id: string
+          _synced_price?: number
+          _synced_qty?: number
+        }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          external_product_id: string | null
+          external_sku: string | null
+          external_url: string | null
+          external_variant_reference: string | null
+          id: string
+          last_operation: string | null
+          last_success_at: string | null
+          last_sync_error: string | null
+          last_synced_at: string | null
+          listing_status: Database["public"]["Enums"]["channel_listing_status"]
+          sales_channel_account_id: string
+          store_product_id: string
+          sync_started_at: string | null
+          synced_price: number | null
+          synced_qty: number | null
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sales_channel_product_listings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       finish_sync_run: {
         Args: {
           _created?: number
@@ -6232,6 +6318,7 @@ export type Database = {
           error_summary: string | null
           id: string
           initiated_by: string | null
+          listing_id: string | null
           records_created: number
           records_failed: number
           records_fetched: number
@@ -6717,6 +6804,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      record_listing_readiness_check: {
+        Args: { _listing_id: string }
+        Returns: Json
       }
       record_return_receipt: {
         Args: { _items: Json; _note?: string; _return_id: string }
@@ -7245,11 +7336,16 @@ export type Database = {
           external_url: string | null
           external_variant_reference: string | null
           id: string
+          last_operation: string | null
+          last_success_at: string | null
           last_sync_error: string | null
           last_synced_at: string | null
           listing_status: Database["public"]["Enums"]["channel_listing_status"]
           sales_channel_account_id: string
           store_product_id: string
+          sync_started_at: string | null
+          synced_price: number | null
+          synced_qty: number | null
           updated_at: string
           updated_by: string | null
         }
@@ -8082,6 +8178,7 @@ export type Database = {
           error_summary: string | null
           id: string
           initiated_by: string | null
+          listing_id: string | null
           records_created: number
           records_failed: number
           records_fetched: number
@@ -8130,6 +8227,38 @@ export type Database = {
         }[]
       }
       store_catalog_summary: { Args: { _store_id: string }; Returns: Json }
+      store_channel_listings: {
+        Args: {
+          _channel_id?: string
+          _health?: string
+          _limit?: number
+          _offset?: number
+          _search?: string
+          _status?: Database["public"]["Enums"]["channel_listing_status"]
+          _store_id: string
+        }
+        Returns: {
+          available_qty: number
+          channel_id: string
+          channel_name: string
+          channel_status: Database["public"]["Enums"]["sales_channel_status"]
+          external_product_id: string
+          external_url: string
+          id: string
+          last_success_at: string
+          last_sync_error: string
+          last_synced_at: string
+          listing_status: Database["public"]["Enums"]["channel_listing_status"]
+          product_id: string
+          product_name: string
+          provider: Database["public"]["Enums"]["sales_channel_provider"]
+          selling_price: number
+          store_product_id: string
+          store_product_status: Database["public"]["Enums"]["store_product_status"]
+          store_sku: string
+          total_count: number
+        }[]
+      }
       store_list: { Args: never; Returns: Json }
       store_product_available_qty: {
         Args: { _product_id: string }
@@ -8360,11 +8489,26 @@ export type Database = {
         | "listing_published"
         | "listing_sync_failed"
         | "listing_archived"
+        | "listing_readiness_checked"
+        | "listing_publish_started"
+        | "listing_publish_failed"
+        | "listing_product_synced"
+        | "listing_price_synced"
+        | "listing_stock_synced"
+        | "listing_status_refreshed"
+        | "listing_external_missing"
+        | "listing_paused"
+        | "listing_unpublished"
+        | "listing_sync_started"
       channel_listing_status:
         | "not_published"
+        | "ready"
         | "publishing"
         | "published"
+        | "update_pending"
+        | "syncing"
         | "sync_failed"
+        | "paused"
         | "archived"
       cost_change_source: "manual" | "purchase_receipt" | "correction"
       courier_environment: "sandbox" | "production"
@@ -8628,7 +8772,17 @@ export type Database = {
         | "completed"
         | "failed"
         | "partial"
-      sales_channel_sync_type: "orders" | "products" | "customers" | "full"
+      sales_channel_sync_type:
+        | "orders"
+        | "products"
+        | "customers"
+        | "full"
+        | "listing_publish"
+        | "listing_update"
+        | "price_sync"
+        | "stock_sync"
+        | "status_refresh"
+        | "unpublish"
       shipment_event_type:
         | "shipment_created"
         | "ready_for_booking"
@@ -8954,12 +9108,27 @@ export const Constants = {
         "listing_published",
         "listing_sync_failed",
         "listing_archived",
+        "listing_readiness_checked",
+        "listing_publish_started",
+        "listing_publish_failed",
+        "listing_product_synced",
+        "listing_price_synced",
+        "listing_stock_synced",
+        "listing_status_refreshed",
+        "listing_external_missing",
+        "listing_paused",
+        "listing_unpublished",
+        "listing_sync_started",
       ],
       channel_listing_status: [
         "not_published",
+        "ready",
         "publishing",
         "published",
+        "update_pending",
+        "syncing",
         "sync_failed",
+        "paused",
         "archived",
       ],
       cost_change_source: ["manual", "purchase_receipt", "correction"],
@@ -9251,7 +9420,18 @@ export const Constants = {
         "failed",
         "partial",
       ],
-      sales_channel_sync_type: ["orders", "products", "customers", "full"],
+      sales_channel_sync_type: [
+        "orders",
+        "products",
+        "customers",
+        "full",
+        "listing_publish",
+        "listing_update",
+        "price_sync",
+        "stock_sync",
+        "status_refresh",
+        "unpublish",
+      ],
       shipment_event_type: [
         "shipment_created",
         "ready_for_booking",

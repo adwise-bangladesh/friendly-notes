@@ -35,10 +35,14 @@ export const STORE_PRODUCT_VISIBILITY_LABELS: Record<StoreProductVisibility, str
 };
 
 export const CHANNEL_LISTING_STATUS_LABELS: Record<ChannelListingStatus, string> = {
-  not_published: "Not published",
+  not_published: "Draft",
+  ready: "Ready",
   publishing: "Publishing",
   published: "Published",
+  update_pending: "Update pending",
+  syncing: "Syncing",
   sync_failed: "Sync failed",
+  paused: "Paused",
   archived: "Archived",
 };
 
@@ -49,6 +53,17 @@ export const CHANNEL_LISTING_EVENT_LABELS: Record<ChannelListingEventType, strin
   listing_published: "Published",
   listing_sync_failed: "Sync failed",
   listing_archived: "Listing archived",
+  listing_readiness_checked: "Readiness checked",
+  listing_publish_started: "Publish started",
+  listing_publish_failed: "Publish failed",
+  listing_sync_started: "Sync started",
+  listing_product_synced: "Product synchronised",
+  listing_price_synced: "Price synchronised",
+  listing_stock_synced: "Stock synchronised",
+  listing_status_refreshed: "Status refreshed",
+  listing_external_missing: "External product missing",
+  listing_paused: "Listing paused",
+  listing_unpublished: "Listing unpublished",
 };
 
 /** One row of the store catalog list (derived, read-only projection). */
