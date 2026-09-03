@@ -421,6 +421,92 @@ export type Database = {
         }
         Relationships: []
       }
+      background_job_attempts: {
+        Row: {
+          attempt_number: number
+          created_at: string
+          duration_ms: number | null
+          failure_class:
+            | Database["public"]["Enums"]["sync_failure_class"]
+            | null
+          finished_at: string | null
+          id: string
+          job_id: string
+          message: string | null
+          ok: boolean | null
+          run_id: string | null
+          started_at: string
+          worker_id: string | null
+        }
+        Insert: {
+          attempt_number: number
+          created_at?: string
+          duration_ms?: number | null
+          failure_class?:
+            | Database["public"]["Enums"]["sync_failure_class"]
+            | null
+          finished_at?: string | null
+          id?: string
+          job_id: string
+          message?: string | null
+          ok?: boolean | null
+          run_id?: string | null
+          started_at?: string
+          worker_id?: string | null
+        }
+        Update: {
+          attempt_number?: number
+          created_at?: string
+          duration_ms?: number | null
+          failure_class?:
+            | Database["public"]["Enums"]["sync_failure_class"]
+            | null
+          finished_at?: string | null
+          id?: string
+          job_id?: string
+          message?: string | null
+          ok?: boolean | null
+          run_id?: string | null
+          started_at?: string
+          worker_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "background_job_attempts_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "sales_channel_sync_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      background_job_types: {
+        Row: {
+          created_at: string
+          description: string | null
+          enabled: boolean
+          job_type: string
+          label: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          job_type: string
+          label: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          job_type?: string
+          label?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       brands: {
         Row: {
           banner_url: string | null
@@ -3914,24 +4000,31 @@ export type Database = {
           completed_at: string | null
           created_at: string
           created_by: string | null
+          depends_on_job_id: string | null
           failure_class:
             | Database["public"]["Enums"]["sync_failure_class"]
             | null
+          final_failed_at: string | null
+          first_failed_at: string | null
           id: string
+          job_type: string
+          last_attempt_at: string | null
           last_error: string | null
           last_run_id: string | null
           lease_expires_at: string | null
           lease_token: string | null
-          listing_id: string
+          listing_id: string | null
           max_attempts: number
           operation: Database["public"]["Enums"]["sales_channel_sync_type"]
           priority: number
-          sales_channel_account_id: string
+          retry_after: string | null
+          sales_channel_account_id: string | null
           source: string
           source_reference: string | null
           status: Database["public"]["Enums"]["sync_job_status"]
           store_id: string
           updated_at: string
+          worker_id: string | null
         }
         Insert: {
           attempts?: number
@@ -3940,24 +4033,31 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           created_by?: string | null
+          depends_on_job_id?: string | null
           failure_class?:
             | Database["public"]["Enums"]["sync_failure_class"]
             | null
+          final_failed_at?: string | null
+          first_failed_at?: string | null
           id?: string
+          job_type?: string
+          last_attempt_at?: string | null
           last_error?: string | null
           last_run_id?: string | null
           lease_expires_at?: string | null
           lease_token?: string | null
-          listing_id: string
+          listing_id?: string | null
           max_attempts?: number
           operation: Database["public"]["Enums"]["sales_channel_sync_type"]
           priority?: number
-          sales_channel_account_id: string
+          retry_after?: string | null
+          sales_channel_account_id?: string | null
           source?: string
           source_reference?: string | null
           status?: Database["public"]["Enums"]["sync_job_status"]
           store_id: string
           updated_at?: string
+          worker_id?: string | null
         }
         Update: {
           attempts?: number
@@ -3966,26 +4066,47 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           created_by?: string | null
+          depends_on_job_id?: string | null
           failure_class?:
             | Database["public"]["Enums"]["sync_failure_class"]
             | null
+          final_failed_at?: string | null
+          first_failed_at?: string | null
           id?: string
+          job_type?: string
+          last_attempt_at?: string | null
           last_error?: string | null
           last_run_id?: string | null
           lease_expires_at?: string | null
           lease_token?: string | null
-          listing_id?: string
+          listing_id?: string | null
           max_attempts?: number
           operation?: Database["public"]["Enums"]["sales_channel_sync_type"]
           priority?: number
-          sales_channel_account_id?: string
+          retry_after?: string | null
+          sales_channel_account_id?: string | null
           source?: string
           source_reference?: string | null
           status?: Database["public"]["Enums"]["sync_job_status"]
           store_id?: string
           updated_at?: string
+          worker_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "sales_channel_sync_jobs_depends_on_job_id_fkey"
+            columns: ["depends_on_job_id"]
+            isOneToOne: false
+            referencedRelation: "sales_channel_sync_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_channel_sync_jobs_job_type_fkey"
+            columns: ["job_type"]
+            isOneToOne: false
+            referencedRelation: "background_job_types"
+            referencedColumns: ["job_type"]
+          },
           {
             foreignKeyName: "sales_channel_sync_jobs_last_run_id_fkey"
             columns: ["last_run_id"]
@@ -9047,7 +9168,12 @@ export type Database = {
       store_product_visibility: "hidden" | "visible"
       store_status: "active" | "inactive" | "archived"
       supply_model: "in_stock" | "local_sourcing" | "preorder" | "group_buy"
-      sync_failure_class: "transient" | "permanent" | "unknown"
+      sync_failure_class:
+        | "transient"
+        | "permanent"
+        | "unknown"
+        | "rate_limited"
+        | "authentication"
       sync_job_status:
         | "pending"
         | "retry_wait"
@@ -9056,6 +9182,7 @@ export type Database = {
         | "failed"
         | "cancelled"
         | "superseded"
+        | "dead_letter"
       variant_status: "active" | "inactive"
       verification_attempt_outcome:
         | "pending"
@@ -9711,7 +9838,13 @@ export const Constants = {
       store_product_visibility: ["hidden", "visible"],
       store_status: ["active", "inactive", "archived"],
       supply_model: ["in_stock", "local_sourcing", "preorder", "group_buy"],
-      sync_failure_class: ["transient", "permanent", "unknown"],
+      sync_failure_class: [
+        "transient",
+        "permanent",
+        "unknown",
+        "rate_limited",
+        "authentication",
+      ],
       sync_job_status: [
         "pending",
         "retry_wait",
@@ -9720,6 +9853,7 @@ export const Constants = {
         "failed",
         "cancelled",
         "superseded",
+        "dead_letter",
       ],
       variant_status: ["active", "inactive"],
       verification_attempt_outcome: [
