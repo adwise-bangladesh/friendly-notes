@@ -8615,7 +8615,10 @@ export type Database = {
         }[]
       }
       sync_job_backoff: { Args: { _attempt: number }; Returns: string }
-      sync_queue_health: { Args: { _store_id?: string }; Returns: Json }
+      sync_queue_health: {
+        Args: { _overdue_hours?: number; _store_id?: string }
+        Returns: Json
+      }
       sync_queue_overview: { Args: { _store_id?: string }; Returns: Json }
       update_shipment_details: {
         Args: {
