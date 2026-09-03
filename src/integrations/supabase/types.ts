@@ -14,6 +14,21 @@ export type Database = {
   }
   public: {
     Tables: {
+      _qa19: {
+        Row: {
+          msg: string | null
+          n: number
+        }
+        Insert: {
+          msg?: string | null
+          n?: number
+        }
+        Update: {
+          msg?: string | null
+          n?: number
+        }
+        Relationships: []
+      }
       ai_analysis_runs: {
         Row: {
           analysis_type: Database["public"]["Enums"]["ai_analysis_type"]
@@ -8615,7 +8630,10 @@ export type Database = {
         }[]
       }
       sync_job_backoff: { Args: { _attempt: number }; Returns: string }
-      sync_queue_health: { Args: { _store_id?: string }; Returns: Json }
+      sync_queue_health: {
+        Args: { _overdue_hours?: number; _store_id?: string }
+        Returns: Json
+      }
       sync_queue_overview: { Args: { _store_id?: string }; Returns: Json }
       update_shipment_details: {
         Args: {

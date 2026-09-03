@@ -164,15 +164,16 @@ function JobsPage() {
         }
       />
 
-      <div className="mb-3 grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="mb-3 grid gap-3 sm:grid-cols-3 lg:grid-cols-7">
         <Stat label="Waiting" value={h?.queue_depth ?? 0} />
         <Stat label="Running" value={h?.processing_count ?? 0} />
         <Stat label="Retrying" value={h?.retry_count ?? 0} />
+        <Stat label="Overdue" value={h?.overdue_count ?? 0} />
         <Stat label="Failed" value={h?.failed_count ?? 0} />
         <Stat label="Dead letter" value={h?.dead_letter_count ?? 0} />
         <Stat
           label="Success rate (24h)"
-          value={h?.success_rate_24h === null || h === undefined ? "No data" : `${h.success_rate_24h}%`}
+          value={h?.success_rate_24h == null ? "No data" : `${h.success_rate_24h}%`}
         />
       </div>
 
