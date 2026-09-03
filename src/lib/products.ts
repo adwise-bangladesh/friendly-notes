@@ -264,7 +264,8 @@ export async function saveProductCatalog(
   };
 
   const { data, error } = await supabase.rpc("save_product_catalog", {
-    _product_id: id ?? null,
+    // The function accepts NULL for "create a new product".
+    _product_id: (id ?? null) as unknown as string,
     _payload: payload as never,
   });
   if (error) throw new Error(friendlySaveError(error.message));
