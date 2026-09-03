@@ -222,33 +222,13 @@ export async function setLowStockThreshold(
 
 /* ---------------- Movements ---------------- */
 
-export async function applyMovement(input: {
-  levelId: string;
-  type: InventoryMovementType;
-  quantity: number;
-  note?: string | null;
-  referenceType?: string | null;
-  referenceId?: string | null;
-}): Promise<void> {
-  const args: {
-    _inventory_level_id: string;
-    _movement_type: InventoryMovementType;
-    _quantity: number;
-    _note?: string;
-    _reference_type?: string;
-    _reference_id?: string;
-  } = {
-    _inventory_level_id: input.levelId,
-    _movement_type: input.type,
-    _quantity: input.quantity,
-  };
-  if (input.note) args._note = input.note;
-  if (input.referenceType) args._reference_type = input.referenceType;
-  if (input.referenceId) args._reference_id = input.referenceId;
-
-  const { error } = await supabase.rpc("apply_inventory_movement", args);
-  if (error) throw error;
-}
+/**
+ * NOTE: there is deliberately no generic "apply any movement" client helper.
+ * `apply_inventory_movement` is an internal ledger primitive and EXECUTE is
+ * revoked from anon/authenticated. Stock only changes through the controlled
+ * workflows: manual adjustment, reservation, fulfillment, purchase receipt,
+ * transfer, return and stocktake.
+ */
 
 export interface MovementWithActor extends InventoryMovement {
   actorName: string | null;
