@@ -7,6 +7,7 @@ import { FormSection } from "@/components/commerce/FormSection";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { FinancialAdjustmentDialog } from "./FinancialAdjustmentDialog";
 import { formatMoney } from "@/lib/currency";
+import { PAYMENT_STATUS_LABELS } from "@/types/orders";
 import { getOrderAdjustments, getOrderFinancials, reverseFinancialAdjustment } from "@/lib/finance";
 import {
   ADJUSTMENT_DIRECTION_LABELS,
@@ -271,7 +272,17 @@ function Block({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
-function Line({ label, value, strong }: { label: string; value: number; strong?: boolean }) {
+function Line({
+  label,
+  value,
+  strong,
+  money = true,
+}: {
+  label: string;
+  value: number;
+  strong?: boolean;
+  money?: boolean;
+}) {
   return (
     <div className="flex items-center justify-between py-0.5 text-[12.5px]">
       <span className="text-muted-foreground">{label}</span>
@@ -280,7 +291,7 @@ function Line({ label, value, strong }: { label: string; value: number; strong?:
           strong ? "font-semibold tabular-nums text-foreground" : "tabular-nums text-foreground"
         }
       >
-        {formatMoney(Number(value))}
+        {money ? formatMoney(Number(value)) : Number(value).toLocaleString()}
       </span>
     </div>
   );
