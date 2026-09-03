@@ -57,6 +57,7 @@ import { Route as AuthenticatedStoresIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedStoresIdRouteImport } from './routes/_authenticated/stores.$id'
 import { Route as AuthenticatedSuppliersIndexRouteImport } from './routes/_authenticated/suppliers.index'
 import { Route as AuthenticatedSuppliersIdRouteImport } from './routes/_authenticated/suppliers.$id'
+import { Route as ApiPublicCourierTrackingWorkerRouteImport } from './routes/api/public/courier-tracking-worker'
 import { Route as ApiPublicSyncWorkerRouteImport } from './routes/api/public/sync-worker'
 import { Route as AuthenticatedAiBrainRunsIdRouteImport } from './routes/_authenticated/ai-brain.runs.$id'
 import { Route as AuthenticatedFinanceCourierSettlementsIdRouteImport } from './routes/_authenticated/finance.courier-settlements_.$id'
@@ -349,6 +350,12 @@ const AuthenticatedSuppliersIdRoute =
     path: '/suppliers/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicCourierTrackingWorkerRoute =
+  ApiPublicCourierTrackingWorkerRouteImport.update({
+    id: '/api/public/courier-tracking-worker',
+    path: '/api/public/courier-tracking-worker',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicSyncWorkerRoute = ApiPublicSyncWorkerRouteImport.update({
   id: '/api/public/sync-worker',
   path: '/api/public/sync-worker',
@@ -488,6 +495,7 @@ export interface FileRoutesByFullPath {
   '/returns/$id': typeof AuthenticatedReturnsIdRoute
   '/stores/$id': typeof AuthenticatedStoresIdRoute
   '/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
+  '/api/public/courier-tracking-worker': typeof ApiPublicCourierTrackingWorkerRoute
   '/api/public/sync-worker': typeof ApiPublicSyncWorkerRoute
   '/ai-brain/': typeof AuthenticatedAiBrainIndexRoute
   '/analytics/': typeof AuthenticatedAnalyticsIndexRoute
@@ -554,6 +562,7 @@ export interface FileRoutesByTo {
   '/returns/$id': typeof AuthenticatedReturnsIdRoute
   '/stores/$id': typeof AuthenticatedStoresIdRoute
   '/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
+  '/api/public/courier-tracking-worker': typeof ApiPublicCourierTrackingWorkerRoute
   '/api/public/sync-worker': typeof ApiPublicSyncWorkerRoute
   '/ai-brain': typeof AuthenticatedAiBrainIndexRoute
   '/analytics': typeof AuthenticatedAnalyticsIndexRoute
@@ -622,6 +631,7 @@ export interface FileRoutesById {
   '/_authenticated/returns_/$id': typeof AuthenticatedReturnsIdRoute
   '/_authenticated/stores/$id': typeof AuthenticatedStoresIdRoute
   '/_authenticated/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
+  '/api/public/courier-tracking-worker': typeof ApiPublicCourierTrackingWorkerRoute
   '/api/public/sync-worker': typeof ApiPublicSyncWorkerRoute
   '/_authenticated/ai-brain/': typeof AuthenticatedAiBrainIndexRoute
   '/_authenticated/analytics/': typeof AuthenticatedAnalyticsIndexRoute
@@ -690,6 +700,7 @@ export interface FileRouteTypes {
     | '/returns/$id'
     | '/stores/$id'
     | '/suppliers/$id'
+    | '/api/public/courier-tracking-worker'
     | '/api/public/sync-worker'
     | '/ai-brain/'
     | '/analytics/'
@@ -756,6 +767,7 @@ export interface FileRouteTypes {
     | '/returns/$id'
     | '/stores/$id'
     | '/suppliers/$id'
+    | '/api/public/courier-tracking-worker'
     | '/api/public/sync-worker'
     | '/ai-brain'
     | '/analytics'
@@ -823,6 +835,7 @@ export interface FileRouteTypes {
     | '/_authenticated/returns_/$id'
     | '/_authenticated/stores/$id'
     | '/_authenticated/suppliers/$id'
+    | '/api/public/courier-tracking-worker'
     | '/api/public/sync-worker'
     | '/_authenticated/ai-brain/'
     | '/_authenticated/analytics/'
@@ -860,6 +873,7 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
+  ApiPublicCourierTrackingWorkerRoute: typeof ApiPublicCourierTrackingWorkerRoute
   ApiPublicSyncWorkerRoute: typeof ApiPublicSyncWorkerRoute
   ApiPublicCouriersProviderWebhookRoute: typeof ApiPublicCouriersProviderWebhookRoute
 }
@@ -1202,6 +1216,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSuppliersIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/courier-tracking-worker': {
+      id: '/api/public/courier-tracking-worker'
+      path: '/api/public/courier-tracking-worker'
+      fullPath: '/api/public/courier-tracking-worker'
+      preLoaderRoute: typeof ApiPublicCourierTrackingWorkerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/sync-worker': {
       id: '/api/public/sync-worker'
       path: '/api/public/sync-worker'
@@ -1468,6 +1489,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
+  ApiPublicCourierTrackingWorkerRoute: ApiPublicCourierTrackingWorkerRoute,
   ApiPublicSyncWorkerRoute: ApiPublicSyncWorkerRoute,
   ApiPublicCouriersProviderWebhookRoute: ApiPublicCouriersProviderWebhookRoute,
 }

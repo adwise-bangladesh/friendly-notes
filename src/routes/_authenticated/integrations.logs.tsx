@@ -23,6 +23,8 @@ import {
   INTEGRATION_ACTIVITY_TONE,
 } from "@/types/integrations";
 import type { IntegrationActivityEntry } from "@/types/integrations";
+import { CourierEventRecovery } from "@/components/shipping/CourierEventRecovery";
+import { useCommercePermissions } from "@/hooks/use-permissions";
 
 const TITLE = "Integration Activity · Commerce Operations";
 const DESCRIPTION =
@@ -47,6 +49,7 @@ function IntegrationLogsPage() {
   const [accountId, setAccountId] = useState<string>("all");
   const [status, setStatus] = useState<string>("all");
   const [page, setPage] = useState(0);
+  const { canManage } = useCommercePermissions();
 
   const accounts = useQuery({
     queryKey: ["integrations", "accounts"],
@@ -120,6 +123,18 @@ function IntegrationLogsPage() {
         title="Integration activity"
         description="Read-only history combining provider API calls and inbound webhook events. Entries are sanitized and cannot be edited."
       />
+
+      <section className="space-y-2 rounded border border-border p-4">
+        <div>
+          <h2 className="text-sm font-medium">Courier events needing attention</h2>
+          <p className="text-[12px] text-muted-foreground">
+            Messages a courier sent that could not be applied yet. Retry re-runs the same
+            authoritative pipeline; replay is a deliberate, recorded reprocessing. An event that was
+            already applied can never be applied twice.
+          </p>
+        </div>
+        <CourierEventRecovery canManage={canManage} />
+      </section>
 
       <div className="flex flex-wrap items-center gap-2">
         <Select

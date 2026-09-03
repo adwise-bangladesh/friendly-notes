@@ -684,13 +684,20 @@ function Page() {
                   >
                     <span className="truncate">
                       {event.provider_event}
-                      <span className="ml-2 text-muted-foreground">{event.processing_status}</span>
+                      <span className="ml-2 text-muted-foreground">
+                        {event.processing_status.replace(/_/g, " ")}
+                        {event.retry_count > 0 ? ` · ${event.retry_count} attempt(s)` : ""}
+                      </span>
                     </span>
                     <span className="shrink-0 text-[11px] text-muted-foreground">
                       {new Date(event.received_at).toLocaleString()}
                     </span>
                   </div>
                 ))}
+                <p className="text-[11px] text-muted-foreground">
+                  Events that could not be applied are retried automatically and can be reviewed on
+                  the integration activity page.
+                </p>
               </div>
             )}
           </FormSection>
