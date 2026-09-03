@@ -71,7 +71,31 @@ export const Route = createFileRoute("/api/public/ops-sweeper")({
         });
         const prunedRuns = prune ? await call("prune_worker_runs") : { ok: true, count: 0 };
 
-        const steps = [staleSyncJobs, courierEventRetries, prunedRuns];
+        // Operational incident detection reuses the existing telemetry and
+        // operational tables; it never mutates business state.
+        let detection: { detected: number; resolved: number; ok: boolean } = {
+          detected: 0,
+          resolved: 0,
+          ok: false,
+        };
+        try {
+          const { data, error } = await client.rpc("detect_operational_alerts");
+          const summary = (data ?? {}) as { detected?: number; resolved?: number };
+          detection = {
+            ok: !error,
+            detected: Number(summary.detected ?? 0),
+            resolved: Number(summary.resolved ?? 0),
+          };
+        } catch {
+          detection = { detected: 0, resolved: 0, ok: false };
+        }
+
+        const steps = [
+          staleSyncJobs,
+          courierEventRetries,
+          prunedRuns,
+          { ok: detection.ok, count: 0 },
+        ];
         const failed = steps.filter((s) => !s.ok).length;
         const processed = steps.reduce((sum, s) => sum + s.count, 0);
 
@@ -87,8 +111,11 @@ export const Route = createFileRoute("/api/public/ops-sweeper")({
           stale_sync_jobs_reclaimed: staleSyncJobs.count,
           courier_events_retried: courierEventRetries.count,
           worker_runs_pruned: prunedRuns.count,
+          alerts_detected: detection.detected,
+          alerts_resolved: detection.resolved,
           failed_steps: failed,
         });
+
       },
     },
   },
