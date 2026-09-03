@@ -122,7 +122,8 @@ function ProductAnalyticsPage() {
           <p className="text-xs text-muted-foreground">
             Revenue and cost come from order line snapshots (order date basis). Returned units are
             accepted returns, and net figures remove them. Variants are grouped into one product row
-            unless a single product is selected.
+            unless a single product is selected. Realized columns count only delivered units (minus accepted
+            returns) and courier charges actually recorded, so they lag behind until couriers report.
           </p>
         </CardHeader>
         <CardContent>
@@ -143,6 +144,12 @@ function ProductAnalyticsPage() {
                   <TableHead className="text-right">Cost</TableHead>
                   <TableHead className="text-right">Est. profit</TableHead>
                   <TableHead className="text-right">Net profit</TableHead>
+                  <TableHead className="text-right">Delivered</TableHead>
+                  <TableHead className="text-right">Lost / damaged</TableHead>
+                  <TableHead className="text-right">Realized revenue</TableHead>
+                  <TableHead className="text-right">Courier cost</TableHead>
+                  <TableHead className="text-right">Realized profit</TableHead>
+                  <TableHead className="text-right">Margin est / real</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -179,6 +186,25 @@ function ProductAnalyticsPage() {
                     </TableCell>
                     <TableCell className="text-right tabular-nums">
                       {formatMoney(row.net_estimated_profit)}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {row.units_delivered}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {row.units_lost} / {row.units_damaged}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {formatMoney(row.realized_revenue)}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {formatMoney(row.courier_cost)}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {formatMoney(row.realized_profit)}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums text-muted-foreground">
+                      {row.estimated_margin === null ? "—" : `${row.estimated_margin}%`} /{" "}
+                      {row.realized_margin === null ? "—" : `${row.realized_margin}%`}
                     </TableCell>
                   </TableRow>
                 ))}

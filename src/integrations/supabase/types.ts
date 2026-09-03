@@ -928,6 +928,13 @@ export type Database = {
             foreignKeyName: "courier_api_logs_shipment_id_fkey"
             columns: ["shipment_id"]
             isOneToOne: false
+            referencedRelation: "shipment_profit_rollup"
+            referencedColumns: ["shipment_id"]
+          },
+          {
+            foreignKeyName: "courier_api_logs_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
             referencedRelation: "shipments"
             referencedColumns: ["id"]
           },
@@ -1058,6 +1065,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "courier_providers"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_provider_events_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipment_profit_rollup"
+            referencedColumns: ["shipment_id"]
           },
           {
             foreignKeyName: "courier_provider_events_shipment_id_fkey"
@@ -1229,6 +1243,13 @@ export type Database = {
             foreignKeyName: "courier_settlement_discrepancies_shipment_id_fkey"
             columns: ["shipment_id"]
             isOneToOne: false
+            referencedRelation: "shipment_profit_rollup"
+            referencedColumns: ["shipment_id"]
+          },
+          {
+            foreignKeyName: "courier_settlement_discrepancies_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
             referencedRelation: "shipments"
             referencedColumns: ["id"]
           },
@@ -1322,6 +1343,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "courier_settlements"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_settlement_items_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipment_profit_rollup"
+            referencedColumns: ["shipment_id"]
           },
           {
             foreignKeyName: "courier_settlement_items_shipment_id_fkey"
@@ -1574,6 +1602,13 @@ export type Database = {
             foreignKeyName: "courier_statement_rows_shipment_id_fkey"
             columns: ["shipment_id"]
             isOneToOne: false
+            referencedRelation: "shipment_profit_rollup"
+            referencedColumns: ["shipment_id"]
+          },
+          {
+            foreignKeyName: "courier_statement_rows_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
             referencedRelation: "shipments"
             referencedColumns: ["id"]
           },
@@ -1665,6 +1700,13 @@ export type Database = {
           worker_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "courier_tracking_polls_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: true
+            referencedRelation: "shipment_profit_rollup"
+            referencedColumns: ["shipment_id"]
+          },
           {
             foreignKeyName: "courier_tracking_polls_shipment_id_fkey"
             columns: ["shipment_id"]
@@ -2711,6 +2753,13 @@ export type Database = {
             foreignKeyName: "order_financial_adjustments_shipment_id_fkey"
             columns: ["shipment_id"]
             isOneToOne: false
+            referencedRelation: "shipment_profit_rollup"
+            referencedColumns: ["shipment_id"]
+          },
+          {
+            foreignKeyName: "order_financial_adjustments_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
             referencedRelation: "shipments"
             referencedColumns: ["id"]
           },
@@ -3313,6 +3362,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_returns_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipment_profit_rollup"
+            referencedColumns: ["shipment_id"]
           },
           {
             foreignKeyName: "order_returns_shipment_id_fkey"
@@ -4764,6 +4820,13 @@ export type Database = {
             foreignKeyName: "shipment_events_shipment_id_fkey"
             columns: ["shipment_id"]
             isOneToOne: false
+            referencedRelation: "shipment_profit_rollup"
+            referencedColumns: ["shipment_id"]
+          },
+          {
+            foreignKeyName: "shipment_events_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
             referencedRelation: "shipments"
             referencedColumns: ["id"]
           },
@@ -4849,6 +4912,13 @@ export type Database = {
             foreignKeyName: "shipment_exceptions_shipment_id_fkey"
             columns: ["shipment_id"]
             isOneToOne: false
+            referencedRelation: "shipment_profit_rollup"
+            referencedColumns: ["shipment_id"]
+          },
+          {
+            foreignKeyName: "shipment_exceptions_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
             referencedRelation: "shipments"
             referencedColumns: ["id"]
           },
@@ -4905,6 +4975,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "order_items"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipment_items_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipment_profit_rollup"
+            referencedColumns: ["shipment_id"]
           },
           {
             foreignKeyName: "shipment_items_shipment_id_fkey"
@@ -5716,6 +5793,86 @@ export type Database = {
           },
         ]
       }
+      shipment_profit_rollup: {
+        Row: {
+          accepted_return_units: number | null
+          actual_delivery_fee: number | null
+          cod_fee: number | null
+          collected_amount: number | null
+          consumed_line_cost: number | null
+          cost_snapshot_complete: boolean | null
+          courier_account_id: string | null
+          created_at: string | null
+          damaged_units: number | null
+          declared_return_units: number | null
+          delivered_at: string | null
+          delivered_line_value: number | null
+          delivered_share: number | null
+          delivered_units: number | null
+          expected_cod: number | null
+          expected_delivery_fee: number | null
+          lost_units: number | null
+          open_discrepancies: number | null
+          order_id: string | null
+          order_number: string | null
+          other_courier_charge: number | null
+          provider_id: string | null
+          received_return_units: number | null
+          recovered_line_cost: number | null
+          refused_units: number | null
+          return_charge: number | null
+          returned_line_value: number | null
+          settlement_finalized: boolean | null
+          settlement_has_actuals: boolean | null
+          settlement_status: string | null
+          shipment_adjustment: number | null
+          shipment_id: string | null
+          shipment_number: string | null
+          shipment_status: string | null
+          shipped_line_cost: number | null
+          shipped_line_value: number | null
+          shipped_share: number | null
+          shipped_units: number | null
+          store_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_courier_account_id_fkey"
+            columns: ["courier_account_id"]
+            isOneToOne: false
+            referencedRelation: "courier_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "shipments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "courier_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       activate_sales_channel_account: {
@@ -6148,6 +6305,8 @@ export type Database = {
         }
         Returns: {
           cost_snapshot_complete: boolean
+          courier_cost: number
+          estimated_margin: number
           estimated_profit: number
           net_estimated_profit: number
           net_revenue: number
@@ -6155,15 +6314,28 @@ export type Database = {
           product_cost: number
           product_id: string
           product_name: string
+          realized_margin: number
+          realized_product_cost: number
+          realized_profit: number
+          realized_revenue: number
+          return_loss: number
           returned_value: number
           revenue: number
           sku: string
+          units_damaged: number
+          units_delivered: number
+          units_lost: number
           units_ordered: number
+          units_refused: number
           units_returned: number
           variant_id: string
           variant_name: string
           variants_grouped: boolean
         }[]
+      }
+      analytics_profitability: {
+        Args: { _from: string; _store_id?: string; _to: string }
+        Returns: Json
       }
       analytics_purchased_products: {
         Args: { _from: string; _limit?: number; _to: string }
@@ -7834,6 +8006,7 @@ export type Database = {
         Args: { _order_id: string }
         Returns: boolean
       }
+      order_profitability: { Args: { _order_id: string }; Returns: Json }
       order_quick_view: { Args: { _order_id: string }; Returns: Json }
       order_settlement_discrepancy_summary: {
         Args: { _order_id: string }
@@ -9939,6 +10112,7 @@ export type Database = {
           variant_name: string
         }[]
       }
+      shipment_profitability: { Args: { _shipment_id: string }; Returns: Json }
       shipment_transition_valid: {
         Args: {
           _from: Database["public"]["Enums"]["shipment_status"]

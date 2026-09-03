@@ -18,6 +18,7 @@ import type {
   SupplierSpendRow,
   TopCustomerRow,
 } from "@/types/analytics";
+import type { ProfitabilitySummary } from "@/types/finance";
 
 /**
  * Analytics data access.
@@ -214,4 +215,16 @@ export function formatPercent(value: number | null | undefined): string {
 export function formatNumber(value: number | null | undefined): string {
   if (value === null || value === undefined) return "—";
   return new Intl.NumberFormat("en-US").format(value);
+}
+
+/**
+ * Estimated vs realized profit for the period. Estimated uses the frozen
+ * order-line snapshots; realized uses money actually collected and courier
+ * charges actually recorded, so the two never share a source.
+ */
+export function getProfitability(range: DateRange, storeId?: string | null) {
+  return rpc<ProfitabilitySummary>("analytics_profitability", {
+    ...args(range),
+    _store_id: storeId ?? null,
+  });
 }

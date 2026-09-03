@@ -162,6 +162,21 @@ export interface ProductPerformanceRow {
   cost_snapshot_complete: boolean;
   /** True when variants of a product are aggregated into one row. */
   variants_grouped: boolean;
+  /* Realized figures, from per-item delivery outcomes and courier money. */
+  units_delivered: number;
+  units_refused: number;
+  units_lost: number;
+  units_damaged: number;
+  /** Delivered units minus accepted returns, at the frozen line price. */
+  realized_revenue: number;
+  /** Delivered + lost + damaged units minus cost recovered by accepted returns. */
+  realized_product_cost: number;
+  realized_profit: number;
+  /** Courier charges attributed to these lines by shipped value share. */
+  courier_cost: number;
+  return_loss: number;
+  estimated_margin: number | null;
+  realized_margin: number | null;
 }
 
 export interface AnalyticsInventory {

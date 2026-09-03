@@ -1,0 +1,1 @@
+ALTER VIEW public.shipment_profit_rollup SET (security_invoker = on);
