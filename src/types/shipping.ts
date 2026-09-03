@@ -109,7 +109,8 @@ export const SHIPMENT_STATUS_MEANINGS: Record<ShipmentStatus, string> = {
   delivery_failed: "A delivery attempt failed. This does not create a return by itself.",
   return_requested: "The shipment is entering the return-to-sender process.",
   return_in_transit: "The package is moving back toward the merchant.",
-  return_received: "The merchant physically received the returned shipment. No restocking yet.",
+  return_received:
+    "The merchant physically received the returned shipment. A return record is open for inspection and restocking.",
   partial_delivered:
     "The customer accepted part of the shipment. The rejected part still needs return handling.",
   pickup_failed: "The courier did not collect the package. The shipment stays operationally active.",

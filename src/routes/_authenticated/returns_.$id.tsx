@@ -367,7 +367,7 @@ function Page() {
                     rows={2}
                     value={inspectionNote}
                     onChange={(event) => setInspectionNote(event.target.value)}
-                    placeholder="Grading decisions. Inventory is not changed by inspection."
+                    placeholder="Grading decisions. Stock is updated when the return is completed."
                   />
                   <Button
                     size="sm"

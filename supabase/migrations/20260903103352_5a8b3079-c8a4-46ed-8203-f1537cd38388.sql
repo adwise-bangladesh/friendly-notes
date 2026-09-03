@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.sync_shipment_return_record() FROM PUBLIC, anon, authenticated;
