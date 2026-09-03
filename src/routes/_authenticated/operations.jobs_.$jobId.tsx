@@ -224,7 +224,7 @@ function JobDetailPage() {
                 job.depends_on_job_id ? (
                   <Link
                     className="font-mono text-[11px] underline"
-                    to="/operations/jobs_/$jobId"
+                    to="/operations/jobs/$jobId"
                     params={{ jobId: job.depends_on_job_id }}
                   >
                     {job.depends_on_job_id}

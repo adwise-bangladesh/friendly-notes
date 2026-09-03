@@ -62,6 +62,7 @@ const TONE: Record<SyncJobStatus, StatusTone> = {
   failed: "danger",
   cancelled: "neutral",
   superseded: "neutral",
+  dead_letter: "danger",
 };
 
 const PAGE_SIZE = 25;
