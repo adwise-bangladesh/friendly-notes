@@ -6269,6 +6269,10 @@ export type Database = {
           product_count: number
         }[]
       }
+      bulk_claim_verification_work: {
+        Args: { _note?: string; _order_ids: string[] }
+        Returns: Json
+      }
       bundle_availability: {
         Args: { _bundle_product_id: string; _location_id?: string }
         Returns: number
@@ -7338,6 +7342,8 @@ export type Database = {
         Args: { _order_id: string }
         Returns: boolean
       }
+      order_quick_view: { Args: { _order_id: string }; Returns: Json }
+      orders_console_list: { Args: { _payload?: Json }; Returns: Json }
       product_store_assignments: {
         Args: { _product_id: string }
         Returns: {
