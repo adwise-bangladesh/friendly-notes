@@ -29,12 +29,12 @@ export async function getStoreCatalog(
 ): Promise<{ rows: StoreCatalogRow[]; total: number }> {
   const { data, error } = await supabase.rpc("store_catalog_list", {
     _store_id: storeId,
-    _search: filters.search?.trim() ? filters.search.trim() : null,
-    _status: filters.status ?? null,
-    _visibility: filters.visibility ?? null,
-    _category_id: filters.categoryId ?? null,
-    _stock: filters.stock ?? null,
-    _channel_id: filters.channelId ?? null,
+    _search: filters.search?.trim() ? filters.search.trim() : undefined,
+    _status: filters.status ?? undefined,
+    _visibility: filters.visibility ?? undefined,
+    _category_id: filters.categoryId ?? undefined,
+    _stock: filters.stock ?? undefined,
+    _channel_id: filters.channelId ?? undefined,
     _limit: filters.limit ?? 50,
     _offset: filters.offset ?? 0,
   });
@@ -133,8 +133,8 @@ export async function addProductToStore(input: {
   const { data, error } = await supabase.rpc("add_product_to_store", {
     _store_id: input.storeId,
     _product_id: input.productId,
-    _selling_price: input.sellingPrice ?? null,
-    _store_sku: input.storeSku ?? null,
+    _selling_price: input.sellingPrice ?? undefined,
+    _store_sku: input.storeSku ?? undefined,
   });
   if (error) throw error;
   return data as unknown as StoreProduct;
@@ -165,7 +165,7 @@ export async function setStoreProductPrice(
   const { data, error } = await supabase.rpc("set_store_product_price", {
     _id: id,
     _price: price,
-    _reason: reason ?? null,
+    _reason: reason ?? undefined,
   });
   if (error) throw error;
   return data as unknown as StoreProduct;
@@ -208,7 +208,7 @@ export async function setChannelListingStatus(
   const { data, error } = await supabase.rpc("set_channel_listing_status", {
     _listing_id: listingId,
     _status: status,
-    _message: message ?? null,
+    _message: message ?? undefined,
   });
   if (error) throw error;
   return data as unknown as ChannelListing;
