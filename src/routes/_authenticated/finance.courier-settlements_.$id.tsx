@@ -388,8 +388,11 @@ function SettlementRow({
         )}
       </td>
       <td className="px-2 py-1.5 text-muted-foreground">{item.shipment?.shipment_number ?? "—"}</td>
-      <td className="px-2 py-1.5 text-right tabular-nums">
+      <td className="px-2 py-1.5 text-right tabular-nums" title={item.eligibility_reason ?? ""}>
         {formatMoney(Number(item.expected_collected_amount))}
+      </td>
+      <td className="px-2 py-1.5 text-right tabular-nums text-muted-foreground">
+        {formatMoney(Number(item.expected_net_amount ?? 0))}
       </td>
       {cell(collected, setCollected)}
       {cell(delivery, setDelivery)}
