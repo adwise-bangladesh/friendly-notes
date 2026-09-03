@@ -8986,6 +8986,7 @@ export type Database = {
         }
       }
       recover_stale_sync_job: { Args: { _job_id: string }; Returns: Json }
+      recovery_readiness_check: { Args: never; Returns: Json }
       refresh_order_delivery_status: {
         Args: { _order_id: string }
         Returns: Database["public"]["Enums"]["order_delivery_status"]
