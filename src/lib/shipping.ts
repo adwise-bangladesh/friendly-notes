@@ -151,8 +151,10 @@ export async function getShipmentById(id: string): Promise<ShipmentWithDetails |
        account:courier_accounts(id, name, code, environment),
        order:orders(id, order_number, status, customer_name, customer_phone, payment_method, grand_total, due_amount),
        fulfillment:order_fulfillments(id, fulfillment_number, status),
-       items:shipment_items(id, shipment_id, order_item_id, fulfillment_item_id, quantity, created_at,
+       items:shipment_items(id, shipment_id, order_item_id, fulfillment_item_id, quantity,
+         delivered_quantity, refused_quantity, lost_quantity, damaged_quantity, created_at,
          order_item:order_items(product_name, variant_name, sku, sort_order))`,
+
     )
     .eq("id", id)
     .maybeSingle();
@@ -415,4 +417,68 @@ export async function resolveUnknownCourierBooking(args: {
   });
   if (error) throw error;
   return data as unknown as Shipment;
+}
+
+/* ---------- Per-item delivery outcomes ---------- */
+
+export interface DeliveryOutcomeLine {
+  shipmentItemId: string;
+  deliveredQuantity: number;
+  refusedQuantity: number;
+  lostQuantity: number;
+  damagedQuantity: number;
+}
+
+/**
+ * Records the authoritative quantity-level courier outcome for a shipment.
+ *
+ * Quantities are validated and applied inside `record_delivery_outcome`, which
+ * locks the shipment, rejects totals above the shipped quantity, raises the
+ * matching delivery exception and moves the shipment through the existing state
+ * machine. Recording refused or damaged units never restocks inventory — that
+ * still requires the physical return receipt and inspection workflow.
+ */
+export async function recordDeliveryOutcome(args: {
+  shipmentId: string;
+  lines: DeliveryOutcomeLine[];
+  note?: string | null;
+  finalize?: boolean;
+}): Promise<Shipment> {
+  const note = args.note?.trim();
+  const { data, error } = await supabase.rpc("record_delivery_outcome", {
+    _shipment_id: args.shipmentId,
+    _items: args.lines.map((l) => ({
+      shipment_item_id: l.shipmentItemId,
+      delivered_quantity: l.deliveredQuantity,
+      refused_quantity: l.refusedQuantity,
+      lost_quantity: l.lostQuantity,
+      damaged_quantity: l.damagedQuantity,
+    })),
+    ...(note ? { _note: note } : {}),
+    _finalize: args.finalize ?? true,
+  });
+  if (error) throw error;
+  return data as unknown as Shipment;
+}
+
+export interface ExpectedReturnLine {
+  order_item_id: string;
+  product_name: string;
+  variant_name: string | null;
+  sku: string | null;
+  refused_quantity: number;
+  damaged_quantity: number;
+  suggested_quantity: number;
+  returnable_quantity: number;
+}
+
+/** Units the courier says are coming back. Nothing is restocked by reading this. */
+export async function getShipmentExpectedReturnItems(
+  shipmentId: string,
+): Promise<ExpectedReturnLine[]> {
+  const { data, error } = await supabase.rpc("shipment_expected_return_items", {
+    _shipment_id: shipmentId,
+  });
+  if (error) throw error;
+  return (data ?? []) as ExpectedReturnLine[];
 }

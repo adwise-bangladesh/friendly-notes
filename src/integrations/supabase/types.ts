@@ -4574,26 +4574,38 @@ export type Database = {
       shipment_items: {
         Row: {
           created_at: string
+          damaged_quantity: number
+          delivered_quantity: number
           fulfillment_item_id: string | null
           id: string
+          lost_quantity: number
           order_item_id: string
           quantity: number
+          refused_quantity: number
           shipment_id: string
         }
         Insert: {
           created_at?: string
+          damaged_quantity?: number
+          delivered_quantity?: number
           fulfillment_item_id?: string | null
           id?: string
+          lost_quantity?: number
           order_item_id: string
           quantity: number
+          refused_quantity?: number
           shipment_id: string
         }
         Update: {
           created_at?: string
+          damaged_quantity?: number
+          delivered_quantity?: number
           fulfillment_item_id?: string | null
           id?: string
+          lost_quantity?: number
           order_item_id?: string
           quantity?: number
+          refused_quantity?: number
           shipment_id?: string
         }
         Relationships: [
@@ -4643,6 +4655,9 @@ export type Database = {
           delivery_address: string
           delivery_area: string | null
           delivery_city: string | null
+          delivery_outcome_fingerprint: string | null
+          delivery_outcome_recorded_at: string | null
+          delivery_outcome_recorded_by: string | null
           delivery_zone: string | null
           external_consignment_id: string | null
           failure_reason:
@@ -4710,6 +4725,9 @@ export type Database = {
           delivery_address: string
           delivery_area?: string | null
           delivery_city?: string | null
+          delivery_outcome_fingerprint?: string | null
+          delivery_outcome_recorded_at?: string | null
+          delivery_outcome_recorded_by?: string | null
           delivery_zone?: string | null
           external_consignment_id?: string | null
           failure_reason?:
@@ -4777,6 +4795,9 @@ export type Database = {
           delivery_address?: string
           delivery_area?: string | null
           delivery_city?: string | null
+          delivery_outcome_fingerprint?: string | null
+          delivery_outcome_recorded_at?: string | null
+          delivery_outcome_recorded_by?: string | null
           delivery_zone?: string | null
           external_consignment_id?: string | null
           failure_reason?:
@@ -6139,6 +6160,9 @@ export type Database = {
           delivery_address: string
           delivery_area: string | null
           delivery_city: string | null
+          delivery_outcome_fingerprint: string | null
+          delivery_outcome_recorded_at: string | null
+          delivery_outcome_recorded_by: string | null
           delivery_zone: string | null
           external_consignment_id: string | null
           failure_reason:
@@ -6762,6 +6786,9 @@ export type Database = {
           delivery_address: string
           delivery_area: string | null
           delivery_city: string | null
+          delivery_outcome_fingerprint: string | null
+          delivery_outcome_recorded_at: string | null
+          delivery_outcome_recorded_by: string | null
           delivery_zone: string | null
           external_consignment_id: string | null
           failure_reason:
@@ -7479,6 +7506,9 @@ export type Database = {
           delivery_address: string
           delivery_area: string | null
           delivery_city: string | null
+          delivery_outcome_fingerprint: string | null
+          delivery_outcome_recorded_at: string | null
+          delivery_outcome_recorded_by: string | null
           delivery_zone: string | null
           external_consignment_id: string | null
           failure_reason:
@@ -7560,6 +7590,9 @@ export type Database = {
           delivery_address: string
           delivery_area: string | null
           delivery_city: string | null
+          delivery_outcome_fingerprint: string | null
+          delivery_outcome_recorded_at: string | null
+          delivery_outcome_recorded_by: string | null
           delivery_zone: string | null
           external_consignment_id: string | null
           failure_reason:
@@ -7636,6 +7669,93 @@ export type Database = {
           delivery_address: string
           delivery_area: string | null
           delivery_city: string | null
+          delivery_outcome_fingerprint: string | null
+          delivery_outcome_recorded_at: string | null
+          delivery_outcome_recorded_by: string | null
+          delivery_zone: string | null
+          external_consignment_id: string | null
+          failure_reason:
+            | Database["public"]["Enums"]["shipment_failure_reason"]
+            | null
+          financials_recorded_at: string | null
+          financials_recorded_by: string | null
+          fulfillment_id: string | null
+          hold_reason:
+            | Database["public"]["Enums"]["shipment_hold_reason"]
+            | null
+          id: string
+          internal_notes: string | null
+          last_synced_at: string | null
+          notes: string | null
+          order_id: string
+          other_courier_charge: number | null
+          package_count: number
+          partial_delivery_note: string | null
+          picked_up_at: string | null
+          postal_code: string | null
+          provider_id: string | null
+          provider_recipient_area_id: string | null
+          provider_recipient_city_id: string | null
+          provider_recipient_zone_id: string | null
+          provider_reference: string | null
+          provider_status: string | null
+          provider_status_at: string | null
+          provider_status_slug: string | null
+          quoted_delivery_fee: number | null
+          recipient_name: string
+          recipient_phone: string
+          return_charge: number | null
+          return_reason: string | null
+          return_tracking_number: string | null
+          service_type:
+            | Database["public"]["Enums"]["courier_service_type"]
+            | null
+          shipment_number: string
+          status: Database["public"]["Enums"]["shipment_status"]
+          tracking_number: string | null
+          updated_at: string
+          updated_by: string | null
+          weight: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shipments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      record_delivery_outcome: {
+        Args: {
+          _finalize?: boolean
+          _items: Json
+          _note?: string
+          _shipment_id: string
+        }
+        Returns: {
+          actual_delivery_fee: number | null
+          booked_at: string | null
+          booked_delivery_fee: number | null
+          booking_attempt_count: number
+          booking_attempt_started_at: string | null
+          booking_idempotency_key: string
+          booking_last_error: string | null
+          booking_outcome_unknown: boolean
+          booking_snapshot: Json | null
+          cancelled_at: string | null
+          cash_on_delivery_amount: number
+          cod_fee: number | null
+          collected_amount: number | null
+          courier_account_id: string | null
+          created_at: string
+          created_by: string | null
+          declared_value: number | null
+          delivered_at: string | null
+          delivery_address: string
+          delivery_area: string | null
+          delivery_city: string | null
+          delivery_outcome_fingerprint: string | null
+          delivery_outcome_recorded_at: string | null
+          delivery_outcome_recorded_by: string | null
           delivery_zone: string | null
           external_consignment_id: string | null
           failure_reason:
@@ -7871,6 +7991,9 @@ export type Database = {
           delivery_address: string
           delivery_area: string | null
           delivery_city: string | null
+          delivery_outcome_fingerprint: string | null
+          delivery_outcome_recorded_at: string | null
+          delivery_outcome_recorded_by: string | null
           delivery_zone: string | null
           external_consignment_id: string | null
           failure_reason:
@@ -8205,6 +8328,9 @@ export type Database = {
           delivery_address: string
           delivery_area: string | null
           delivery_city: string | null
+          delivery_outcome_fingerprint: string | null
+          delivery_outcome_recorded_at: string | null
+          delivery_outcome_recorded_by: string | null
           delivery_zone: string | null
           external_consignment_id: string | null
           failure_reason:
@@ -9073,6 +9199,9 @@ export type Database = {
           delivery_address: string
           delivery_area: string | null
           delivery_city: string | null
+          delivery_outcome_fingerprint: string | null
+          delivery_outcome_recorded_at: string | null
+          delivery_outcome_recorded_by: string | null
           delivery_zone: string | null
           external_consignment_id: string | null
           failure_reason:
@@ -9157,6 +9286,9 @@ export type Database = {
           delivery_address: string
           delivery_area: string | null
           delivery_city: string | null
+          delivery_outcome_fingerprint: string | null
+          delivery_outcome_recorded_at: string | null
+          delivery_outcome_recorded_by: string | null
           delivery_zone: string | null
           external_consignment_id: string | null
           failure_reason:
@@ -9278,6 +9410,19 @@ export type Database = {
           _transfer_id: string
         }
         Returns: undefined
+      }
+      shipment_expected_return_items: {
+        Args: { _shipment_id: string }
+        Returns: {
+          damaged_quantity: number
+          order_item_id: string
+          product_name: string
+          refused_quantity: number
+          returnable_quantity: number
+          sku: string
+          suggested_quantity: number
+          variant_name: string
+        }[]
       }
       shipment_transition_valid: {
         Args: {
@@ -9634,6 +9779,9 @@ export type Database = {
           delivery_address: string
           delivery_area: string | null
           delivery_city: string | null
+          delivery_outcome_fingerprint: string | null
+          delivery_outcome_recorded_at: string | null
+          delivery_outcome_recorded_by: string | null
           delivery_zone: string | null
           external_consignment_id: string | null
           failure_reason:
