@@ -61,7 +61,8 @@ async function call(
       ...(options.body === undefined ? {} : { body: JSON.stringify(options.body) }),
     });
   } catch {
-    throw new SalesChannelError("The store could not be reached");
+    // network/DNS/timeout — worth retrying later
+    throw new SalesChannelError("The store could not be reached", true);
   }
   if (!response.ok) {
     // status only: a provider body can echo credentials or private data
@@ -73,12 +74,18 @@ async function call(
         ? new ExternalMissingError("The product no longer exists on the store")
         : new SalesChannelError("The WooCommerce REST API was not found at this address");
     }
+    if (response.status === 429 || response.status >= 500) {
+      throw new SalesChannelError(
+        `The store is temporarily unavailable (HTTP ${response.status})`,
+        true,
+      );
+    }
     throw new SalesChannelError(`The store returned an error (HTTP ${response.status})`);
   }
   try {
     return (await response.json()) as unknown;
   } catch {
-    throw new SalesChannelError("The store returned a response that could not be read");
+    throw new SalesChannelError("The store returned a response that could not be read", true);
   }
 }
 
@@ -184,10 +191,12 @@ function outcome(raw: unknown, message: string, data?: EffectiveProductData): Pu
 
 function failure(error: unknown): PublishResult {
   const missing = error instanceof ExternalMissingError;
+  const retryable = error instanceof SalesChannelError ? error.retryable : false;
   return {
     ok: false,
     message: error instanceof SalesChannelError ? error.message : "The operation failed on the store",
     ...(missing ? { external_missing: true } : {}),
+    failure_class: missing ? "permanent" : retryable ? "transient" : "permanent",
   };
 }
 

@@ -97,6 +97,11 @@ export interface PublishResult {
   external_missing?: boolean;
   synced_price?: number | null;
   synced_qty?: number | null;
+  /**
+   * How the background engine should treat a failure.
+   * `transient` is retried with backoff, `permanent` stops immediately.
+   */
+  failure_class?: "transient" | "permanent" | "unknown";
 }
 
 export interface SalesChannelAdapter {
@@ -144,8 +149,11 @@ export interface SalesChannelAdapter {
 
 /** Provider failures surface as this — never a raw provider body. */
 export class SalesChannelError extends Error {
-  constructor(message: string) {
+  /** True when retrying the same request later could plausibly succeed. */
+  readonly retryable: boolean;
+  constructor(message: string, retryable = false) {
     super(message);
     this.name = "SalesChannelError";
+    this.retryable = retryable;
   }
 }
