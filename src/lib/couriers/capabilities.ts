@@ -58,7 +58,7 @@ export const COURIER_CAPABILITY_PROFILES: Record<string, CourierProviderCapabili
     integrationLevel: "ready_for_api",
     api: { book: true, status: true, quote: false, locations: false, cancel: false },
     accountRequirements: ["API key", "Secret key"],
-    note: "Booking and consignment status are implemented against the documented merchant API. Steadfast publishes no pricing, area or cancellation endpoints, so those stay manual.",
+    note: "Booking and consignment status are implemented against the documented merchant API. Delivery-status translations are loaded from Steadfast's documented vocabulary but have not been confirmed against a live credentialed account yet — unrecognised statuses are recorded without changing the shipment. Steadfast publishes no pricing, area or cancellation endpoints, so those stay manual.",
   },
   redx: {
     providerKey: "redx",
@@ -67,7 +67,7 @@ export const COURIER_CAPABILITY_PROFILES: Record<string, CourierProviderCapabili
     integrationLevel: "ready_for_api",
     api: { book: true, status: true, quote: false, locations: true, cancel: false },
     accountRequirements: ["API access token"],
-    note: "Parcel creation, tracking and delivery-area lookup are implemented. RedX exposes no public price or cancellation endpoint, so those stay manual.",
+    note: "Parcel creation, tracking and delivery-area lookup are implemented. Tracking-status translations come from RedX's documented vocabulary and are not yet confirmed against a live credentialed account — unrecognised statuses are recorded without changing the shipment. RedX exposes no public price or cancellation endpoint, so those stay manual.",
   },
   paperfly: {
     providerKey: "paperfly",
