@@ -279,17 +279,38 @@ export async function addOrderNote(orderId: string, note: string): Promise<Order
   return data;
 }
 
-/* ---------- Bangladesh phone helpers (deliberately light) ---------- */
+/* ---------- Bangladesh phone helpers ---------- */
 
+/**
+ * Client-side mirror of the database canonicaliser (`canonical_contact_phone`).
+ * The database remains authoritative — this only gives the operator instant
+ * feedback in the form.
+ */
 export function normalisePhone(value: string): string {
   return value.replace(/[^\d+]/g, "");
 }
 
-/** Accepts 01XXXXXXXXX, +8801XXXXXXXXX and 8801XXXXXXXXX. */
+/** Accepts 01XXXXXXXXX, 8801XXXXXXXXX, +8801XXXXXXXXX, 008801XXXXXXXXX. */
 export function isPlausibleBdPhone(value: string): boolean {
   const p = normalisePhone(value);
-  return /^(?:\+?880|0)1[3-9]\d{8}$/.test(p);
+  if (/^\+/.test(p) && !/^\+880/.test(p)) {
+    // legitimate international numbers stay allowed
+    return /^\+\d{8,15}$/.test(p);
+  }
+  const digits = p.replace(/\D/g, "");
+  const local =
+    digits.length === 11 && digits.startsWith("01")
+      ? digits
+      : digits.length === 13 && digits.startsWith("8801")
+        ? digits.slice(2)
+        : digits.length === 15 && digits.startsWith("008801")
+          ? digits.slice(4)
+          : digits.length === 10 && digits.startsWith("1")
+            ? `0${digits}`
+            : digits;
+  return /^01[3-9]\d{8}$/.test(local);
 }
+
 
 /* ---------- Controlled order corrections (Step 20.1 fix) ---------- */
 
@@ -347,4 +368,99 @@ export async function updateOrderAddress(orderId: string, address: OrderAddressI
     _address: address as unknown as Json,
   });
   if (error) throw error;
+}
+
+/* ---------- Controlled pre-operation item editing (Step 20.8.1) ---------- */
+
+/**
+ * Returns a plain-English reason why the order's items can no longer be
+ * edited, or null when a controlled edit is still allowed. The same check runs
+ * again inside `update_order_items`, so this is UX only.
+ */
+export async function getOrderEditBlockReason(orderId: string): Promise<string | null> {
+  const { data, error } = await supabase.rpc("order_edit_block_reason", { _order_id: orderId });
+  if (error) throw error;
+  return (data as string | null) ?? null;
+}
+
+export interface OrderItemEditInput {
+  /** Existing order_items row — omitted for a newly added line. */
+  id?: string | null;
+  productId: string;
+  variantId: string | null;
+  quantity: number;
+  discountAmount: number;
+  /** Authorised price correction. Omitted keeps the existing snapshot price. */
+  unitPrice?: number | null;
+}
+
+export interface UpdateOrderItemsInput {
+  orderId: string;
+  items: OrderItemEditInput[];
+  orderDiscount?: number;
+  shippingCharge?: number;
+  adjustment?: number;
+  reason?: string | null;
+}
+
+/**
+ * The only way to change what an order contains after creation. Every total is
+ * recalculated by the database, reservations are released and rebuilt, and an
+ * append-only system note records the change.
+ */
+export async function updateOrderItems(input: UpdateOrderItemsInput): Promise<Order> {
+  const payload: Record<string, unknown> = {
+    items: input.items.map((i) => ({
+      ...(i.id ? { id: i.id } : {}),
+      product_id: i.productId,
+      variant_id: i.variantId,
+      quantity: i.quantity,
+      discount_amount: i.discountAmount,
+      ...(typeof i.unitPrice === "number" ? { unit_price: i.unitPrice } : {}),
+    })),
+  };
+  if (typeof input.orderDiscount === "number") payload["order_discount"] = input.orderDiscount;
+  if (typeof input.shippingCharge === "number") payload["shipping_charge"] = input.shippingCharge;
+  if (typeof input.adjustment === "number") payload["adjustment"] = input.adjustment;
+  if (input.reason?.trim()) payload["reason"] = input.reason.trim();
+
+  const { data, error } = await supabase.rpc("update_order_items", {
+    _order_id: input.orderId,
+    _payload: payload as unknown as Json,
+  });
+  if (error) throw error;
+  return data as unknown as Order;
+}
+
+/* ---------- Customer intelligence for order surfaces ---------- */
+
+export interface OrderCustomerIntelligence {
+  linked: boolean;
+  customer: { id: string; name: string; primary_phone: string; status: string } | null;
+  metrics: Record<string, number | string | boolean | null> | null;
+  flags: { flag: string; reason: string | null; created_at: string }[];
+  recent_orders: {
+    id: string;
+    order_number: string;
+    status: OrderStatus;
+    delivery_status: DeliveryStatus;
+    verification_status: string;
+    grand_total: number;
+    created_at: string;
+  }[];
+}
+
+/**
+ * Operational history for the customer behind an order: previous orders,
+ * delivery/return behaviour and any active manual flags. Permission checked in
+ * the database; carries no internal cost data.
+ */
+export async function getOrderCustomerIntelligence(
+  orderId: string,
+): Promise<OrderCustomerIntelligence> {
+  const { data, error } = await supabase.rpc("order_customer_intelligence", {
+    _order_id: orderId,
+  });
+  if (error) throw error;
+  return data as unknown as OrderCustomerIntelligence;
 }
