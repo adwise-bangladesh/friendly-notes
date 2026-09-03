@@ -53,11 +53,12 @@ const RISK_LABEL: Record<string, string> = {
 
 function ProductAnalyticsPage() {
   const [preset, setPreset] = useState<DatePresetId>("30d");
+  const [storeId, setStoreId] = useState<string | null>(null);
   const range = useMemo(() => rangeFromPreset(preset), [preset]);
 
   const products = useQuery({
-    queryKey: ["analytics", "products", preset],
-    queryFn: () => getProductPerformance(range, 20),
+    queryKey: ["analytics", "products", preset, storeId],
+    queryFn: () => getProductPerformance(range, 20, storeId),
   });
   const inventory = useQuery({
     queryKey: ["analytics", "inventory"],
@@ -81,14 +82,19 @@ function ProductAnalyticsPage() {
         description="Sales figures use the frozen price and cost snapshots stored on each order line, so history never changes when a product is edited."
       />
 
-      <AnalyticsFilters preset={preset} onPresetChange={setPreset} />
+      <AnalyticsFilters
+        preset={preset}
+        onPresetChange={setPreset}
+        storeId={storeId}
+        onStoreChange={setStoreId}
+      />
 
       {inv ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <MetricCard
             label="Inventory value"
             value={formatMoney(inv.inventory_value)}
-            hint={`${formatNumber(inv.total_on_hand)} units on hand`}
+            hint={`${formatNumber(inv.total_on_hand)} units on hand · valued at current catalog cost`}
           />
           <MetricCard
             label="Available units"
@@ -114,7 +120,9 @@ function ProductAnalyticsPage() {
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-semibold">Product performance</CardTitle>
           <p className="text-xs text-muted-foreground">
-            Revenue and cost come from order line snapshots; returned units are accepted returns.
+            Revenue and cost come from order line snapshots (order date basis). Returned units are
+            accepted returns, and net figures remove them. Variants are grouped into one product row
+            unless a single product is selected.
           </p>
         </CardHeader>
         <CardContent>
@@ -131,13 +139,15 @@ function ProductAnalyticsPage() {
                   <TableHead className="text-right">Units</TableHead>
                   <TableHead className="text-right">Returned</TableHead>
                   <TableHead className="text-right">Revenue</TableHead>
+                  <TableHead className="text-right">Net revenue</TableHead>
                   <TableHead className="text-right">Cost</TableHead>
                   <TableHead className="text-right">Est. profit</TableHead>
+                  <TableHead className="text-right">Net profit</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {(products.data ?? []).map((row) => (
-                  <TableRow key={row.product_id}>
+                  <TableRow key={`${row.product_id}:${row.variant_id ?? "all"}`}>
                     <TableCell>
                       <Link
                         to="/products/$id"
@@ -159,10 +169,16 @@ function ProductAnalyticsPage() {
                       {formatMoney(row.revenue)}
                     </TableCell>
                     <TableCell className="text-right tabular-nums">
+                      {formatMoney(row.net_revenue)}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
                       {formatMoney(row.product_cost)}
                     </TableCell>
                     <TableCell className="text-right tabular-nums">
                       {formatMoney(row.estimated_profit)}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {formatMoney(row.net_estimated_profit)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -221,10 +237,10 @@ function ProductAnalyticsPage() {
 
         <StatList
           title="Stock movement activity"
-          description="Every recorded inventory movement in this period, grouped by movement type."
+          description="Physical movements change stock on hand; logical movements only reserve or release it. Net shows the signed stock change, so reversals cancel out."
           rows={(movements.data ?? []).map((m) => ({
-            label: m.movement_type.replace(/_/g, " "),
-            value: `${formatNumber(m.movements)} · ${formatNumber(m.total_quantity)} units`,
+            label: `${m.movement_type.replace(/_/g, " ")} (${m.category})`,
+            value: `${formatNumber(m.movements)} · ${formatNumber(m.total_quantity)} units · net ${formatNumber(m.net_quantity)}`,
           }))}
         />
       </div>
