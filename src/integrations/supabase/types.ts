@@ -14,21 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      _qa19: {
-        Row: {
-          msg: string | null
-          n: number
-        }
-        Insert: {
-          msg?: string | null
-          n?: number
-        }
-        Update: {
-          msg?: string | null
-          n?: number
-        }
-        Relationships: []
-      }
       ai_analysis_runs: {
         Row: {
           analysis_type: Database["public"]["Enums"]["ai_analysis_type"]
