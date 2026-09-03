@@ -88,7 +88,7 @@ function ProcurementAnalyticsPage() {
               label="Procurement value"
               value={formatMoney(s.procurement_value)}
               change={p ? percentChange(s.procurement_value, p.procurement_value) : null}
-              hint={`${formatNumber(s.purchase_orders_created)} purchase orders`}
+              hint={`${formatNumber(s.purchase_orders_effective)} active purchase orders · cancelled excluded`}
             />
             <MetricCard
               label="Received value"
@@ -98,20 +98,27 @@ function ProcurementAnalyticsPage() {
             <MetricCard
               label="Completion rate"
               value={formatPercent(s.completion_rate)}
-              hint={`${formatNumber(s.purchase_orders_partially_received)} partially received`}
+              hint={`${formatNumber(s.purchase_orders_partially_received)} partially received · of active POs only`}
             />
             <MetricCard
               label="Avg lead time"
               value={s.avg_lead_time_days ? `${s.avg_lead_time_days} days` : "—"}
               hint={`${formatNumber(s.lead_time_sample)} receipts measured`}
             />
-            <MetricCard label="Quantity ordered" value={formatNumber(s.quantity_ordered)} />
+            <MetricCard
+              label="Quantity ordered"
+              value={formatNumber(s.quantity_ordered)}
+              hint={`${formatNumber(s.quantity_outstanding)} still outstanding`}
+            />
             <MetricCard label="Quantity accepted" value={formatNumber(s.quantity_received)} />
             <MetricCard label="Quantity damaged" value={formatNumber(s.quantity_damaged)} invert />
             <MetricCard
               label="Cancelled purchase orders"
               value={formatNumber(s.purchase_orders_cancelled)}
               invert
+              hint={`${formatMoney(s.cancelled_value)} cancelled value · ${formatNumber(
+                s.quantity_cancelled,
+              )} units, excluded above`}
             />
           </div>
 
