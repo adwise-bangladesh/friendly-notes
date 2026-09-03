@@ -48,7 +48,7 @@ export const Route = createFileRoute("/_authenticated/analytics/products")({
 const RISK_LABEL: Record<string, string> = {
   out_of_stock: "Out of stock",
   low_stock: "Low stock",
-  damaged: "Damaged stock",
+  damaged_attention: "Damaged stock",
 };
 
 function ProductAnalyticsPage() {
@@ -215,6 +215,11 @@ function ProductAnalyticsPage() {
                         {row.product_name}
                         {row.variant_name ? (
                           <span className="text-muted-foreground"> · {row.variant_name}</span>
+                        ) : null}
+                        {row.variant_sku ? (
+                          <span className="block text-xs text-muted-foreground">
+                            {row.variant_sku}
+                          </span>
                         ) : null}
                       </TableCell>
                       <TableCell className="text-muted-foreground">{row.location_name}</TableCell>

@@ -6,7 +6,6 @@ import type {
   InventoryLocationInsert,
   InventoryLocationUpdate,
   InventoryMovement,
-  InventoryMovementType,
 } from "@/types/inventory";
 import { toInventoryItem } from "@/types/inventory";
 
