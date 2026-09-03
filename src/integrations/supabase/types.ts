@@ -5875,6 +5875,7 @@ export type Database = {
           risk: string
           threshold: number
           variant_name: string
+          variant_sku: string
         }[]
       }
       analytics_store_guard: { Args: { _store_id: string }; Returns: undefined }
@@ -8056,6 +8057,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      save_product_catalog: {
+        Args: { _payload: Json; _product_id: string }
+        Returns: Json
+      }
       save_purchase_order: { Args: { _payload: Json }; Returns: string }
       save_sales_channel_account: {
         Args: { _payload: Json }
@@ -9334,6 +9339,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      variant_has_history: { Args: { _variant_id: string }; Returns: boolean }
       verification_max_attempts: { Args: never; Returns: number }
       verification_transition_allowed: {
         Args: {
@@ -9823,7 +9829,7 @@ export type Database = {
         | "cancelled"
         | "superseded"
         | "dead_letter"
-      variant_status: "active" | "inactive"
+      variant_status: "active" | "inactive" | "archived"
       verification_attempt_outcome:
         | "pending"
         | "answered"
@@ -10512,7 +10518,7 @@ export const Constants = {
         "superseded",
         "dead_letter",
       ],
-      variant_status: ["active", "inactive"],
+      variant_status: ["active", "inactive", "archived"],
       verification_attempt_outcome: [
         "pending",
         "answered",

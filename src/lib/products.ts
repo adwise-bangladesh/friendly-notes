@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toSlug } from "./commerce";
+import { removeCommerceMedia } from "./media";
 import { variantFromPrice } from "@/types/commerce";
 import type {
   ProductDraft,
@@ -122,6 +123,11 @@ export async function isProductSkuAvailable(sku: string, excludeId?: string): Pr
 
 /* ---------- Save ---------- */
 
+/**
+ * Client-side pre-checks. These are convenience only — the authoritative
+ * validation and the whole write live in the `save_product_catalog` database
+ * function, which applies every change in ONE transaction.
+ */
 function validate(draft: ProductDraft) {
   if (!draft.name.trim()) throw new Error("Product name is required.");
   if (!toSlug(draft.slug || draft.name)) throw new Error("A valid slug is required.");
@@ -159,131 +165,40 @@ function validate(draft: ProductDraft) {
   }
 }
 
-async function syncChildren(productId: string, draft: ProductDraft) {
-  // Categories
-  await supabase.from("product_categories").delete().eq("product_id", productId);
-  if (draft.categories.length) {
-    const { error } = await supabase.from("product_categories").insert(
-      draft.categories.map((c, i) => ({
-        product_id: productId,
-        category_id: c.category_id,
-        is_primary: c.is_primary,
-        sort_order: i,
-      })),
-    );
-    if (error) throw error;
-  }
-
-  // Variants (deleting a variant cascades its variant-level media)
-  await supabase.from("product_variants").delete().eq("product_id", productId);
-
-  // Product-level media
-  await supabase.from("product_media").delete().eq("product_id", productId);
-  if (draft.media.length) {
-    const { error } = await supabase.from("product_media").insert(
-      draft.media.map((m, i) => ({
-        product_id: productId,
-        url: m.url,
-        alt_text: m.alt_text,
-        is_primary: m.is_primary,
-        sort_order: i,
-      })),
-    );
-    if (error) throw error;
-  }
-
-  if (draft.product_type === "variable" && draft.variants.length) {
-    const { data: inserted, error } = await supabase
-      .from("product_variants")
-      .insert(
-        draft.variants.map((v, i) => ({
-          product_id: productId,
-          title: v.title.trim(),
-          sku: v.sku?.trim() || null,
-          barcode: v.barcode?.trim() || null,
-          price: v.price,
-          compare_at_price: v.compare_at_price,
-          base_cost: v.base_cost,
-          additional_cost: v.additional_cost,
-          weight: v.weight,
-          length: v.length,
-          width: v.width,
-          height: v.height,
-          status: v.status,
-          sort_order: i,
-        })),
-      )
-      .select("id, sort_order");
-    if (error) throw error;
-
-    // Variant-specific media, matched back by sort_order.
-    const byOrder = new Map((inserted ?? []).map((r) => [r.sort_order, r.id]));
-    const variantMedia = draft.variants.flatMap((v, i) => {
-      const variantId = byOrder.get(i);
-      if (!variantId) return [];
-      return v.media.map((m, j) => ({
-        variant_id: variantId,
-        product_id: null,
-        url: m.url,
-        alt_text: m.alt_text,
-        is_primary: m.is_primary,
-        sort_order: j,
-      }));
-    });
-    if (variantMedia.length) {
-      const { error: mErr } = await supabase.from("product_media").insert(variantMedia);
-      if (mErr) throw mErr;
-    }
-  }
-
-  // Relationships (outgoing only)
-  await supabase.from("product_relationships").delete().eq("product_id", productId);
-  if (draft.relationships.length) {
-    const { error } = await supabase.from("product_relationships").insert(
-      draft.relationships.map((r, i) => ({
-        product_id: productId,
-        related_product_id: r.related_product_id,
-        relationship_type: r.relationship_type,
-        sort_order: i,
-      })),
-    );
-    if (error) throw error;
-  }
-
-  // Bundle contents
-  await supabase.from("bundle_items").delete().eq("bundle_product_id", productId);
-  if (draft.product_type === "bundle" && draft.bundle_items.length) {
-    const { error } = await supabase.from("bundle_items").insert(
-      draft.bundle_items.map((b, i) => ({
-        bundle_product_id: productId,
-        product_id: b.variant_id ? null : b.product_id,
-        variant_id: b.variant_id,
-        quantity: b.quantity,
-        sort_order: i,
-      })),
-    );
-    if (error) throw error;
-  }
+export interface SaveProductResult {
+  productId: string;
+  /** Variants removed in the editor that were archived because they have history. */
+  archivedVariants: number;
+  deletedVariants: number;
+  /** Storage paths no longer referenced by any media row. */
+  removedMedia: string[];
 }
 
-export async function saveProduct(draft: ProductDraft, id?: string): Promise<string> {
+/**
+ * Saves a product and every child record atomically.
+ *
+ * The payload is handed to `save_product_catalog`, which validates first and
+ * then applies product, categories, variants, media, relationships and bundle
+ * contents inside a single transaction. Variant identity is preserved: a
+ * variant that already exists is UPDATED (its id, stock, ledger, orders and
+ * purchasing history stay attached), a variant removed in the editor is
+ * ARCHIVED when it has history and only physically deleted when it has never
+ * been used.
+ *
+ * Storage objects for media rows that disappeared are removed afterwards
+ * (compensating step — storage is not transactional). A failure there leaves
+ * an unreferenced file, never a broken record.
+ */
+export async function saveProductCatalog(
+  draft: ProductDraft,
+  id?: string,
+): Promise<SaveProductResult> {
   validate(draft);
 
-  const slug = toSlug(draft.slug || draft.name);
-  if (!(await isProductSlugAvailable(slug, id)))
-    throw new Error(`The slug "${slug}" is already in use.`);
-
-  const sku = draft.sku?.trim() || null;
-  if (sku && !(await isProductSkuAvailable(sku, id)))
-    throw new Error(`The SKU "${sku}" is already used by another product.`);
-
-  const { data: userData } = await supabase.auth.getUser();
-  const userId = userData.user?.id ?? null;
-
-  const base = {
+  const payload = {
     name: draft.name.trim(),
-    slug,
-    sku,
+    slug: toSlug(draft.slug || draft.name),
+    sku: draft.sku?.trim() || null,
     barcode: draft.barcode?.trim() || null,
     short_description: draft.short_description?.trim() || null,
     description: draft.description?.trim() || null,
@@ -306,25 +221,90 @@ export async function saveProduct(draft: ProductDraft, id?: string): Promise<str
     height: draft.height,
     dimension_unit: draft.dimension_unit,
     requires_shipping: draft.requires_shipping,
-    updated_by: userId,
+    categories: draft.categories.map((c) => ({
+      category_id: c.category_id,
+      is_primary: c.is_primary,
+    })),
+    media: draft.media.map((m) => ({
+      key: m.key,
+      url: m.url,
+      alt_text: m.alt_text,
+      is_primary: m.is_primary,
+    })),
+    variants: draft.variants.map((v) => ({
+      key: v.key,
+      title: v.title.trim(),
+      sku: v.sku?.trim() || null,
+      barcode: v.barcode?.trim() || null,
+      price: v.price,
+      compare_at_price: v.compare_at_price,
+      base_cost: v.base_cost,
+      additional_cost: v.additional_cost,
+      weight: v.weight,
+      length: v.length,
+      width: v.width,
+      height: v.height,
+      status: v.status,
+      media: v.media.map((m) => ({
+        key: m.key,
+        url: m.url,
+        alt_text: m.alt_text,
+        is_primary: m.is_primary,
+      })),
+    })),
+    relationships: draft.relationships.map((r) => ({
+      related_product_id: r.related_product_id,
+      relationship_type: r.relationship_type,
+    })),
+    bundle_items: draft.bundle_items.map((b) => ({
+      product_id: b.product_id,
+      variant_id: b.variant_id,
+      quantity: b.quantity,
+    })),
   };
 
-  let productId = id;
-  if (productId) {
-    const { error } = await supabase.from("products").update(base).eq("id", productId);
-    if (error) throw error;
-  } else {
-    const { data, error } = await supabase
-      .from("products")
-      .insert({ ...base, created_by: userId })
-      .select("id")
-      .single();
-    if (error) throw error;
-    productId = data.id;
-  }
+  const { data, error } = await supabase.rpc("save_product_catalog", {
+    // The function accepts NULL for "create a new product".
+    _product_id: (id ?? null) as unknown as string,
+    _payload: payload as never,
+  });
+  if (error) throw new Error(friendlySaveError(error.message));
 
-  await syncChildren(productId, draft);
-  return productId;
+  const result = (data ?? {}) as {
+    product_id: string;
+    archived_variants?: number;
+    deleted_variants?: number;
+    removed_media?: string[];
+  };
+
+  const removedMedia = (result.removed_media ?? []).filter(
+    (path) => !!path && !/^https?:\/\//.test(path),
+  );
+  // Compensating cleanup: only paths that no record references any more.
+  await Promise.all(removedMedia.map((path) => removeCommerceMedia(path).catch(() => undefined)));
+
+  return {
+    productId: result.product_id,
+    archivedVariants: result.archived_variants ?? 0,
+    deletedVariants: result.deleted_variants ?? 0,
+    removedMedia,
+  };
+}
+
+/** Keeps raw Postgres noise out of the UI. */
+function friendlySaveError(message: string): string {
+  if (/duplicate key|unique constraint/i.test(message))
+    return "Something in this product is already used by another record. Check the web address, product code and variant codes.";
+  if (/violates foreign key/i.test(message))
+    return "One of the selected records no longer exists. Reload the page and try again.";
+  if (/permission denied|not permitted|permission to manage/i.test(message))
+    return "You do not have permission to manage products.";
+  return message;
+}
+
+/** Back-compatible wrapper: returns the product id. */
+export async function saveProduct(draft: ProductDraft, id?: string): Promise<string> {
+  return (await saveProductCatalog(draft, id)).productId;
 }
 
 /* ---------- Status operations ---------- */

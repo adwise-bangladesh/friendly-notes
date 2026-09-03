@@ -23,6 +23,8 @@ interface Props {
   /** Parent product cost, used to show inherited values. */
   productCost: { base_cost: number; additional_cost: number };
   /** Parent physical values, used to show inherited values. */
+  /** Ids of variants that already exist in the database (identity is stable). */
+  existingKeys?: string[];
   productPhysical: {
     weight: number | null;
     length: number | null;
@@ -46,7 +48,9 @@ export function ProductVariantsEditor({
   disabled,
   productCost,
   productPhysical,
+  existingKeys,
 }: Props) {
+  const existing = new Set(existingKeys ?? []);
   const [expanded, setExpanded] = useState<string | null>(null);
 
   const update = (key: string, patch: Partial<ProductVariantDraft>) =>
@@ -141,6 +145,7 @@ export function ProductVariantsEditor({
                   <SelectContent>
                     <SelectItem value="active">Active</SelectItem>
                     <SelectItem value="inactive">Inactive</SelectItem>
+                    <SelectItem value="archived">Archived</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -151,6 +156,11 @@ export function ProductVariantsEditor({
                   variant="ghost"
                   disabled={disabled}
                   aria-label="Remove variant"
+                  title={
+                    existing.has(v.key)
+                      ? "Remove from this product. A variant with stock or history is archived, never deleted."
+                      : "Remove variant"
+                  }
                   onClick={() => onChange(value.filter((x) => x.key !== v.key))}
                   className="h-8 w-8 text-muted-foreground hover:text-destructive"
                 >
@@ -160,6 +170,14 @@ export function ProductVariantsEditor({
             </div>
 
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span className="rounded border border-border px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                {existing.has(v.key) ? "Saved variant" : "New"}
+              </span>
+              {v.status === "archived" && (
+                <span className="rounded border border-border px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                  Archived
+                </span>
+              )}
               <button
                 type="button"
                 onClick={() => setExpanded(open ? null : v.key)}

@@ -186,13 +186,14 @@ export interface StockRiskRow {
   product_id: string;
   product_name: string;
   variant_name: string | null;
+  variant_sku: string | null;
   location_name: string;
   on_hand: number;
   available: number;
   damaged: number;
   incoming: number;
   threshold: number;
-  risk: "out_of_stock" | "low_stock" | "damaged";
+  risk: "out_of_stock" | "low_stock" | "damaged_attention";
 }
 
 export interface MovementSummaryRow {

@@ -24,7 +24,7 @@ import { ProductRelationshipsEditor } from "./ProductRelationshipsEditor";
 import { BundleContentsEditor } from "./BundleContentsEditor";
 import { GroupBuyCampaigns } from "./GroupBuyCampaigns";
 import { getBrands, getCategories, toSlug } from "@/lib/commerce";
-import { saveProduct, primaryMedia, unpricedVariantCount } from "@/lib/products";
+import { saveProductCatalog, primaryMedia, unpricedVariantCount } from "@/lib/products";
 import { CURRENCY_SYMBOL, formatMoney, parseMoney } from "@/lib/currency";
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import {
@@ -253,14 +253,19 @@ export function ProductEditor({ record }: Props) {
   );
 
   const mutation = useMutation({
-    mutationFn: (next: ProductDraft) => saveProduct(next, record?.id),
-    onSuccess: (id) => {
+    mutationFn: (next: ProductDraft) => saveProductCatalog(next, record?.id),
+    onSuccess: ({ productId: id, archivedVariants }) => {
       setDirty(false);
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["product", id] });
       queryClient.invalidateQueries({ queryKey: ["category-product-counts"] });
       queryClient.invalidateQueries({ queryKey: ["brand-product-counts"] });
-      toast.success(record ? "Product updated" : "Product created");
+      toast.success(record ? "Product updated" : "Product created", {
+        description:
+          archivedVariants > 0
+            ? `${archivedVariants} removed variant${archivedVariants > 1 ? "s were" : " was"} archived because ${archivedVariants > 1 ? "they have" : "it has"} stock or history.`
+            : undefined,
+      });
       if (!record) void navigate({ to: "/products/$id", params: { id } });
     },
     onError: (err) => toast.error(err instanceof Error ? err.message : "Could not save product"),
@@ -637,6 +642,7 @@ export function ProductEditor({ record }: Props) {
                 value={draft.variants}
                 onChange={(v) => set("variants", v)}
                 disabled={readOnly}
+                existingKeys={(record?.product_variants ?? []).map((v) => v.id)}
                 productCost={{
                   base_cost: draft.base_cost,
                   additional_cost: draft.additional_cost,
