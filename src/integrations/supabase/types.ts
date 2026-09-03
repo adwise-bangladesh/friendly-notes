@@ -2519,6 +2519,81 @@ export type Database = {
           },
         ]
       }
+      operational_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          acknowledged_note: string | null
+          category: string
+          created_at: string
+          detail: string
+          detection_count: number
+          entity_id: string | null
+          entity_type: string | null
+          fingerprint: string
+          first_detected_at: string
+          id: string
+          last_detected_at: string
+          metrics: Json
+          peak_severity: string
+          recommended_action: string
+          resolved_at: string | null
+          severity: string
+          signal: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          acknowledged_note?: string | null
+          category: string
+          created_at?: string
+          detail: string
+          detection_count?: number
+          entity_id?: string | null
+          entity_type?: string | null
+          fingerprint: string
+          first_detected_at?: string
+          id?: string
+          last_detected_at?: string
+          metrics?: Json
+          peak_severity: string
+          recommended_action: string
+          resolved_at?: string | null
+          severity: string
+          signal: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          acknowledged_note?: string | null
+          category?: string
+          created_at?: string
+          detail?: string
+          detection_count?: number
+          entity_id?: string | null
+          entity_type?: string | null
+          fingerprint?: string
+          first_detected_at?: string
+          id?: string
+          last_detected_at?: string
+          metrics?: Json
+          peak_severity?: string
+          recommended_action?: string
+          resolved_at?: string | null
+          severity?: string
+          signal?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       operational_assignment_events: {
         Row: {
           actor_id: string | null
@@ -10677,6 +10752,21 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      upsert_operational_alert: {
+        Args: {
+          _category: string
+          _detail: string
+          _entity_id?: string
+          _entity_type?: string
+          _fingerprint: string
+          _metrics?: Json
+          _recommended_action: string
+          _severity: string
+          _signal: string
+          _title: string
+        }
+        Returns: string
       }
       variant_has_history: { Args: { _variant_id: string }; Returns: boolean }
       verification_claim_block_reason: {
