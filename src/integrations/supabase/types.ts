@@ -6004,6 +6004,10 @@ export type Database = {
       }
     }
     Functions: {
+      acknowledge_operational_alert: {
+        Args: { _alert_id: string; _note?: string }
+        Returns: Json
+      }
       activate_sales_channel_account: {
         Args: { _account_id: string }
         Returns: {
@@ -7593,6 +7597,7 @@ export type Database = {
         Args: { _customer_id: string; _limit?: number; _offset?: number }
         Returns: Json
       }
+      detect_operational_alerts: { Args: never; Returns: Json }
       detect_settlement_item_discrepancies: {
         Args: { _item_id: string }
         Returns: number
@@ -8091,6 +8096,7 @@ export type Database = {
       next_stocktake_number: { Args: never; Returns: string }
       next_transfer_number: { Args: never; Returns: string }
       normalize_bd_phone: { Args: { _phone: string }; Returns: string }
+      operational_health_overview: { Args: never; Returns: Json }
       operations_attention_feed: {
         Args: {
           _limit?: number
