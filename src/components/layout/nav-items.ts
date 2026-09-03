@@ -48,6 +48,7 @@ export const NAV_ITEMS: NavItem[] = [
     children: [
       { label: "Command Center", to: "/operations" },
       { label: "My Work", to: "/operations/my-work" },
+      { label: "Background Jobs", to: "/operations/jobs" },
     ],
   },
   {
