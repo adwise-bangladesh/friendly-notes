@@ -27,6 +27,7 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { FormSection } from "@/components/commerce/FormSection";
 import { SettlementDiscrepancies } from "@/components/finance/SettlementDiscrepancies";
+import { StatementImportDialog } from "@/components/finance/StatementImportDialog";
 import { formatMoney } from "@/lib/currency";
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import {
@@ -37,6 +38,7 @@ import {
   removeSettlementItem,
   setSettlementStatus,
 } from "@/lib/finance";
+import { populateSettlement } from "@/lib/settlement-import";
 import {
   SETTLEMENT_STATUS_LABELS,
   SETTLEMENT_STATUS_TONE,
