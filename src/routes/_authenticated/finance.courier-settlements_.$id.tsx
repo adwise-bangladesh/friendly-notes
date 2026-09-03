@@ -281,13 +281,23 @@ function Page() {
       </div>
 
       {canManage && !locked && settlement.account && (
-        <AddShipmentDialog
-          open={addOpen}
-          onOpenChange={setAddOpen}
-          settlementId={id}
-          courierAccountId={settlement.account.id}
-          onAdded={invalidate}
-        />
+        <>
+          <AddShipmentDialog
+            open={addOpen}
+            onOpenChange={setAddOpen}
+            settlementId={id}
+            courierAccountId={settlement.account.id}
+            onAdded={invalidate}
+          />
+          <StatementImportDialog
+            open={importOpen}
+            onOpenChange={setImportOpen}
+            settlementId={id}
+            courierAccountId={settlement.account.id}
+            courierAccountName={settlement.account.name}
+            onApplied={invalidate}
+          />
+        </>
       )}
     </>
   );
