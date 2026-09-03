@@ -52,6 +52,12 @@ export const SYNC_TYPE_LABELS: Record<SyncType, string> = {
   products: "Products",
   customers: "Customers",
   full: "Full",
+  listing_publish: "Publish",
+  listing_update: "Product update",
+  price_sync: "Price sync",
+  stock_sync: "Stock sync",
+  status_refresh: "Status refresh",
+  unpublish: "Unpublish",
 };
 
 export const SYNC_STATUS_LABELS: Record<SyncStatus, string> = {

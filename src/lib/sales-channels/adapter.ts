@@ -54,13 +54,92 @@ export interface SalesChannelCredentials {
   api_version: string;
 }
 
+/**
+ * Product data that the internal system owns and is willing to send outward.
+ * Resolved once, server-side, by `effective_store_product_data` — never
+ * recomputed in the UI or inside an adapter.
+ */
+export interface EffectiveProductData {
+  store_product_id: string;
+  store_id: string;
+  product_id: string;
+  title: string;
+  description: string | null;
+  sku: string | null;
+  price: number;
+  status: string;
+  visibility: string;
+  available_qty: number;
+  is_purchasable: boolean;
+  master_status: string;
+  requires_shipping: boolean;
+  weight: number | null;
+}
+
+/** Outbound operations an adapter may support. Declared, never assumed. */
+export type ChannelCapability =
+  | "connection"
+  | "order_import"
+  | "product_publish"
+  | "product_update"
+  | "price_sync"
+  | "stock_sync"
+  | "status_refresh"
+  | "unpublish";
+
+export interface PublishResult {
+  ok: boolean;
+  /** Sanitised, user-facing. */
+  message: string;
+  external_product_id?: string | null;
+  external_url?: string | null;
+  /** True when the provider no longer has the referenced product. */
+  external_missing?: boolean;
+  synced_price?: number | null;
+  synced_qty?: number | null;
+}
+
 export interface SalesChannelAdapter {
   provider: string;
+  capabilities: ChannelCapability[];
   testConnection(credentials: SalesChannelCredentials): Promise<AdapterTestResult>;
   fetchOrders(
     credentials: SalesChannelCredentials,
     options: { limit: number },
   ): Promise<NormalizedExternalOrder[]>;
+  /** Creates the external product. Must be safe to call only when unmapped. */
+  publishProduct?(
+    credentials: SalesChannelCredentials,
+    data: EffectiveProductData,
+  ): Promise<PublishResult>;
+  updateProduct?(
+    credentials: SalesChannelCredentials,
+    externalId: string,
+    data: EffectiveProductData,
+  ): Promise<PublishResult>;
+  updatePrice?(
+    credentials: SalesChannelCredentials,
+    externalId: string,
+    data: EffectiveProductData,
+  ): Promise<PublishResult>;
+  updateStock?(
+    credentials: SalesChannelCredentials,
+    externalId: string,
+    data: EffectiveProductData,
+  ): Promise<PublishResult>;
+  unpublishProduct?(
+    credentials: SalesChannelCredentials,
+    externalId: string,
+  ): Promise<PublishResult>;
+  refreshProductStatus?(
+    credentials: SalesChannelCredentials,
+    externalId: string,
+  ): Promise<PublishResult>;
+  /** Existing external product with this SKU, used to avoid duplicates. */
+  findProductBySku?(
+    credentials: SalesChannelCredentials,
+    sku: string,
+  ): Promise<{ external_product_id: string; external_url: string | null } | null>;
 }
 
 /** Provider failures surface as this — never a raw provider body. */

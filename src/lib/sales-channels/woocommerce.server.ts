@@ -9,6 +9,8 @@
 
 import type {
   AdapterTestResult,
+  EffectiveProductData,
+  PublishResult,
   NormalizedExternalOrder,
   NormalizedExternalOrderLine,
   SalesChannelAdapter,
@@ -42,6 +44,7 @@ async function call(
   credentials: SalesChannelCredentials,
   path: string,
   params: Record<string, string> = {},
+  options: { method?: string; body?: unknown } = {},
 ): Promise<unknown> {
   const url = new URL(`${baseUrl(credentials)}${path}`);
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
@@ -49,7 +52,13 @@ async function call(
   let response: Response;
   try {
     response = await fetch(url, {
-      headers: { Authorization: authHeader(credentials), Accept: "application/json" },
+      method: options.method ?? "GET",
+      headers: {
+        Authorization: authHeader(credentials),
+        Accept: "application/json",
+        ...(options.body === undefined ? {} : { "Content-Type": "application/json" }),
+      },
+      ...(options.body === undefined ? {} : { body: JSON.stringify(options.body) }),
     });
   } catch {
     throw new SalesChannelError("The store could not be reached");
@@ -60,7 +69,9 @@ async function call(
       throw new SalesChannelError("The store rejected the API credentials");
     }
     if (response.status === 404) {
-      throw new SalesChannelError("The WooCommerce REST API was not found at this address");
+      throw path.startsWith("/products/")
+        ? new ExternalMissingError("The product no longer exists on the store")
+        : new SalesChannelError("The WooCommerce REST API was not found at this address");
     }
     throw new SalesChannelError(`The store returned an error (HTTP ${response.status})`);
   }
@@ -131,8 +142,67 @@ export function normalizeWooOrder(raw: unknown): NormalizedExternalOrder {
   };
 }
 
+/** Raised when the provider says the referenced record is gone. */
+export class ExternalMissingError extends SalesChannelError {
+  constructor(message: string) {
+    super(message);
+    this.name = "ExternalMissingError";
+  }
+}
+
+/**
+ * Fields Commerce Operations owns on the channel. Anything not listed here
+ * (categories, images, SEO, channel-only attributes) is left untouched.
+ */
+function productPayload(data: EffectiveProductData): Record<string, unknown> {
+  const qty = Math.max(0, Math.trunc(data.available_qty));
+  return {
+    name: data.title,
+    type: "simple",
+    regular_price: data.price.toFixed(2),
+    description: data.description ?? "",
+    ...(data.sku ? { sku: data.sku } : {}),
+    status: data.visibility === "visible" && data.status === "active" ? "publish" : "draft",
+    manage_stock: true,
+    stock_quantity: qty,
+    stock_status: qty > 0 ? "instock" : "outofstock",
+  };
+}
+
+function outcome(raw: unknown, message: string, data?: EffectiveProductData): PublishResult {
+  const p = record(raw);
+  return {
+    ok: true,
+    message,
+    external_product_id: str(p["id"]) || null,
+    external_url: str(p["permalink"]) || null,
+    ...(data
+      ? { synced_price: data.price, synced_qty: Math.max(0, Math.trunc(data.available_qty)) }
+      : {}),
+  };
+}
+
+function failure(error: unknown): PublishResult {
+  const missing = error instanceof ExternalMissingError;
+  return {
+    ok: false,
+    message: error instanceof SalesChannelError ? error.message : "The operation failed on the store",
+    ...(missing ? { external_missing: true } : {}),
+  };
+}
+
 export const wooCommerceAdapter: SalesChannelAdapter = {
   provider: "woocommerce",
+  capabilities: [
+    "connection",
+    "order_import",
+    "product_publish",
+    "product_update",
+    "price_sync",
+    "stock_sync",
+    "status_refresh",
+    "unpublish",
+  ],
 
   async testConnection(credentials): Promise<AdapterTestResult> {
     try {
@@ -164,4 +234,101 @@ export const wooCommerceAdapter: SalesChannelAdapter = {
     if (!Array.isArray(data)) throw new SalesChannelError("The store returned an unexpected order list");
     return data.map(normalizeWooOrder).filter((order) => order.external_id !== "");
   },
+};
+
+/* ------------------------------------------------------------------ */
+/* Outbound product operations. Inventory is never mutated here — the  */
+/* quantity sent is the authoritative internal availability, read-only.*/
+/* ------------------------------------------------------------------ */
+
+wooCommerceAdapter.findProductBySku = async (credentials, sku) => {
+  const data = await call(credentials, "/products", { sku, per_page: "1" });
+  if (!Array.isArray(data) || data.length === 0) return null;
+  const p = record(data[0]);
+  const id = str(p["id"]);
+  if (!id) return null;
+  return { external_product_id: id, external_url: str(p["permalink"]) || null };
+};
+
+wooCommerceAdapter.publishProduct = async (credentials, data) => {
+  try {
+    // idempotency at the provider: reuse an existing product with the same SKU
+    if (data.sku) {
+      const existing = await wooCommerceAdapter.findProductBySku!(credentials, data.sku);
+      if (existing) {
+        const updated = await call(credentials, `/products/${existing.external_product_id}`, {}, {
+          method: "PUT",
+          body: productPayload(data),
+        });
+        return outcome(updated, "An existing product with this SKU was reused and updated", data);
+      }
+    }
+    const created = await call(credentials, "/products", {}, { method: "POST", body: productPayload(data) });
+    return outcome(created, "Product published", data);
+  } catch (error) {
+    return failure(error);
+  }
+};
+
+wooCommerceAdapter.updateProduct = async (credentials, externalId, data) => {
+  try {
+    const updated = await call(credentials, `/products/${externalId}`, {}, {
+      method: "PUT",
+      body: productPayload(data),
+    });
+    return outcome(updated, "Product updated on the store", data);
+  } catch (error) {
+    return failure(error);
+  }
+};
+
+wooCommerceAdapter.updatePrice = async (credentials, externalId, data) => {
+  try {
+    const updated = await call(credentials, `/products/${externalId}`, {}, {
+      method: "PUT",
+      body: { regular_price: data.price.toFixed(2) },
+    });
+    return { ...outcome(updated, "Price synchronised", data), synced_qty: null };
+  } catch (error) {
+    return failure(error);
+  }
+};
+
+wooCommerceAdapter.updateStock = async (credentials, externalId, data) => {
+  try {
+    const qty = Math.max(0, Math.trunc(data.available_qty));
+    const updated = await call(credentials, `/products/${externalId}`, {}, {
+      method: "PUT",
+      body: { manage_stock: true, stock_quantity: qty, stock_status: qty > 0 ? "instock" : "outofstock" },
+    });
+    return { ...outcome(updated, "Stock synchronised", data), synced_price: null };
+  } catch (error) {
+    return failure(error);
+  }
+};
+
+wooCommerceAdapter.unpublishProduct = async (credentials, externalId) => {
+  try {
+    const updated = await call(credentials, `/products/${externalId}`, {}, {
+      method: "PUT",
+      body: { status: "draft" },
+    });
+    return outcome(updated, "Product unpublished on the store");
+  } catch (error) {
+    return failure(error);
+  }
+};
+
+wooCommerceAdapter.refreshProductStatus = async (credentials, externalId) => {
+  try {
+    const product = await call(credentials, `/products/${externalId}`);
+    const p = record(product);
+    return {
+      ...outcome(product, `Store status: ${str(p["status"]) || "unknown"}`),
+      synced_qty: p["stock_quantity"] === null ? null : num(p["stock_quantity"]),
+      synced_price: num(p["regular_price"]) || null,
+    };
+  } catch (error) {
+    return failure(error);
+  }
 };

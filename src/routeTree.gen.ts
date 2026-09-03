@@ -68,6 +68,7 @@ import { Route as AuthenticatedProcurementPurchaseOrdersIdRouteImport } from './
 import { Route as AuthenticatedProcurementPurchaseOrdersNewRouteImport } from './routes/_authenticated/procurement.purchase-orders.new'
 import { Route as AuthenticatedStoresIdCatalogRouteImport } from './routes/_authenticated/stores_.$id.catalog'
 import { Route as AuthenticatedStoresIdCatalogStoreProductIdRouteImport } from './routes/_authenticated/stores_.$id.catalog_.$storeProductId'
+import { Route as AuthenticatedStoresIdCatalogListingsRouteImport } from './routes/_authenticated/stores_.$id.catalog_.listings'
 import { Route as ApiPublicCouriersProviderWebhookRouteImport } from './routes/api/public/couriers.$provider.webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -410,6 +411,12 @@ const AuthenticatedStoresIdCatalogStoreProductIdRoute =
     path: '/stores/$id/catalog/$storeProductId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedStoresIdCatalogListingsRoute =
+  AuthenticatedStoresIdCatalogListingsRouteImport.update({
+    id: '/stores_/$id/catalog_/listings',
+    path: '/stores/$id/catalog/listings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicCouriersProviderWebhookRoute =
   ApiPublicCouriersProviderWebhookRouteImport.update({
     id: '/api/public/couriers/$provider/webhook',
@@ -476,6 +483,7 @@ export interface FileRoutesByFullPath {
   '/stores/$id/catalog': typeof AuthenticatedStoresIdCatalogRoute
   '/procurement/purchase-orders/': typeof AuthenticatedProcurementPurchaseOrdersIndexRoute
   '/stores/$id/catalog/$storeProductId': typeof AuthenticatedStoresIdCatalogStoreProductIdRoute
+  '/stores/$id/catalog/listings': typeof AuthenticatedStoresIdCatalogListingsRoute
   '/api/public/couriers/$provider/webhook': typeof ApiPublicCouriersProviderWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -537,6 +545,7 @@ export interface FileRoutesByTo {
   '/stores/$id/catalog': typeof AuthenticatedStoresIdCatalogRoute
   '/procurement/purchase-orders': typeof AuthenticatedProcurementPurchaseOrdersIndexRoute
   '/stores/$id/catalog/$storeProductId': typeof AuthenticatedStoresIdCatalogStoreProductIdRoute
+  '/stores/$id/catalog/listings': typeof AuthenticatedStoresIdCatalogListingsRoute
   '/api/public/couriers/$provider/webhook': typeof ApiPublicCouriersProviderWebhookRoute
 }
 export interface FileRoutesById {
@@ -600,6 +609,7 @@ export interface FileRoutesById {
   '/_authenticated/stores_/$id/catalog': typeof AuthenticatedStoresIdCatalogRoute
   '/_authenticated/procurement/purchase-orders/': typeof AuthenticatedProcurementPurchaseOrdersIndexRoute
   '/_authenticated/stores_/$id/catalog_/$storeProductId': typeof AuthenticatedStoresIdCatalogStoreProductIdRoute
+  '/_authenticated/stores_/$id/catalog_/listings': typeof AuthenticatedStoresIdCatalogListingsRoute
   '/api/public/couriers/$provider/webhook': typeof ApiPublicCouriersProviderWebhookRoute
 }
 export interface FileRouteTypes {
@@ -663,6 +673,7 @@ export interface FileRouteTypes {
     | '/stores/$id/catalog'
     | '/procurement/purchase-orders/'
     | '/stores/$id/catalog/$storeProductId'
+    | '/stores/$id/catalog/listings'
     | '/api/public/couriers/$provider/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -724,6 +735,7 @@ export interface FileRouteTypes {
     | '/stores/$id/catalog'
     | '/procurement/purchase-orders'
     | '/stores/$id/catalog/$storeProductId'
+    | '/stores/$id/catalog/listings'
     | '/api/public/couriers/$provider/webhook'
   id:
     | '__root__'
@@ -786,6 +798,7 @@ export interface FileRouteTypes {
     | '/_authenticated/stores_/$id/catalog'
     | '/_authenticated/procurement/purchase-orders/'
     | '/_authenticated/stores_/$id/catalog_/$storeProductId'
+    | '/_authenticated/stores_/$id/catalog_/listings'
     | '/api/public/couriers/$provider/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -1214,6 +1227,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStoresIdCatalogStoreProductIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/stores_/$id/catalog_/listings': {
+      id: '/_authenticated/stores_/$id/catalog_/listings'
+      path: '/stores/$id/catalog/listings'
+      fullPath: '/stores/$id/catalog/listings'
+      preLoaderRoute: typeof AuthenticatedStoresIdCatalogListingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/couriers/$provider/webhook': {
       id: '/api/public/couriers/$provider/webhook'
       path: '/api/public/couriers/$provider/webhook'
@@ -1278,6 +1298,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedStoresIdCatalogRoute: typeof AuthenticatedStoresIdCatalogRoute
   AuthenticatedProcurementPurchaseOrdersIndexRoute: typeof AuthenticatedProcurementPurchaseOrdersIndexRoute
   AuthenticatedStoresIdCatalogStoreProductIdRoute: typeof AuthenticatedStoresIdCatalogStoreProductIdRoute
+  AuthenticatedStoresIdCatalogListingsRoute: typeof AuthenticatedStoresIdCatalogListingsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -1346,6 +1367,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedProcurementPurchaseOrdersIndexRoute,
   AuthenticatedStoresIdCatalogStoreProductIdRoute:
     AuthenticatedStoresIdCatalogStoreProductIdRoute,
+  AuthenticatedStoresIdCatalogListingsRoute:
+    AuthenticatedStoresIdCatalogListingsRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

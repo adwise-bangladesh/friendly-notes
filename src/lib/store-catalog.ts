@@ -225,3 +225,90 @@ export async function setChannelListingStatus(
   fail(error);
   return data as unknown as ChannelListing;
 }
+
+/* ---------------- publishing & sync reads (Step 17) ---------------- */
+
+export interface ListingReadinessResult {
+  listing_id: string;
+  ready: boolean;
+  blocking: string[];
+  warnings: string[];
+  provider: string;
+  listing_status: ChannelListingStatus;
+  effective_title: string | null;
+  effective_sku: string | null;
+  effective_price: number | null;
+  available_qty: number;
+  external_product_id: string | null;
+}
+
+/** Read-only readiness. Running it as an audited check goes through the server. */
+export async function getListingReadiness(listingId: string): Promise<ListingReadinessResult> {
+  const { data, error } = await supabase.rpc("channel_listing_readiness", {
+    _listing_id: listingId,
+  });
+  fail(error);
+  return data as unknown as ListingReadinessResult;
+}
+
+export interface ChannelListingRow {
+  id: string;
+  store_product_id: string;
+  product_id: string;
+  product_name: string;
+  store_sku: string | null;
+  selling_price: number;
+  store_product_status: string;
+  channel_id: string;
+  channel_name: string;
+  provider: string;
+  channel_status: string;
+  listing_status: ChannelListingStatus;
+  external_product_id: string | null;
+  external_url: string | null;
+  last_synced_at: string | null;
+  last_success_at: string | null;
+  last_sync_error: string | null;
+  available_qty: number;
+  total_count: number;
+}
+
+export interface ChannelListingFilters {
+  search?: string;
+  channelId?: string | null;
+  status?: ChannelListingStatus | null;
+  health?: "healthy" | "failing" | "never_synced" | null;
+  limit?: number;
+  offset?: number;
+}
+
+export async function getStoreChannelListings(
+  storeId: string,
+  filters: ChannelListingFilters = {},
+): Promise<{ rows: ChannelListingRow[]; total: number }> {
+  const search = filters.search?.trim();
+  const { data, error } = await supabase.rpc("store_channel_listings", {
+    _store_id: storeId,
+    ...(search ? { _search: search } : {}),
+    ...(filters.channelId ? { _channel_id: filters.channelId } : {}),
+    ...(filters.status ? { _status: filters.status } : {}),
+    ...(filters.health ? { _health: filters.health } : {}),
+    _limit: filters.limit ?? 50,
+    _offset: filters.offset ?? 0,
+  });
+  if (error) throw error;
+  const rows = (data ?? []) as unknown as ChannelListingRow[];
+  return { rows, total: rows[0]?.total_count ? Number(rows[0].total_count) : 0 };
+}
+
+/** Sync history for one listing (append-only, newest first). */
+export async function getListingSyncRuns(listingId: string) {
+  const { data, error } = await supabase
+    .from("sales_channel_sync_runs")
+    .select("id, sync_type, status, started_at, completed_at, error_summary")
+    .eq("listing_id", listingId)
+    .order("started_at", { ascending: false })
+    .limit(25);
+  if (error) throw error;
+  return data ?? [];
+}
