@@ -99,6 +99,22 @@ function Page() {
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Could not remove"),
   });
 
+  const populateMutation = useMutation({
+    mutationFn: () => populateSettlement(id),
+    onSuccess: (r) => {
+      invalidate();
+      toast.success(
+        `${r.added} shipment(s) added · ${r.already_present} already on this settlement` +
+          (r.skipped_other_settlement > 0
+            ? ` · ${r.skipped_other_settlement} on another settlement`
+            : ""),
+      );
+    },
+    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Could not populate"),
+  });
+
+
+
   if (isLoading) return <LoadingState rows={6} label="Loading settlement" />;
   if (!data) {
     return (
