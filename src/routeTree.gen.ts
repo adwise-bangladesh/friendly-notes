@@ -63,6 +63,7 @@ import { Route as AuthenticatedFinanceCourierSettlementsIdRouteImport } from './
 import { Route as AuthenticatedIntegrationsCouriersIdRouteImport } from './routes/_authenticated/integrations.couriers.$id'
 import { Route as AuthenticatedInventoryStocktakesIdRouteImport } from './routes/_authenticated/inventory.stocktakes_.$id'
 import { Route as AuthenticatedInventoryTransfersIdRouteImport } from './routes/_authenticated/inventory.transfers_.$id'
+import { Route as AuthenticatedOperationsJobsJobIdRouteImport } from './routes/_authenticated/operations.jobs_.$jobId'
 import { Route as AuthenticatedOrdersFulfillmentsIdRouteImport } from './routes/_authenticated/orders.fulfillments.$id'
 import { Route as AuthenticatedOrdersShipmentsIdRouteImport } from './routes/_authenticated/orders.shipments_.$id'
 import { Route as AuthenticatedProcurementPurchaseOrdersIndexRouteImport } from './routes/_authenticated/procurement.purchase-orders.index'
@@ -383,6 +384,12 @@ const AuthenticatedInventoryTransfersIdRoute =
     path: '/inventory/transfers/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedOperationsJobsJobIdRoute =
+  AuthenticatedOperationsJobsJobIdRouteImport.update({
+    id: '/operations/jobs_/$jobId',
+    path: '/operations/jobs/$jobId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOrdersFulfillmentsIdRoute =
   AuthenticatedOrdersFulfillmentsIdRouteImport.update({
     id: '/orders/fulfillments/$id',
@@ -498,6 +505,7 @@ export interface FileRoutesByFullPath {
   '/integrations/couriers/$id': typeof AuthenticatedIntegrationsCouriersIdRoute
   '/inventory/stocktakes/$id': typeof AuthenticatedInventoryStocktakesIdRoute
   '/inventory/transfers/$id': typeof AuthenticatedInventoryTransfersIdRoute
+  '/operations/jobs/$jobId': typeof AuthenticatedOperationsJobsJobIdRoute
   '/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
   '/orders/shipments/$id': typeof AuthenticatedOrdersShipmentsIdRoute
   '/procurement/purchase-orders/$id': typeof AuthenticatedProcurementPurchaseOrdersIdRoute
@@ -563,6 +571,7 @@ export interface FileRoutesByTo {
   '/integrations/couriers/$id': typeof AuthenticatedIntegrationsCouriersIdRoute
   '/inventory/stocktakes/$id': typeof AuthenticatedInventoryStocktakesIdRoute
   '/inventory/transfers/$id': typeof AuthenticatedInventoryTransfersIdRoute
+  '/operations/jobs/$jobId': typeof AuthenticatedOperationsJobsJobIdRoute
   '/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
   '/orders/shipments/$id': typeof AuthenticatedOrdersShipmentsIdRoute
   '/procurement/purchase-orders/$id': typeof AuthenticatedProcurementPurchaseOrdersIdRoute
@@ -630,6 +639,7 @@ export interface FileRoutesById {
   '/_authenticated/integrations/couriers/$id': typeof AuthenticatedIntegrationsCouriersIdRoute
   '/_authenticated/inventory/stocktakes_/$id': typeof AuthenticatedInventoryStocktakesIdRoute
   '/_authenticated/inventory/transfers_/$id': typeof AuthenticatedInventoryTransfersIdRoute
+  '/_authenticated/operations/jobs_/$jobId': typeof AuthenticatedOperationsJobsJobIdRoute
   '/_authenticated/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
   '/_authenticated/orders/shipments_/$id': typeof AuthenticatedOrdersShipmentsIdRoute
   '/_authenticated/procurement/purchase-orders/$id': typeof AuthenticatedProcurementPurchaseOrdersIdRoute
@@ -697,6 +707,7 @@ export interface FileRouteTypes {
     | '/integrations/couriers/$id'
     | '/inventory/stocktakes/$id'
     | '/inventory/transfers/$id'
+    | '/operations/jobs/$jobId'
     | '/orders/fulfillments/$id'
     | '/orders/shipments/$id'
     | '/procurement/purchase-orders/$id'
@@ -762,6 +773,7 @@ export interface FileRouteTypes {
     | '/integrations/couriers/$id'
     | '/inventory/stocktakes/$id'
     | '/inventory/transfers/$id'
+    | '/operations/jobs/$jobId'
     | '/orders/fulfillments/$id'
     | '/orders/shipments/$id'
     | '/procurement/purchase-orders/$id'
@@ -828,6 +840,7 @@ export interface FileRouteTypes {
     | '/_authenticated/integrations/couriers/$id'
     | '/_authenticated/inventory/stocktakes_/$id'
     | '/_authenticated/inventory/transfers_/$id'
+    | '/_authenticated/operations/jobs_/$jobId'
     | '/_authenticated/orders/fulfillments/$id'
     | '/_authenticated/orders/shipments_/$id'
     | '/_authenticated/procurement/purchase-orders/$id'
@@ -1231,6 +1244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInventoryTransfersIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/operations/jobs_/$jobId': {
+      id: '/_authenticated/operations/jobs_/$jobId'
+      path: '/operations/jobs/$jobId'
+      fullPath: '/operations/jobs/$jobId'
+      preLoaderRoute: typeof AuthenticatedOperationsJobsJobIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/orders/fulfillments/$id': {
       id: '/_authenticated/orders/fulfillments/$id'
       path: '/orders/fulfillments/$id'
@@ -1352,6 +1372,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIntegrationsCouriersIdRoute: typeof AuthenticatedIntegrationsCouriersIdRoute
   AuthenticatedInventoryStocktakesIdRoute: typeof AuthenticatedInventoryStocktakesIdRoute
   AuthenticatedInventoryTransfersIdRoute: typeof AuthenticatedInventoryTransfersIdRoute
+  AuthenticatedOperationsJobsJobIdRoute: typeof AuthenticatedOperationsJobsJobIdRoute
   AuthenticatedOrdersFulfillmentsIdRoute: typeof AuthenticatedOrdersFulfillmentsIdRoute
   AuthenticatedOrdersShipmentsIdRoute: typeof AuthenticatedOrdersShipmentsIdRoute
   AuthenticatedProcurementPurchaseOrdersIdRoute: typeof AuthenticatedProcurementPurchaseOrdersIdRoute
@@ -1418,6 +1439,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedInventoryStocktakesIdRoute,
   AuthenticatedInventoryTransfersIdRoute:
     AuthenticatedInventoryTransfersIdRoute,
+  AuthenticatedOperationsJobsJobIdRoute: AuthenticatedOperationsJobsJobIdRoute,
   AuthenticatedOrdersFulfillmentsIdRoute:
     AuthenticatedOrdersFulfillmentsIdRoute,
   AuthenticatedOrdersShipmentsIdRoute: AuthenticatedOrdersShipmentsIdRoute,
