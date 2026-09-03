@@ -112,7 +112,7 @@ export const ERROR_CATEGORY_LABELS: Record<string, string> = {
   lease_conflict: "Locked by another run",
   retry_exhausted: "Retries exhausted",
   unknown_outcome: "Outcome unknown",
-  internal: "Unclassified",
+  internal: "Internal error",
 };
 
 export const FAILURE_STAGE_LABELS: Record<string, string> = {
