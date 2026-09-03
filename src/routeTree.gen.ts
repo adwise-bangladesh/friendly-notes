@@ -58,6 +58,7 @@ import { Route as AuthenticatedStoresIdRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSuppliersIndexRouteImport } from './routes/_authenticated/suppliers.index'
 import { Route as AuthenticatedSuppliersIdRouteImport } from './routes/_authenticated/suppliers.$id'
 import { Route as ApiPublicCourierTrackingWorkerRouteImport } from './routes/api/public/courier-tracking-worker'
+import { Route as ApiPublicOpsSweeperRouteImport } from './routes/api/public/ops-sweeper'
 import { Route as ApiPublicSyncWorkerRouteImport } from './routes/api/public/sync-worker'
 import { Route as AuthenticatedAiBrainRunsIdRouteImport } from './routes/_authenticated/ai-brain.runs.$id'
 import { Route as AuthenticatedFinanceCourierSettlementsIdRouteImport } from './routes/_authenticated/finance.courier-settlements_.$id'
@@ -356,6 +357,11 @@ const ApiPublicCourierTrackingWorkerRoute =
     path: '/api/public/courier-tracking-worker',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicOpsSweeperRoute = ApiPublicOpsSweeperRouteImport.update({
+  id: '/api/public/ops-sweeper',
+  path: '/api/public/ops-sweeper',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSyncWorkerRoute = ApiPublicSyncWorkerRouteImport.update({
   id: '/api/public/sync-worker',
   path: '/api/public/sync-worker',
@@ -496,6 +502,7 @@ export interface FileRoutesByFullPath {
   '/stores/$id': typeof AuthenticatedStoresIdRoute
   '/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
   '/api/public/courier-tracking-worker': typeof ApiPublicCourierTrackingWorkerRoute
+  '/api/public/ops-sweeper': typeof ApiPublicOpsSweeperRoute
   '/api/public/sync-worker': typeof ApiPublicSyncWorkerRoute
   '/ai-brain/': typeof AuthenticatedAiBrainIndexRoute
   '/analytics/': typeof AuthenticatedAnalyticsIndexRoute
@@ -563,6 +570,7 @@ export interface FileRoutesByTo {
   '/stores/$id': typeof AuthenticatedStoresIdRoute
   '/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
   '/api/public/courier-tracking-worker': typeof ApiPublicCourierTrackingWorkerRoute
+  '/api/public/ops-sweeper': typeof ApiPublicOpsSweeperRoute
   '/api/public/sync-worker': typeof ApiPublicSyncWorkerRoute
   '/ai-brain': typeof AuthenticatedAiBrainIndexRoute
   '/analytics': typeof AuthenticatedAnalyticsIndexRoute
@@ -632,6 +640,7 @@ export interface FileRoutesById {
   '/_authenticated/stores/$id': typeof AuthenticatedStoresIdRoute
   '/_authenticated/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
   '/api/public/courier-tracking-worker': typeof ApiPublicCourierTrackingWorkerRoute
+  '/api/public/ops-sweeper': typeof ApiPublicOpsSweeperRoute
   '/api/public/sync-worker': typeof ApiPublicSyncWorkerRoute
   '/_authenticated/ai-brain/': typeof AuthenticatedAiBrainIndexRoute
   '/_authenticated/analytics/': typeof AuthenticatedAnalyticsIndexRoute
@@ -701,6 +710,7 @@ export interface FileRouteTypes {
     | '/stores/$id'
     | '/suppliers/$id'
     | '/api/public/courier-tracking-worker'
+    | '/api/public/ops-sweeper'
     | '/api/public/sync-worker'
     | '/ai-brain/'
     | '/analytics/'
@@ -768,6 +778,7 @@ export interface FileRouteTypes {
     | '/stores/$id'
     | '/suppliers/$id'
     | '/api/public/courier-tracking-worker'
+    | '/api/public/ops-sweeper'
     | '/api/public/sync-worker'
     | '/ai-brain'
     | '/analytics'
@@ -836,6 +847,7 @@ export interface FileRouteTypes {
     | '/_authenticated/stores/$id'
     | '/_authenticated/suppliers/$id'
     | '/api/public/courier-tracking-worker'
+    | '/api/public/ops-sweeper'
     | '/api/public/sync-worker'
     | '/_authenticated/ai-brain/'
     | '/_authenticated/analytics/'
@@ -874,6 +886,7 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicCourierTrackingWorkerRoute: typeof ApiPublicCourierTrackingWorkerRoute
+  ApiPublicOpsSweeperRoute: typeof ApiPublicOpsSweeperRoute
   ApiPublicSyncWorkerRoute: typeof ApiPublicSyncWorkerRoute
   ApiPublicCouriersProviderWebhookRoute: typeof ApiPublicCouriersProviderWebhookRoute
 }
@@ -1223,6 +1236,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCourierTrackingWorkerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/ops-sweeper': {
+      id: '/api/public/ops-sweeper'
+      path: '/api/public/ops-sweeper'
+      fullPath: '/api/public/ops-sweeper'
+      preLoaderRoute: typeof ApiPublicOpsSweeperRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/sync-worker': {
       id: '/api/public/sync-worker'
       path: '/api/public/sync-worker'
@@ -1490,6 +1510,7 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicCourierTrackingWorkerRoute: ApiPublicCourierTrackingWorkerRoute,
+  ApiPublicOpsSweeperRoute: ApiPublicOpsSweeperRoute,
   ApiPublicSyncWorkerRoute: ApiPublicSyncWorkerRoute,
   ApiPublicCouriersProviderWebhookRoute: ApiPublicCouriersProviderWebhookRoute,
 }
