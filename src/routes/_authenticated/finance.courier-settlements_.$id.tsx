@@ -153,9 +153,29 @@ function Page() {
               </Link>
             </Button>
             {canManage && !locked && (
-              <Button variant="outline" size="sm" className="h-8" onClick={() => setAddOpen(true)}>
-                <Plus className="mr-1 h-3.5 w-3.5" /> Add shipment
-              </Button>
+              <>
+                <Button variant="outline" size="sm" className="h-8" onClick={() => setAddOpen(true)}>
+                  <Plus className="mr-1 h-3.5 w-3.5" /> Add shipment
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8"
+                  disabled={populateMutation.isPending}
+                  onClick={() => populateMutation.mutate()}
+                >
+                  <Wand2 className="mr-1 h-3.5 w-3.5" />
+                  {populateMutation.isPending ? "Adding…" : "Populate eligible"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8"
+                  onClick={() => setImportOpen(true)}
+                >
+                  <FileSpreadsheet className="mr-1 h-3.5 w-3.5" /> Import statement
+                </Button>
+              </>
             )}
             {isAdmin && !locked && (
               <>
