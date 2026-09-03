@@ -306,17 +306,26 @@ export async function isOrderOperationallyLocked(orderId: string): Promise<boole
   return Boolean(data);
 }
 
+/**
+ * Corrects the customer identity on an order.
+ *
+ * The database refuses to point an order at a blocked customer and requires a
+ * reason whenever the correction moves the order to a different customer
+ * record — a typo fix on the same customer needs no reason.
+ */
 export async function updateOrderCustomer(args: {
   orderId: string;
   name: string;
   phone: string;
   email?: string | null;
+  reason?: string | null;
 }): Promise<Order> {
   const { data, error } = await supabase.rpc("update_order_customer", {
     _order_id: args.orderId,
     _customer_name: args.name,
     _customer_phone: args.phone,
     ...(args.email ? { _customer_email: args.email } : {}),
+    ...(args.reason ? { _reason: args.reason } : {}),
   });
   if (error) throw error;
   return data as unknown as Order;

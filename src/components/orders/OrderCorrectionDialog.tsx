@@ -39,6 +39,7 @@ export function OrderCorrectionDialog({
   const [name, setName] = useState(order.customer_name);
   const [phone, setPhone] = useState(order.customer_phone);
   const [email, setEmail] = useState(order.customer_email ?? "");
+  const [reason, setReason] = useState("");
 
   const [recipient, setRecipient] = useState(address?.recipient_name ?? order.customer_name);
   const [addrPhone, setAddrPhone] = useState(address?.phone ?? order.customer_phone);
@@ -51,7 +52,13 @@ export function OrderCorrectionDialog({
   const mutation = useMutation({
     mutationFn: async () => {
       if (mode === "customer") {
-        await updateOrderCustomer({ orderId: order.id, name, phone, email: email || null });
+        await updateOrderCustomer({
+          orderId: order.id,
+          name,
+          phone,
+          email: email || null,
+          reason: reason || null,
+        });
         return;
       }
       await updateOrderAddress(order.id, {
@@ -90,6 +97,11 @@ export function OrderCorrectionDialog({
             <Field label="Name" value={name} onChange={setName} />
             <Field label="Phone" value={phone} onChange={setPhone} />
             <Field label="Email" value={email} onChange={setEmail} />
+            <Field label="Correction reason" value={reason} onChange={setReason} />
+            <p className="text-[11.5px] text-muted-foreground">
+              A reason is required only when the correction moves this order to a different
+              customer record. An order can never be moved to a blocked customer.
+            </p>
           </div>
         ) : (
           <div className="space-y-3">

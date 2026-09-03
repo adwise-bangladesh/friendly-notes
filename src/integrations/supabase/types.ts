@@ -1509,6 +1509,7 @@ export type Database = {
           external_reference: string | null
           id: string
           internal_id: string
+          payload_fingerprint: string | null
           sales_channel_account_id: string
           updated_at: string
         }
@@ -1519,6 +1520,7 @@ export type Database = {
           external_reference?: string | null
           id?: string
           internal_id: string
+          payload_fingerprint?: string | null
           sales_channel_account_id: string
           updated_at?: string
         }
@@ -1529,6 +1531,7 @@ export type Database = {
           external_reference?: string | null
           id?: string
           internal_id?: string
+          payload_fingerprint?: string | null
           sales_channel_account_id?: string
           updated_at?: string
         }
@@ -3962,6 +3965,39 @@ export type Database = {
           },
         ]
       }
+      role_change_events: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          id: string
+          reason: string | null
+          role_from: Database["public"]["Enums"]["app_role"] | null
+          role_to: Database["public"]["Enums"]["app_role"] | null
+          target_user_id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          reason?: string | null
+          role_from?: Database["public"]["Enums"]["app_role"] | null
+          role_to?: Database["public"]["Enums"]["app_role"] | null
+          target_user_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          reason?: string | null
+          role_from?: Database["public"]["Enums"]["app_role"] | null
+          role_to?: Database["public"]["Enums"]["app_role"] | null
+          target_user_id?: string
+        }
+        Relationships: []
+      }
       sales_channel_accounts: {
         Row: {
           created_at: string
@@ -5340,6 +5376,32 @@ export type Database = {
       }
     }
     Functions: {
+      activate_sales_channel_account: {
+        Args: { _account_id: string }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          environment: Database["public"]["Enums"]["sales_channel_environment"]
+          external_store_id: string | null
+          external_store_name: string | null
+          id: string
+          last_error: string | null
+          last_successful_sync_at: string | null
+          last_sync_at: string | null
+          name: string
+          provider: Database["public"]["Enums"]["sales_channel_provider"]
+          status: Database["public"]["Enums"]["sales_channel_status"]
+          store_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sales_channel_accounts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       activate_store_product: {
         Args: { _id: string }
         Returns: {
@@ -5450,6 +5512,28 @@ export type Database = {
           _reason: Database["public"]["Enums"]["inventory_adjustment_reason"]
         }
         Returns: undefined
+      }
+      admin_list_users: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          full_name: string
+          joined_at: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }[]
+      }
+      admin_revoke_user_role: {
+        Args: { _reason?: string; _user_id: string }
+        Returns: Json
+      }
+      admin_set_user_role: {
+        Args: {
+          _reason?: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: Json
       }
       ai_brain_overview: { Args: never; Returns: Json }
       ai_complete_analysis_run: {
@@ -6644,6 +6728,17 @@ export type Database = {
         }
         Returns: string
       }
+      enqueue_listing_sync_result: {
+        Args: {
+          _delay?: string
+          _listing_id: string
+          _operation: Database["public"]["Enums"]["sales_channel_sync_type"]
+          _priority?: number
+          _reference?: string
+          _source?: string
+        }
+        Returns: Json
+      }
       enqueue_sync_for_product: {
         Args: {
           _operation: Database["public"]["Enums"]["sales_channel_sync_type"]
@@ -6715,6 +6810,7 @@ export type Database = {
         Args: { _type: Database["public"]["Enums"]["shipment_exception_type"] }
         Returns: string
       }
+      external_order_fingerprint: { Args: { _payload: Json }; Returns: string }
       finalize_goods_receipt: {
         Args: { _receipt_id: string }
         Returns: undefined
@@ -7843,6 +7939,10 @@ export type Database = {
       reverse_goods_receipt: {
         Args: { _reason: string; _receipt_id: string }
         Returns: undefined
+      }
+      sales_channel_account_readiness: {
+        Args: { _account_id: string }
+        Returns: Json
       }
       sales_channel_credentials_status: {
         Args: { _account_id: string }
@@ -8990,6 +9090,7 @@ export type Database = {
           _customer_name: string
           _customer_phone: string
           _order_id: string
+          _reason?: string
         }
         Returns: {
           adjustment: number
@@ -9165,6 +9266,7 @@ export type Database = {
           external_reference: string | null
           id: string
           internal_id: string
+          payload_fingerprint: string | null
           sales_channel_account_id: string
           updated_at: string
         }
