@@ -30,6 +30,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { getQueueHealth, getSyncJobs } from "@/lib/sync-queue";
 import { processSyncQueueNow } from "@/lib/sync-queue.functions";
 import { WorkerHealthPanel } from "@/components/operations/WorkerHealthPanel";
+import { OperationalAlertsPanel } from "@/components/operations/OperationalAlertsPanel";
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import {
   JOB_TYPE_LABELS,
