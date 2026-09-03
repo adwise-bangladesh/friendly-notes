@@ -68,12 +68,14 @@ export function WorkerHealthPanel() {
     mutationFn: () => sweepFn({ data: {} }),
     onSuccess: (s) => {
       toast.success(
-        `Sweep finished · ${s.staleSyncJobsReclaimed} stale jobs reclaimed, ${s.courierEventsRetried} events retried`,
+        `Sweep finished · ${s.staleSyncJobsReclaimed} stale jobs reclaimed, ${s.courierEventsRetried} events retried, ${s.alertsDetected} incidents detected`,
       );
+      void qc.invalidateQueries({ queryKey: ["operational-health"] });
       refresh();
     },
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "The sweep failed"),
   });
+
 
   const data = health.data;
   const backlog = data?.backlog;

@@ -85,7 +85,10 @@ export const runOpsSweeperNow = createServerFn({ method: "POST" })
 
     const staleSyncJobs = await call("reclaim_stale_sync_jobs");
     const retries = await call("sweep_courier_event_retries", { _limit: 20 });
-    const steps = [staleSyncJobs, retries];
+    // Incident detection runs inside the existing sweep so there is no second
+    // schedule and no second source of truth for operational health.
+    const detection = await admin.rpc("detect_operational_alerts");
+    const steps = [staleSyncJobs, retries, { ok: !detection.error, count: 0 }];
     const failed = steps.filter((s) => !s.ok).length;
 
     await finishWorkerRun(admin, runId, failed > 0 ? "failed" : "succeeded", {
@@ -95,9 +98,14 @@ export const runOpsSweeperNow = createServerFn({ method: "POST" })
       failed,
     });
 
+    const summary = (detection.data ?? {}) as { detected?: number; resolved?: number };
+
     return {
       staleSyncJobsReclaimed: staleSyncJobs.count,
       courierEventsRetried: retries.count,
+      alertsDetected: Number(summary.detected ?? 0),
+      alertsResolved: Number(summary.resolved ?? 0),
       failedSteps: failed,
     };
   });
+
