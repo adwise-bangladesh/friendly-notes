@@ -161,7 +161,13 @@ export interface OrderFinancialSnapshot {
 
 export interface SettlementItemWithContext extends CourierSettlementItem {
   order: { id: string; order_number: string } | null;
-  shipment: { id: string; shipment_number: string; cash_on_delivery_amount: number } | null;
+  shipment: {
+    id: string;
+    shipment_number: string;
+    cash_on_delivery_amount: number;
+    status?: string;
+    external_consignment_id?: string | null;
+  } | null;
 }
 
 export interface SettlementWithContext extends CourierSettlement {
