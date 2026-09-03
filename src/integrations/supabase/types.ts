@@ -2732,6 +2732,7 @@ export type Database = {
           quantity_expected: number
           quantity_received: number
           reason: string | null
+          received_recorded_at: string | null
           return_id: string
           updated_at: string
         }
@@ -2745,6 +2746,7 @@ export type Database = {
           quantity_expected?: number
           quantity_received?: number
           reason?: string | null
+          received_recorded_at?: string | null
           return_id: string
           updated_at?: string
         }
@@ -2758,6 +2760,7 @@ export type Database = {
           quantity_expected?: number
           quantity_received?: number
           reason?: string | null
+          received_recorded_at?: string | null
           return_id?: string
           updated_at?: string
         }
@@ -6542,6 +6545,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      exception_resolution_class: {
+        Args: { _type: Database["public"]["Enums"]["shipment_exception_type"] }
+        Returns: string
+      }
       finalize_goods_receipt: {
         Args: { _receipt_id: string }
         Returns: undefined
@@ -9142,6 +9149,8 @@ export type Database = {
         | "packing"
         | "packed"
         | "ready_for_courier"
+        | "partially_fulfilled"
+        | "fulfilled"
       order_note_type: "general" | "system"
       order_return_status:
         | "pending"
@@ -9792,6 +9801,8 @@ export const Constants = {
         "packing",
         "packed",
         "ready_for_courier",
+        "partially_fulfilled",
+        "fulfilled",
       ],
       order_note_type: ["general", "system"],
       order_return_status: [

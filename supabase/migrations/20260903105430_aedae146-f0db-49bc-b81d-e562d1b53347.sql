@@ -1,0 +1,2 @@
+ALTER TYPE public.order_fulfillment_status ADD VALUE IF NOT EXISTS 'partially_fulfilled' AFTER 'ready_for_courier';
+ALTER TYPE public.order_fulfillment_status ADD VALUE IF NOT EXISTS 'fulfilled' AFTER 'partially_fulfilled';

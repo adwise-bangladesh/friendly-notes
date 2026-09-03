@@ -73,6 +73,8 @@ export const FULFILLMENT_STATUSES: FulfillmentStatus[] = [
   "packing",
   "packed",
   "ready_for_courier",
+  "partially_fulfilled",
+  "fulfilled",
 ];
 
 /** Statuses the warehouse queue works on. */
@@ -95,6 +97,8 @@ export const FULFILLMENT_STATUS_LABELS: Record<FulfillmentStatus, string> = {
   packing: "Packing",
   packed: "Packed",
   ready_for_courier: "Ready for courier",
+  partially_fulfilled: "Partially fulfilled",
+  fulfilled: "Fulfilled",
 };
 
 export const FULFILLMENT_STATUS_MEANINGS: Record<FulfillmentStatus, string> = {
@@ -106,6 +110,10 @@ export const FULFILLMENT_STATUS_MEANINGS: Record<FulfillmentStatus, string> = {
   packing: "Items are being packed.",
   packed: "Items are packed and stock has been permanently deducted.",
   ready_for_courier: "The package is ready to hand over to a courier.",
+  partially_fulfilled:
+    "Warehouse work is finished, but part of the ordered quantity never left the warehouse (shortage).",
+  fulfilled:
+    "Warehouse work is complete: every ordered unit was handed over. Delivery progress is tracked separately.",
 };
 
 export const FULFILLMENT_STATUS_TONE: Record<FulfillmentStatus, StatusTone> = {
@@ -117,7 +125,10 @@ export const FULFILLMENT_STATUS_TONE: Record<FulfillmentStatus, StatusTone> = {
   packing: "info",
   packed: "success",
   ready_for_courier: "success",
+  partially_fulfilled: "warning",
+  fulfilled: "success",
 };
+
 
 /* ---------- Actions (UI affordance only; the database is the authority) ---------- */
 
@@ -200,8 +211,14 @@ export function availableFulfillmentActions(args: {
 
 /** True once stock has permanently left on hand. */
 export function isStockCommitted(fulfillment: FulfillmentStatus): boolean {
-  return fulfillment === "packed" || fulfillment === "ready_for_courier";
+  return (
+    fulfillment === "packed" ||
+    fulfillment === "ready_for_courier" ||
+    fulfillment === "partially_fulfilled" ||
+    fulfillment === "fulfilled"
+  );
 }
+
 
 
 /* ---------- Pick list ---------- */
