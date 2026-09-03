@@ -93,6 +93,9 @@ function Page() {
 
   const [action, setAction] = useState<ShipmentAction | null>(null);
   const [reason, setReason] = useState("");
+  // unknown-booking recovery inputs
+  const [recoveryConsignment, setRecoveryConsignment] = useState("");
+  const [recoveryReason, setRecoveryReason] = useState("");
   const [holdReason, setHoldReason] = useState<ShipmentHoldReason | "">("");
   const [failureReason, setFailureReason] = useState<ShipmentFailureReason | "">("");
   const [tracking, setTracking] = useState("");
