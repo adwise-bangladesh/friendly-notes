@@ -40,6 +40,8 @@ export const ADJUSTMENT_TYPE_LABELS: Record<FinancialAdjustmentType, string> = {
   manual_expense: "Manual expense",
   manual_income: "Manual income",
   settlement_adjustment: "Settlement adjustment",
+  refund: "Customer refund",
+  settlement_shortfall: "Settlement shortfall",
   other: "Other",
 };
 
