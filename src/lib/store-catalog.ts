@@ -20,6 +20,15 @@ import type {
   StoreProductVisibility,
 } from "@/types/store-catalog";
 
+/**
+ * Supabase returns plain objects for database errors, so the friendly message
+ * raised by the controlled operations must be re-thrown as a real Error for
+ * the UI to show it.
+ */
+function fail(error: { message: string } | null): never | void {
+  if (error) throw new Error(error.message);
+}
+
 const LISTING_COLUMNS =
   "id, store_product_id, sales_channel_account_id, external_product_id, external_variant_reference, external_sku, external_url, listing_status, last_synced_at, last_sync_error, created_at, updated_at";
 
@@ -139,7 +148,7 @@ export async function addProductToStore(input: {
       : { _selling_price: input.sellingPrice }),
     ...(input.storeSku ? { _store_sku: input.storeSku } : {}),
   });
-  if (error) throw error;
+  fail(error);
   return data as unknown as StoreProduct;
 }
 
@@ -156,7 +165,7 @@ export async function updateStoreProduct(
     _id: id,
     _payload: payload,
   });
-  if (error) throw error;
+  fail(error);
   return data as unknown as StoreProduct;
 }
 
@@ -170,19 +179,19 @@ export async function setStoreProductPrice(
     _price: price,
     ...(reason ? { _reason: reason } : {}),
   });
-  if (error) throw error;
+  fail(error);
   return data as unknown as StoreProduct;
 }
 
 export async function activateStoreProduct(id: string): Promise<StoreProduct> {
   const { data, error } = await supabase.rpc("activate_store_product", { _id: id });
-  if (error) throw error;
+  fail(error);
   return data as unknown as StoreProduct;
 }
 
 export async function archiveStoreProduct(id: string): Promise<StoreProduct> {
   const { data, error } = await supabase.rpc("archive_store_product", { _id: id });
-  if (error) throw error;
+  fail(error);
   return data as unknown as StoreProduct;
 }
 
@@ -199,7 +208,7 @@ export async function saveChannelListing(input: {
     _account_id: accountId,
     _payload: payload,
   });
-  if (error) throw error;
+  fail(error);
   return data as unknown as ChannelListing;
 }
 
@@ -213,6 +222,6 @@ export async function setChannelListingStatus(
     _status: status,
     ...(message ? { _message: message } : {}),
   });
-  if (error) throw error;
+  fail(error);
   return data as unknown as ChannelListing;
 }
