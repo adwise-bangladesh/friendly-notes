@@ -977,7 +977,12 @@ export type Database = {
           consignment_id: string | null
           fingerprint: string
           id: string
+          last_attempt_at: string | null
+          last_error: string | null
+          last_replay_at: string | null
+          last_replay_by: string | null
           merchant_order_id: string | null
+          next_retry_at: string | null
           payload: Json | null
           processing_note: string | null
           processing_status: Database["public"]["Enums"]["courier_event_processing_status"]
@@ -986,6 +991,8 @@ export type Database = {
           provider_id: string | null
           provider_status: string | null
           received_at: string
+          replay_count: number
+          retry_count: number
           shipment_id: string | null
           source: string
         }
@@ -994,7 +1001,12 @@ export type Database = {
           consignment_id?: string | null
           fingerprint: string
           id?: string
+          last_attempt_at?: string | null
+          last_error?: string | null
+          last_replay_at?: string | null
+          last_replay_by?: string | null
           merchant_order_id?: string | null
+          next_retry_at?: string | null
           payload?: Json | null
           processing_note?: string | null
           processing_status: Database["public"]["Enums"]["courier_event_processing_status"]
@@ -1003,6 +1015,8 @@ export type Database = {
           provider_id?: string | null
           provider_status?: string | null
           received_at?: string
+          replay_count?: number
+          retry_count?: number
           shipment_id?: string | null
           source?: string
         }
@@ -1011,7 +1025,12 @@ export type Database = {
           consignment_id?: string | null
           fingerprint?: string
           id?: string
+          last_attempt_at?: string | null
+          last_error?: string | null
+          last_replay_at?: string | null
+          last_replay_by?: string | null
           merchant_order_id?: string | null
+          next_retry_at?: string | null
           payload?: Json | null
           processing_note?: string | null
           processing_status?: Database["public"]["Enums"]["courier_event_processing_status"]
@@ -1020,6 +1039,8 @@ export type Database = {
           provider_id?: string | null
           provider_status?: string | null
           received_at?: string
+          replay_count?: number
+          retry_count?: number
           shipment_id?: string | null
           source?: string
         }
@@ -1387,6 +1408,56 @@ export type Database = {
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "courier_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courier_tracking_polls: {
+        Row: {
+          attempts: number
+          consecutive_failures: number
+          created_at: string
+          last_error: string | null
+          last_polled_at: string | null
+          lease_token: string | null
+          lease_until: string | null
+          next_poll_at: string
+          shipment_id: string
+          updated_at: string
+          worker_id: string | null
+        }
+        Insert: {
+          attempts?: number
+          consecutive_failures?: number
+          created_at?: string
+          last_error?: string | null
+          last_polled_at?: string | null
+          lease_token?: string | null
+          lease_until?: string | null
+          next_poll_at?: string
+          shipment_id: string
+          updated_at?: string
+          worker_id?: string | null
+        }
+        Update: {
+          attempts?: number
+          consecutive_failures?: number
+          created_at?: string
+          last_error?: string | null
+          last_polled_at?: string | null
+          lease_token?: string | null
+          lease_until?: string | null
+          next_poll_at?: string
+          shipment_id?: string
+          updated_at?: string
+          worker_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_tracking_polls_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: true
+            referencedRelation: "shipments"
             referencedColumns: ["id"]
           },
         ]
@@ -7175,7 +7246,12 @@ export type Database = {
           consignment_id: string | null
           fingerprint: string
           id: string
+          last_attempt_at: string | null
+          last_error: string | null
+          last_replay_at: string | null
+          last_replay_by: string | null
           merchant_order_id: string | null
+          next_retry_at: string | null
           payload: Json | null
           processing_note: string | null
           processing_status: Database["public"]["Enums"]["courier_event_processing_status"]
@@ -7184,6 +7260,8 @@ export type Database = {
           provider_id: string | null
           provider_status: string | null
           received_at: string
+          replay_count: number
+          retry_count: number
           shipment_id: string | null
           source: string
         }
@@ -10006,6 +10084,9 @@ export type Database = {
         | "stale"
         | "unmatched"
         | "rejected"
+        | "received"
+        | "retry_scheduled"
+        | "dead_letter"
       courier_provider_status: "active" | "inactive" | "disabled"
       courier_service_type:
         | "standard"
@@ -10657,6 +10738,9 @@ export const Constants = {
         "stale",
         "unmatched",
         "rejected",
+        "received",
+        "retry_scheduled",
+        "dead_letter",
       ],
       courier_provider_status: ["active", "inactive", "disabled"],
       courier_service_type: [
