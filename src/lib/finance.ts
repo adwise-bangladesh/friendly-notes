@@ -47,10 +47,12 @@ const SETTLEMENT_SELECT = `
 
 const SETTLEMENT_ITEM_SELECT = `
   id, settlement_id, order_id, shipment_id, expected_collected_amount,
+  expected_delivery_fee, expected_cod_fee, expected_return_charge,
+  expected_other_charge, expected_net_amount, eligibility_reason, reconciled_at,
   actual_collected_amount, delivery_charge, cod_charge, return_charge,
   other_charge, net_settlement_amount, created_at, updated_at,
   order:orders(id, order_number),
-  shipment:shipments(id, shipment_number, cash_on_delivery_amount)
+  shipment:shipments(id, shipment_number, cash_on_delivery_amount, status, external_consignment_id)
 `;
 
 /* ---------- Order financials ---------- */

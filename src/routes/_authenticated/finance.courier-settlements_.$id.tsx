@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, FileSpreadsheet, Plus, Trash2, Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,7 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { FormSection } from "@/components/commerce/FormSection";
 import { SettlementDiscrepancies } from "@/components/finance/SettlementDiscrepancies";
+import { StatementImportDialog } from "@/components/finance/StatementImportDialog";
 import { formatMoney } from "@/lib/currency";
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import {
@@ -37,6 +38,7 @@ import {
   removeSettlementItem,
   setSettlementStatus,
 } from "@/lib/finance";
+import { populateSettlement } from "@/lib/settlement-import";
 import {
   SETTLEMENT_STATUS_LABELS,
   SETTLEMENT_STATUS_TONE,
@@ -66,6 +68,7 @@ function Page() {
   const queryClient = useQueryClient();
   const { canManage, canDelete: isAdmin } = useCommercePermissions();
   const [addOpen, setAddOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["courier-settlement", id],
@@ -95,6 +98,22 @@ function Page() {
     },
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Could not remove"),
   });
+
+  const populateMutation = useMutation({
+    mutationFn: () => populateSettlement(id),
+    onSuccess: (r) => {
+      invalidate();
+      toast.success(
+        `${r.added} shipment(s) added · ${r.already_present} already on this settlement` +
+          (r.skipped_other_settlement > 0
+            ? ` · ${r.skipped_other_settlement} on another settlement`
+            : ""),
+      );
+    },
+    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Could not populate"),
+  });
+
+
 
   if (isLoading) return <LoadingState rows={6} label="Loading settlement" />;
   if (!data) {
@@ -134,9 +153,29 @@ function Page() {
               </Link>
             </Button>
             {canManage && !locked && (
-              <Button variant="outline" size="sm" className="h-8" onClick={() => setAddOpen(true)}>
-                <Plus className="mr-1 h-3.5 w-3.5" /> Add shipment
-              </Button>
+              <>
+                <Button variant="outline" size="sm" className="h-8" onClick={() => setAddOpen(true)}>
+                  <Plus className="mr-1 h-3.5 w-3.5" /> Add shipment
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8"
+                  disabled={populateMutation.isPending}
+                  onClick={() => populateMutation.mutate()}
+                >
+                  <Wand2 className="mr-1 h-3.5 w-3.5" />
+                  {populateMutation.isPending ? "Adding…" : "Populate eligible"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8"
+                  onClick={() => setImportOpen(true)}
+                >
+                  <FileSpreadsheet className="mr-1 h-3.5 w-3.5" /> Import statement
+                </Button>
+              </>
             )}
             {isAdmin && !locked && (
               <>
@@ -201,7 +240,8 @@ function Page() {
                 <tr>
                   <th className="px-2 py-1.5 text-left font-medium">Order</th>
                   <th className="px-2 py-1.5 text-left font-medium">Shipment</th>
-                  <th className="px-2 py-1.5 text-right font-medium">Expected</th>
+                  <th className="px-2 py-1.5 text-right font-medium">Expected COD</th>
+                  <th className="px-2 py-1.5 text-right font-medium">Expected net</th>
                   <th className="px-2 py-1.5 text-right font-medium">Collected</th>
                   <th className="px-2 py-1.5 text-right font-medium">Delivery</th>
                   <th className="px-2 py-1.5 text-right font-medium">COD fee</th>
@@ -242,13 +282,23 @@ function Page() {
       </div>
 
       {canManage && !locked && settlement.account && (
-        <AddShipmentDialog
-          open={addOpen}
-          onOpenChange={setAddOpen}
-          settlementId={id}
-          courierAccountId={settlement.account.id}
-          onAdded={invalidate}
-        />
+        <>
+          <AddShipmentDialog
+            open={addOpen}
+            onOpenChange={setAddOpen}
+            settlementId={id}
+            courierAccountId={settlement.account.id}
+            onAdded={invalidate}
+          />
+          <StatementImportDialog
+            open={importOpen}
+            onOpenChange={setImportOpen}
+            settlementId={id}
+            courierAccountId={settlement.account.id}
+            courierAccountName={settlement.account.name}
+            onApplied={invalidate}
+          />
+        </>
       )}
     </>
   );
@@ -338,8 +388,11 @@ function SettlementRow({
         )}
       </td>
       <td className="px-2 py-1.5 text-muted-foreground">{item.shipment?.shipment_number ?? "—"}</td>
-      <td className="px-2 py-1.5 text-right tabular-nums">
+      <td className="px-2 py-1.5 text-right tabular-nums" title={item.eligibility_reason ?? ""}>
         {formatMoney(Number(item.expected_collected_amount))}
+      </td>
+      <td className="px-2 py-1.5 text-right tabular-nums text-muted-foreground">
+        {formatMoney(Number(item.expected_net_amount ?? 0))}
       </td>
       {cell(collected, setCollected)}
       {cell(delivery, setDelivery)}
