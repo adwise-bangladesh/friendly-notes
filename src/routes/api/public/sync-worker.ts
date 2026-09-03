@@ -47,6 +47,7 @@ export const Route = createFileRoute("/api/public/sync-worker")({
               batchSize: Number.isFinite(batch) ? batch : 10,
               leaseSeconds: 120,
               timeBudgetMs: 25_000,
+              workerId: "scheduled",
             },
           );
           return Response.json({

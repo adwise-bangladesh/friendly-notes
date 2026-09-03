@@ -38,6 +38,7 @@ import { Route as AuthenticatedInventoryMovementsRouteImport } from './routes/_a
 import { Route as AuthenticatedInventoryStocktakesRouteImport } from './routes/_authenticated/inventory.stocktakes'
 import { Route as AuthenticatedInventoryTransfersRouteImport } from './routes/_authenticated/inventory.transfers'
 import { Route as AuthenticatedOperationsIndexRouteImport } from './routes/_authenticated/operations.index'
+import { Route as AuthenticatedOperationsJobsRouteImport } from './routes/_authenticated/operations.jobs'
 import { Route as AuthenticatedOperationsMyWorkRouteImport } from './routes/_authenticated/operations.my-work'
 import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenticated/orders.index'
 import { Route as AuthenticatedOrdersIdRouteImport } from './routes/_authenticated/orders.$id'
@@ -62,6 +63,7 @@ import { Route as AuthenticatedFinanceCourierSettlementsIdRouteImport } from './
 import { Route as AuthenticatedIntegrationsCouriersIdRouteImport } from './routes/_authenticated/integrations.couriers.$id'
 import { Route as AuthenticatedInventoryStocktakesIdRouteImport } from './routes/_authenticated/inventory.stocktakes_.$id'
 import { Route as AuthenticatedInventoryTransfersIdRouteImport } from './routes/_authenticated/inventory.transfers_.$id'
+import { Route as AuthenticatedOperationsJobsJobIdRouteImport } from './routes/_authenticated/operations.jobs_.$jobId'
 import { Route as AuthenticatedOrdersFulfillmentsIdRouteImport } from './routes/_authenticated/orders.fulfillments.$id'
 import { Route as AuthenticatedOrdersShipmentsIdRouteImport } from './routes/_authenticated/orders.shipments_.$id'
 import { Route as AuthenticatedProcurementPurchaseOrdersIndexRouteImport } from './routes/_authenticated/procurement.purchase-orders.index'
@@ -238,6 +240,12 @@ const AuthenticatedOperationsIndexRoute =
     path: '/operations/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedOperationsJobsRoute =
+  AuthenticatedOperationsJobsRouteImport.update({
+    id: '/operations/jobs',
+    path: '/operations/jobs',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOperationsMyWorkRoute =
   AuthenticatedOperationsMyWorkRouteImport.update({
     id: '/operations/my-work',
@@ -376,6 +384,12 @@ const AuthenticatedInventoryTransfersIdRoute =
     path: '/inventory/transfers/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedOperationsJobsJobIdRoute =
+  AuthenticatedOperationsJobsJobIdRouteImport.update({
+    id: '/operations/jobs_/$jobId',
+    path: '/operations/jobs/$jobId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOrdersFulfillmentsIdRoute =
   AuthenticatedOrdersFulfillmentsIdRouteImport.update({
     id: '/orders/fulfillments/$id',
@@ -459,6 +473,7 @@ export interface FileRoutesByFullPath {
   '/inventory/movements': typeof AuthenticatedInventoryMovementsRoute
   '/inventory/stocktakes': typeof AuthenticatedInventoryStocktakesRoute
   '/inventory/transfers': typeof AuthenticatedInventoryTransfersRoute
+  '/operations/jobs': typeof AuthenticatedOperationsJobsRoute
   '/operations/my-work': typeof AuthenticatedOperationsMyWorkRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders/exceptions': typeof AuthenticatedOrdersExceptionsRoute
@@ -490,6 +505,7 @@ export interface FileRoutesByFullPath {
   '/integrations/couriers/$id': typeof AuthenticatedIntegrationsCouriersIdRoute
   '/inventory/stocktakes/$id': typeof AuthenticatedInventoryStocktakesIdRoute
   '/inventory/transfers/$id': typeof AuthenticatedInventoryTransfersIdRoute
+  '/operations/jobs/$jobId': typeof AuthenticatedOperationsJobsJobIdRoute
   '/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
   '/orders/shipments/$id': typeof AuthenticatedOrdersShipmentsIdRoute
   '/procurement/purchase-orders/$id': typeof AuthenticatedProcurementPurchaseOrdersIdRoute
@@ -523,6 +539,7 @@ export interface FileRoutesByTo {
   '/inventory/movements': typeof AuthenticatedInventoryMovementsRoute
   '/inventory/stocktakes': typeof AuthenticatedInventoryStocktakesRoute
   '/inventory/transfers': typeof AuthenticatedInventoryTransfersRoute
+  '/operations/jobs': typeof AuthenticatedOperationsJobsRoute
   '/operations/my-work': typeof AuthenticatedOperationsMyWorkRoute
   '/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/orders/exceptions': typeof AuthenticatedOrdersExceptionsRoute
@@ -554,6 +571,7 @@ export interface FileRoutesByTo {
   '/integrations/couriers/$id': typeof AuthenticatedIntegrationsCouriersIdRoute
   '/inventory/stocktakes/$id': typeof AuthenticatedInventoryStocktakesIdRoute
   '/inventory/transfers/$id': typeof AuthenticatedInventoryTransfersIdRoute
+  '/operations/jobs/$jobId': typeof AuthenticatedOperationsJobsJobIdRoute
   '/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
   '/orders/shipments/$id': typeof AuthenticatedOrdersShipmentsIdRoute
   '/procurement/purchase-orders/$id': typeof AuthenticatedProcurementPurchaseOrdersIdRoute
@@ -589,6 +607,7 @@ export interface FileRoutesById {
   '/_authenticated/inventory/movements': typeof AuthenticatedInventoryMovementsRoute
   '/_authenticated/inventory/stocktakes': typeof AuthenticatedInventoryStocktakesRoute
   '/_authenticated/inventory/transfers': typeof AuthenticatedInventoryTransfersRoute
+  '/_authenticated/operations/jobs': typeof AuthenticatedOperationsJobsRoute
   '/_authenticated/operations/my-work': typeof AuthenticatedOperationsMyWorkRoute
   '/_authenticated/orders/$id': typeof AuthenticatedOrdersIdRoute
   '/_authenticated/orders/exceptions': typeof AuthenticatedOrdersExceptionsRoute
@@ -620,6 +639,7 @@ export interface FileRoutesById {
   '/_authenticated/integrations/couriers/$id': typeof AuthenticatedIntegrationsCouriersIdRoute
   '/_authenticated/inventory/stocktakes_/$id': typeof AuthenticatedInventoryStocktakesIdRoute
   '/_authenticated/inventory/transfers_/$id': typeof AuthenticatedInventoryTransfersIdRoute
+  '/_authenticated/operations/jobs_/$jobId': typeof AuthenticatedOperationsJobsJobIdRoute
   '/_authenticated/orders/fulfillments/$id': typeof AuthenticatedOrdersFulfillmentsIdRoute
   '/_authenticated/orders/shipments_/$id': typeof AuthenticatedOrdersShipmentsIdRoute
   '/_authenticated/procurement/purchase-orders/$id': typeof AuthenticatedProcurementPurchaseOrdersIdRoute
@@ -655,6 +675,7 @@ export interface FileRouteTypes {
     | '/inventory/movements'
     | '/inventory/stocktakes'
     | '/inventory/transfers'
+    | '/operations/jobs'
     | '/operations/my-work'
     | '/orders/$id'
     | '/orders/exceptions'
@@ -686,6 +707,7 @@ export interface FileRouteTypes {
     | '/integrations/couriers/$id'
     | '/inventory/stocktakes/$id'
     | '/inventory/transfers/$id'
+    | '/operations/jobs/$jobId'
     | '/orders/fulfillments/$id'
     | '/orders/shipments/$id'
     | '/procurement/purchase-orders/$id'
@@ -719,6 +741,7 @@ export interface FileRouteTypes {
     | '/inventory/movements'
     | '/inventory/stocktakes'
     | '/inventory/transfers'
+    | '/operations/jobs'
     | '/operations/my-work'
     | '/orders/$id'
     | '/orders/exceptions'
@@ -750,6 +773,7 @@ export interface FileRouteTypes {
     | '/integrations/couriers/$id'
     | '/inventory/stocktakes/$id'
     | '/inventory/transfers/$id'
+    | '/operations/jobs/$jobId'
     | '/orders/fulfillments/$id'
     | '/orders/shipments/$id'
     | '/procurement/purchase-orders/$id'
@@ -784,6 +808,7 @@ export interface FileRouteTypes {
     | '/_authenticated/inventory/movements'
     | '/_authenticated/inventory/stocktakes'
     | '/_authenticated/inventory/transfers'
+    | '/_authenticated/operations/jobs'
     | '/_authenticated/operations/my-work'
     | '/_authenticated/orders/$id'
     | '/_authenticated/orders/exceptions'
@@ -815,6 +840,7 @@ export interface FileRouteTypes {
     | '/_authenticated/integrations/couriers/$id'
     | '/_authenticated/inventory/stocktakes_/$id'
     | '/_authenticated/inventory/transfers_/$id'
+    | '/_authenticated/operations/jobs_/$jobId'
     | '/_authenticated/orders/fulfillments/$id'
     | '/_authenticated/orders/shipments_/$id'
     | '/_authenticated/procurement/purchase-orders/$id'
@@ -1043,6 +1069,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOperationsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/operations/jobs': {
+      id: '/_authenticated/operations/jobs'
+      path: '/operations/jobs'
+      fullPath: '/operations/jobs'
+      preLoaderRoute: typeof AuthenticatedOperationsJobsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/operations/my-work': {
       id: '/_authenticated/operations/my-work'
       path: '/operations/my-work'
@@ -1211,6 +1244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInventoryTransfersIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/operations/jobs_/$jobId': {
+      id: '/_authenticated/operations/jobs_/$jobId'
+      path: '/operations/jobs/$jobId'
+      fullPath: '/operations/jobs/$jobId'
+      preLoaderRoute: typeof AuthenticatedOperationsJobsJobIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/orders/fulfillments/$id': {
       id: '/_authenticated/orders/fulfillments/$id'
       path: '/orders/fulfillments/$id'
@@ -1301,6 +1341,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInventoryMovementsRoute: typeof AuthenticatedInventoryMovementsRoute
   AuthenticatedInventoryStocktakesRoute: typeof AuthenticatedInventoryStocktakesRoute
   AuthenticatedInventoryTransfersRoute: typeof AuthenticatedInventoryTransfersRoute
+  AuthenticatedOperationsJobsRoute: typeof AuthenticatedOperationsJobsRoute
   AuthenticatedOperationsMyWorkRoute: typeof AuthenticatedOperationsMyWorkRoute
   AuthenticatedOrdersIdRoute: typeof AuthenticatedOrdersIdRoute
   AuthenticatedOrdersExceptionsRoute: typeof AuthenticatedOrdersExceptionsRoute
@@ -1331,6 +1372,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIntegrationsCouriersIdRoute: typeof AuthenticatedIntegrationsCouriersIdRoute
   AuthenticatedInventoryStocktakesIdRoute: typeof AuthenticatedInventoryStocktakesIdRoute
   AuthenticatedInventoryTransfersIdRoute: typeof AuthenticatedInventoryTransfersIdRoute
+  AuthenticatedOperationsJobsJobIdRoute: typeof AuthenticatedOperationsJobsJobIdRoute
   AuthenticatedOrdersFulfillmentsIdRoute: typeof AuthenticatedOrdersFulfillmentsIdRoute
   AuthenticatedOrdersShipmentsIdRoute: typeof AuthenticatedOrdersShipmentsIdRoute
   AuthenticatedProcurementPurchaseOrdersIdRoute: typeof AuthenticatedProcurementPurchaseOrdersIdRoute
@@ -1362,6 +1404,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedInventoryMovementsRoute: AuthenticatedInventoryMovementsRoute,
   AuthenticatedInventoryStocktakesRoute: AuthenticatedInventoryStocktakesRoute,
   AuthenticatedInventoryTransfersRoute: AuthenticatedInventoryTransfersRoute,
+  AuthenticatedOperationsJobsRoute: AuthenticatedOperationsJobsRoute,
   AuthenticatedOperationsMyWorkRoute: AuthenticatedOperationsMyWorkRoute,
   AuthenticatedOrdersIdRoute: AuthenticatedOrdersIdRoute,
   AuthenticatedOrdersExceptionsRoute: AuthenticatedOrdersExceptionsRoute,
@@ -1396,6 +1439,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedInventoryStocktakesIdRoute,
   AuthenticatedInventoryTransfersIdRoute:
     AuthenticatedInventoryTransfersIdRoute,
+  AuthenticatedOperationsJobsJobIdRoute: AuthenticatedOperationsJobsJobIdRoute,
   AuthenticatedOrdersFulfillmentsIdRoute:
     AuthenticatedOrdersFulfillmentsIdRoute,
   AuthenticatedOrdersShipmentsIdRoute: AuthenticatedOrdersShipmentsIdRoute,

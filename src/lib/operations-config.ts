@@ -24,6 +24,12 @@ export const OPERATION_ATTENTION_CONFIG = {
   purchase_order_overdue_days: 3,
   /** Low-stock fallback when an inventory level has no explicit threshold. */
   low_stock_default: 5,
+  /** A queued job waiting longer than this is overdue. Default 2h. */
+  job_waiting_hours: 2,
+  /** Retry count at which repeated transient failures warrant a warning. */
+  job_retry_warning_attempts: 2,
+  /** Queue depth that counts as a backlog. */
+  job_backlog_warning: 25,
   /** Hard cap on derived items fetched per load. */
   feed_limit: 500,
 } as const;

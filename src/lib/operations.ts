@@ -34,7 +34,22 @@ export async function getAttentionFeed(): Promise<OperationAttention[]> {
     _limit: OPERATION_ATTENTION_CONFIG.feed_limit,
   });
   if (error) throw error;
-  return (data ?? []) as unknown as OperationAttention[];
+
+  // Background job reliability is derived from the authoritative job rows by
+  // `background_jobs_attention`, then merged into the single feed so counters
+  // and lists stay consistent with the rest of the Command Center.
+  const { data: jobItems, error: jobError } = await supabase.rpc("background_jobs_attention", {
+    _stale_wait_hours: OPERATION_ATTENTION_CONFIG.job_waiting_hours,
+    _retry_warning_attempts: OPERATION_ATTENTION_CONFIG.job_retry_warning_attempts,
+    _backlog_warning: OPERATION_ATTENTION_CONFIG.job_backlog_warning,
+    _limit: OPERATION_ATTENTION_CONFIG.feed_limit,
+  });
+  if (jobError) throw jobError;
+
+  return [
+    ...((data ?? []) as unknown as OperationAttention[]),
+    ...((jobItems ?? []) as unknown as OperationAttention[]),
+  ];
 }
 
 export async function getRecentOperationalActivity(
@@ -73,6 +88,7 @@ export function computeCounters(items: OperationAttention[]): AttentionCounters 
     return: 0,
     inventory: 0,
     procurement: 0,
+    integration: 0,
   } as Record<OperationCategory, number>;
 
   let critical = 0;

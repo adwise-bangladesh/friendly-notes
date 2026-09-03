@@ -5,7 +5,8 @@ export type OperationCategory =
   | "delivery_exception"
   | "return"
   | "inventory"
-  | "procurement";
+  | "procurement"
+  | "integration";
 
 export type OperationSeverity = "info" | "warning" | "high" | "critical";
 
@@ -98,6 +99,7 @@ export const OPERATION_CATEGORY_LABELS: Record<OperationCategory, string> = {
   return: "Returns",
   inventory: "Inventory",
   procurement: "Procurement",
+  integration: "Integrations & jobs",
 };
 
 export const OPERATION_CATEGORIES: OperationCategory[] = [
@@ -108,6 +110,7 @@ export const OPERATION_CATEGORIES: OperationCategory[] = [
   "return",
   "inventory",
   "procurement",
+  "integration",
 ];
 
 export const OPERATION_SEVERITIES: OperationSeverity[] = ["critical", "high", "warning", "info"];

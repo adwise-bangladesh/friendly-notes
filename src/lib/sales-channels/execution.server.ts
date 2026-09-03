@@ -17,7 +17,12 @@ import type { EffectiveProductData, PublishResult } from "./adapter";
 import { OPERATION_CAPABILITY } from "./capabilities";
 import type { ListingOperation } from "./capabilities";
 
-export type FailureClass = "transient" | "permanent" | "unknown";
+export type FailureClass =
+  | "transient"
+  | "permanent"
+  | "rate_limited"
+  | "authentication"
+  | "unknown";
 
 export interface RpcClient {
   rpc: (
@@ -34,6 +39,8 @@ export interface ExecutionResult {
   externalProductId: string | null;
   externalMissing: boolean;
   failureClass: FailureClass | null;
+  /** Provider-requested earliest retry time, when the failure was rate limiting. */
+  retryAfter: string | null;
 }
 
 function safeMessage(error: unknown): string {
@@ -85,6 +92,7 @@ export async function executeListingOperation(
       externalProductId: listing.external_product_id,
       externalMissing: false,
       failureClass: "permanent",
+      retryAfter: null,
     };
   }
 
@@ -104,6 +112,7 @@ export async function executeListingOperation(
         externalProductId: listing.external_product_id,
         externalMissing: false,
         failureClass: "permanent",
+        retryAfter: null,
       };
     }
   }
@@ -122,6 +131,7 @@ export async function executeListingOperation(
       externalProductId: listing.external_product_id,
       externalMissing: false,
       failureClass: classifyControlError(beginError.message),
+      retryAfter: null,
     };
   }
   const runId = (begun as { run_id: string }).run_id;
@@ -159,7 +169,10 @@ export async function executeListingOperation(
     result = {
       ok: false,
       message: safeMessage(error),
-      failure_class: error instanceof SalesChannelError && error.retryable ? "transient" : "permanent",
+      failure_class: error instanceof SalesChannelError ? error.failureClass : "unknown",
+      ...(error instanceof SalesChannelError && error.retryAfter
+        ? { retry_after: error.retryAfter }
+        : {}),
     };
   }
 
@@ -205,5 +218,6 @@ export async function executeListingOperation(
     externalProductId: row.external_product_id,
     externalMissing: result.external_missing ?? false,
     failureClass: result.ok ? null : (result.failure_class ?? "unknown"),
+    retryAfter: result.retry_after ?? null,
   };
 }

@@ -67,17 +67,40 @@ async function call(
   if (!response.ok) {
     // status only: a provider body can echo credentials or private data
     if (response.status === 401 || response.status === 403) {
-      throw new SalesChannelError("The store rejected the API credentials");
+      throw new SalesChannelError(
+        "The store rejected the API credentials",
+        false,
+        "authentication",
+      );
     }
     if (response.status === 404) {
       throw path.startsWith("/products/")
         ? new ExternalMissingError("The product no longer exists on the store")
         : new SalesChannelError("The WooCommerce REST API was not found at this address");
     }
-    if (response.status === 429 || response.status >= 500) {
+    if (response.status === 429) {
+      // provider-aware delay: Retry-After is seconds or an HTTP date
+      const header = response.headers.get("retry-after");
+      let retryAfter: string | null = null;
+      if (header) {
+        const seconds = Number.parseInt(header, 10);
+        const at = Number.isFinite(seconds)
+          ? new Date(Date.now() + Math.min(Math.max(seconds, 1), 3600) * 1000)
+          : new Date(header);
+        if (!Number.isNaN(at.getTime())) retryAfter = at.toISOString();
+      }
+      throw new SalesChannelError(
+        "The store is rate limiting our requests",
+        true,
+        "rate_limited",
+        retryAfter,
+      );
+    }
+    if (response.status >= 500) {
       throw new SalesChannelError(
         `The store is temporarily unavailable (HTTP ${response.status})`,
         true,
+        "transient",
       );
     }
     throw new SalesChannelError(`The store returned an error (HTTP ${response.status})`);
@@ -191,12 +214,13 @@ function outcome(raw: unknown, message: string, data?: EffectiveProductData): Pu
 
 function failure(error: unknown): PublishResult {
   const missing = error instanceof ExternalMissingError;
-  const retryable = error instanceof SalesChannelError ? error.retryable : false;
+  const channelError = error instanceof SalesChannelError ? error : null;
   return {
     ok: false,
-    message: error instanceof SalesChannelError ? error.message : "The operation failed on the store",
+    message: channelError ? channelError.message : "The operation failed on the store",
     ...(missing ? { external_missing: true } : {}),
-    failure_class: missing ? "permanent" : retryable ? "transient" : "permanent",
+    failure_class: missing ? "permanent" : (channelError?.failureClass ?? "unknown"),
+    ...(channelError?.retryAfter ? { retry_after: channelError.retryAfter } : {}),
   };
 }
 
