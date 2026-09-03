@@ -52,11 +52,22 @@ async function assertCanManage(supabase: unknown, userId: string) {
   if (data !== true) throw new Error("You are not permitted to manage sales channels");
 }
 
-async function assertIsAdmin(supabase: unknown, userId: string) {
-  const client = supabase as MinimalClient;
-  const { data } = await client.rpc("is_admin", { _user_id: userId });
-  if (data !== true) throw new Error("Only an administrator can perform this action");
+/**
+ * `is_admin` is intentionally not executable by the authenticated role, so the
+ * role is read server-side with the service client instead of being trusted
+ * from the browser.
+ */
+async function assertIsAdmin(_supabase: unknown, userId: string) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await supabaseAdmin
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .in("role", ["owner", "admin"])
+    .limit(1);
+  if (!data || data.length === 0) throw new Error("Only an administrator can perform this action");
 }
+
 
 /** Sanitised: provider bodies and credentials never reach the message. */
 function safeMessage(error: unknown): string {

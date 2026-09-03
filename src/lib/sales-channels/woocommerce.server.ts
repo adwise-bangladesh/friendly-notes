@@ -102,7 +102,8 @@ export function normalizeWooOrder(raw: unknown): NormalizedExternalOrder {
         unit_price: quantity > 0 ? Number((total / quantity).toFixed(2)) : 0,
       };
     })
-    .filter((line) => line.external_product_id !== "");
+    // a line without a real product reference cannot be mapped, so it is dropped
+    .filter((line) => Number(line.external_product_id) > 0);
 
   const name =
     `${str(shipping["first_name"]) || str(billing["first_name"])} ${str(shipping["last_name"]) || str(billing["last_name"])}`.trim();
