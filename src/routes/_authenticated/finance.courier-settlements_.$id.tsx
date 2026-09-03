@@ -240,7 +240,8 @@ function Page() {
                 <tr>
                   <th className="px-2 py-1.5 text-left font-medium">Order</th>
                   <th className="px-2 py-1.5 text-left font-medium">Shipment</th>
-                  <th className="px-2 py-1.5 text-right font-medium">Expected</th>
+                  <th className="px-2 py-1.5 text-right font-medium">Expected COD</th>
+                  <th className="px-2 py-1.5 text-right font-medium">Expected net</th>
                   <th className="px-2 py-1.5 text-right font-medium">Collected</th>
                   <th className="px-2 py-1.5 text-right font-medium">Delivery</th>
                   <th className="px-2 py-1.5 text-right font-medium">COD fee</th>
