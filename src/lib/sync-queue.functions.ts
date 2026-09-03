@@ -64,6 +64,20 @@ export const requeueSyncJob = createServerFn({ method: "POST" })
     return { jobId: newId as string };
   });
 
+/** Recover a job whose worker lease has genuinely expired. Staff/admin only. */
+export const recoverStaleSyncJob = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ jobId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }): Promise<{ status: string }> => {
+    const client = context.supabase as unknown as MinimalClient;
+    await assertCanManage(client, context.userId);
+    const { data: result, error } = await client.rpc("recover_stale_sync_job", {
+      _job_id: data.jobId,
+    });
+    if (error) throw new Error(error.message);
+    return { status: (result as { status?: string })?.status ?? "unknown" };
+  });
+
 /**
  * Operator-triggered worker run. Same bounded worker the scheduled endpoint
  * uses, executed as the signed-in user so RLS and permissions still apply.
@@ -77,5 +91,9 @@ export const processSyncQueueNow = createServerFn({ method: "POST" })
     const client = context.supabase as unknown as MinimalClient;
     await assertCanManage(client, context.userId);
     const { runSyncWorker } = await import("./sales-channels/worker.server");
-    return runSyncWorker(client, { batchSize: data.batchSize, timeBudgetMs: 20_000 });
+    return runSyncWorker(client, {
+      batchSize: data.batchSize,
+      timeBudgetMs: 20_000,
+      workerId: `operator:${context.userId.slice(0, 8)}`,
+    });
   });
