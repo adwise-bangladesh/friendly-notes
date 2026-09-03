@@ -44,7 +44,8 @@ const PO_ITEM_SELECT = `
 `;
 
 const PO_SELECT = `
-  id, purchase_order_number, supplier_id, status, order_date, expected_delivery_date, currency,
+  id, purchase_order_number, supplier_id, supplier_name_snapshot, supplier_code_snapshot,
+  status, order_date, expected_delivery_date, currency,
   exchange_rate, subtotal, discount_total, shipping_cost, duty_cost, other_cost, grand_total,
   notes, submitted_at, approved_by, approved_at, ordered_at, cancelled_at, cancel_reason,
   closed_at, created_by, updated_by, created_at, updated_at
@@ -225,20 +226,36 @@ export async function getSupplierProducts(supplierId: string): Promise<SupplierP
   return (data ?? []) as unknown as SupplierProductWithItem[];
 }
 
+/** Atomic, server-side preferred supplier switch (single preferred per product/variant). */
+export async function setPreferredSupplierProduct(supplierProductId: string): Promise<void> {
+  const { error } = await supabase.rpc("set_preferred_supplier_product", {
+    _supplier_product_id: supplierProductId,
+  });
+  if (error) throw error;
+}
+
 export async function saveSupplierProduct(input: SupplierProductInsert & { id?: string }): Promise<void> {
   const { id, ...values } = input;
-  // One preferred supplier per item: clear the previous holder first.
-  if (values.is_preferred) {
-    const target = values.variant_id
-      ? supabase.from("supplier_products").update({ is_preferred: false }).eq("variant_id", values.variant_id)
-      : supabase.from("supplier_products").update({ is_preferred: false }).eq("product_id", values.product_id!);
-    const { error } = id ? await target.neq("id", id) : await target;
+  const wantsPreferred = values.is_preferred === true;
+  // The preferred flag is never written directly: the controlled operation
+  // clears the previous holder and sets the new one in one step.
+  const payload = { ...values, is_preferred: false };
+
+  let rowId = id;
+  if (id) {
+    const { error } = await supabase.from("supplier_products").update(payload).eq("id", id);
     if (error) throw error;
+  } else {
+    const { data, error } = await supabase
+      .from("supplier_products")
+      .insert(payload)
+      .select("id")
+      .single();
+    if (error) throw error;
+    rowId = data.id;
   }
-  const { error } = id
-    ? await supabase.from("supplier_products").update(values).eq("id", id)
-    : await supabase.from("supplier_products").insert(values);
-  if (error) throw error;
+
+  if (wantsPreferred && rowId) await setPreferredSupplierProduct(rowId);
 }
 
 export async function deleteSupplierProduct(id: string): Promise<void> {
@@ -344,7 +361,7 @@ export async function getPurchaseOrders(options?: {
     .from("purchase_orders")
     .select(
       `id, purchase_order_number, status, order_date, expected_delivery_date, currency,
-       grand_total, created_at,
+       grand_total, created_at, supplier_name_snapshot, supplier_code_snapshot,
        supplier:suppliers(id, name, supplier_code),
        item_count:purchase_order_items(count)`,
     )
@@ -365,7 +382,7 @@ export async function getPurchaseOrders(options?: {
   return rows.filter(
     (r) =>
       r.purchase_order_number.toLowerCase().includes(term) ||
-      (r.supplier?.name ?? "").toLowerCase().includes(term),
+      (r.supplier_name_snapshot ?? r.supplier?.name ?? "").toLowerCase().includes(term),
   );
 }
 

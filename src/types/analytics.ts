@@ -208,8 +208,10 @@ export interface SupplierSpendRow {
 }
 
 export interface PurchasedProductRow {
-  product_id: string;
+  product_id: string | null;
+  variant_id: string | null;
   product_name: string;
+  sku: string | null;
   quantity_ordered: number;
   quantity_received: number;
   ordered_value: number;

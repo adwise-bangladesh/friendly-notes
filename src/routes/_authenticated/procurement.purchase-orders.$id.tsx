@@ -330,10 +330,10 @@ function Page() {
                         params={{ id: po.supplier.id }}
                         className="text-primary hover:underline"
                       >
-                        {po.supplier.name}
+                        {po.supplier_name_snapshot ?? po.supplier.name}
                       </Link>
                     ) : (
-                      "—"
+                      (po.supplier_name_snapshot ?? "—")
                     )}
                   </dd>
                 </div>
