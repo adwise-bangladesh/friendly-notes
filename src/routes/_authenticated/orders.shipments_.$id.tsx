@@ -96,6 +96,7 @@ function Page() {
   // unknown-booking recovery inputs
   const [recoveryConsignment, setRecoveryConsignment] = useState("");
   const [recoveryReason, setRecoveryReason] = useState("");
+  const [cancelReason, setCancelReason] = useState("");
   const [holdReason, setHoldReason] = useState<ShipmentHoldReason | "">("");
   const [failureReason, setFailureReason] = useState<ShipmentFailureReason | "">("");
   const [tracking, setTracking] = useState("");
@@ -224,10 +225,10 @@ function Page() {
 
   const cancelWithCourierFn = useServerFn(cancelShipmentWithCourier);
   const cancelCourierMutation = useMutation({
-    mutationFn: () => cancelWithCourierFn({ data: { shipmentId: id, reason } }),
+    mutationFn: () => cancelWithCourierFn({ data: { shipmentId: id, reason: cancelReason } }),
     onSuccess: (result) => {
       toast.success(result.message);
-      setReason("");
+      setCancelReason("");
       invalidate();
     },
     onError: (error: Error) => toast.error(error.message),
@@ -590,6 +591,12 @@ function Page() {
                 >
                   Refresh status
                 </Button>
+                <Input
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  placeholder="Cancellation reason"
+                  className="h-8 max-w-[200px] text-[12.5px]"
+                />
                 <Button
                   size="sm"
                   variant="outline"
@@ -597,9 +604,9 @@ function Page() {
                   disabled={
                     cancelCourierMutation.isPending ||
                     !shipment.external_consignment_id ||
-                    !reason.trim()
+                    cancelReason.trim().length < 3
                   }
-                  title="Enter a reason in the action dialog field first. Only couriers that support API cancellation accept this."
+                  title="Only couriers whose integration supports API cancellation accept this."
                 >
                   Cancel with courier
                 </Button>
