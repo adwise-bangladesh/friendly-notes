@@ -133,17 +133,37 @@ function Page() {
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Could not add note"),
   });
 
+  const backToOrders = (
+    <Button asChild size="sm" className="h-8">
+      <Link to="/orders">Back to orders</Link>
+    </Button>
+  );
+
+  if (!idIsValid) {
+    return (
+      <EmptyState
+        title="Invalid order link"
+        description="This link does not point at a real order reference. Open the order from the orders console."
+        action={backToOrders}
+      />
+    );
+  }
   if (isLoading) return <LoadingState rows={8} label="Loading order" />;
+  if (isError) {
+    return (
+      <EmptyState
+        title="Could not load this order"
+        description={error instanceof Error ? error.message : "Something went wrong while loading the order."}
+        action={backToOrders}
+      />
+    );
+  }
   if (!order) {
     return (
       <EmptyState
         title="Order not found"
         description="This order may have been removed or you do not have access."
-        action={
-          <Button asChild size="sm" className="h-8">
-            <Link to="/orders">Back to orders</Link>
-          </Button>
-        }
+        action={backToOrders}
       />
     );
   }
