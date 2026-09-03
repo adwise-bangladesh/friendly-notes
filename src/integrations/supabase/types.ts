@@ -595,6 +595,59 @@ export type Database = {
           },
         ]
       }
+      channel_listing_events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          event_type: Database["public"]["Enums"]["channel_listing_event_type"]
+          id: string
+          listing_id: string
+          message: string | null
+          status_from:
+            | Database["public"]["Enums"]["channel_listing_status"]
+            | null
+          status_to:
+            | Database["public"]["Enums"]["channel_listing_status"]
+            | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          event_type: Database["public"]["Enums"]["channel_listing_event_type"]
+          id?: string
+          listing_id: string
+          message?: string | null
+          status_from?:
+            | Database["public"]["Enums"]["channel_listing_status"]
+            | null
+          status_to?:
+            | Database["public"]["Enums"]["channel_listing_status"]
+            | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          event_type?: Database["public"]["Enums"]["channel_listing_event_type"]
+          id?: string
+          listing_id?: string
+          message?: string | null
+          status_from?:
+            | Database["public"]["Enums"]["channel_listing_status"]
+            | null
+          status_to?:
+            | Database["public"]["Enums"]["channel_listing_status"]
+            | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_listing_events_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "sales_channel_product_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courier_account_credentials: {
         Row: {
           access_token: string | null
@@ -3769,6 +3822,72 @@ export type Database = {
           },
         ]
       }
+      sales_channel_product_listings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          external_product_id: string | null
+          external_sku: string | null
+          external_url: string | null
+          external_variant_reference: string | null
+          id: string
+          last_sync_error: string | null
+          last_synced_at: string | null
+          listing_status: Database["public"]["Enums"]["channel_listing_status"]
+          sales_channel_account_id: string
+          store_product_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          external_product_id?: string | null
+          external_sku?: string | null
+          external_url?: string | null
+          external_variant_reference?: string | null
+          id?: string
+          last_sync_error?: string | null
+          last_synced_at?: string | null
+          listing_status?: Database["public"]["Enums"]["channel_listing_status"]
+          sales_channel_account_id: string
+          store_product_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          external_product_id?: string | null
+          external_sku?: string | null
+          external_url?: string | null
+          external_variant_reference?: string | null
+          id?: string
+          last_sync_error?: string | null
+          last_synced_at?: string | null
+          listing_status?: Database["public"]["Enums"]["channel_listing_status"]
+          sales_channel_account_id?: string
+          store_product_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_channel_product_listings_sales_channel_account_id_fkey"
+            columns: ["sales_channel_account_id"]
+            isOneToOne: false
+            referencedRelation: "sales_channel_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_channel_product_listings_store_product_id_fkey"
+            columns: ["store_product_id"]
+            isOneToOne: false
+            referencedRelation: "store_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sales_channel_sync_runs: {
         Row: {
           completed_at: string | null
@@ -4387,6 +4506,113 @@ export type Database = {
           },
         ]
       }
+      store_product_price_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          id: string
+          new_price: number
+          previous_price: number | null
+          reason: string | null
+          store_product_id: string
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_price: number
+          previous_price?: number | null
+          reason?: string | null
+          store_product_id: string
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_price?: number
+          previous_price?: number | null
+          reason?: string | null
+          store_product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_product_price_history_store_product_id_fkey"
+            columns: ["store_product_id"]
+            isOneToOne: false
+            referencedRelation: "store_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_products: {
+        Row: {
+          activated_at: string | null
+          archived_at: string | null
+          created_at: string
+          created_by: string | null
+          description_override: string | null
+          id: string
+          product_id: string
+          selling_price: number
+          status: Database["public"]["Enums"]["store_product_status"]
+          store_id: string
+          store_sku: string | null
+          title_override: string | null
+          updated_at: string
+          updated_by: string | null
+          visibility: Database["public"]["Enums"]["store_product_visibility"]
+        }
+        Insert: {
+          activated_at?: string | null
+          archived_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description_override?: string | null
+          id?: string
+          product_id: string
+          selling_price: number
+          status?: Database["public"]["Enums"]["store_product_status"]
+          store_id: string
+          store_sku?: string | null
+          title_override?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          visibility?: Database["public"]["Enums"]["store_product_visibility"]
+        }
+        Update: {
+          activated_at?: string | null
+          archived_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description_override?: string | null
+          id?: string
+          product_id?: string
+          selling_price?: number
+          status?: Database["public"]["Enums"]["store_product_status"]
+          store_id?: string
+          store_sku?: string | null
+          title_override?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          visibility?: Database["public"]["Enums"]["store_product_visibility"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "store_products_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stores: {
         Row: {
           code: string
@@ -4688,6 +4914,32 @@ export type Database = {
       }
     }
     Functions: {
+      activate_store_product: {
+        Args: { _id: string }
+        Returns: {
+          activated_at: string | null
+          archived_at: string | null
+          created_at: string
+          created_by: string | null
+          description_override: string | null
+          id: string
+          product_id: string
+          selling_price: number
+          status: Database["public"]["Enums"]["store_product_status"]
+          store_id: string
+          store_sku: string | null
+          title_override: string | null
+          updated_at: string
+          updated_by: string | null
+          visibility: Database["public"]["Enums"]["store_product_visibility"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "store_products"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       add_customer_note: {
         Args: { _customer_id: string; _note: string }
         Returns: {
@@ -4700,6 +4952,37 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "customer_notes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      add_product_to_store: {
+        Args: {
+          _product_id: string
+          _selling_price?: number
+          _store_id: string
+          _store_sku?: string
+        }
+        Returns: {
+          activated_at: string | null
+          archived_at: string | null
+          created_at: string
+          created_by: string | null
+          description_override: string | null
+          id: string
+          product_id: string
+          selling_price: number
+          status: Database["public"]["Enums"]["store_product_status"]
+          store_id: string
+          store_sku: string | null
+          title_override: string | null
+          updated_at: string
+          updated_by: string | null
+          visibility: Database["public"]["Enums"]["store_product_visibility"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "store_products"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -5197,6 +5480,32 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      archive_store_product: {
+        Args: { _id: string }
+        Returns: {
+          activated_at: string | null
+          archived_at: string | null
+          created_at: string
+          created_by: string | null
+          description_override: string | null
+          id: string
+          product_id: string
+          selling_price: number
+          status: Database["public"]["Enums"]["store_product_status"]
+          store_id: string
+          store_sku: string | null
+          title_override: string | null
+          updated_at: string
+          updated_by: string | null
+          visibility: Database["public"]["Enums"]["store_product_visibility"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "store_products"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       assert_operation_source_exists: {
         Args: {
           _source_id: string
@@ -5563,6 +5872,35 @@ export type Database = {
           _to_location_id: string
         }
         Returns: string
+      }
+      create_or_update_channel_listing: {
+        Args: {
+          _account_id: string
+          _payload?: Json
+          _store_product_id: string
+        }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          external_product_id: string | null
+          external_sku: string | null
+          external_url: string | null
+          external_variant_reference: string | null
+          id: string
+          last_sync_error: string | null
+          last_synced_at: string | null
+          listing_status: Database["public"]["Enums"]["channel_listing_status"]
+          sales_channel_account_id: string
+          store_product_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sales_channel_product_listings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       create_order: {
         Args: { _payload: Json }
@@ -6184,6 +6522,21 @@ export type Database = {
           order_item_id: string
           ordered: number
           remaining: number
+        }[]
+      }
+      product_store_assignments: {
+        Args: { _product_id: string }
+        Returns: {
+          available_qty: number
+          id: string
+          listing_count: number
+          selling_price: number
+          status: Database["public"]["Enums"]["store_product_status"]
+          store_code: string
+          store_id: string
+          store_name: string
+          updated_at: string
+          visibility: Database["public"]["Enums"]["store_product_visibility"]
         }[]
       }
       recalculate_purchase_order_totals: {
@@ -6878,6 +7231,35 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      set_channel_listing_status: {
+        Args: {
+          _listing_id: string
+          _message?: string
+          _status: Database["public"]["Enums"]["channel_listing_status"]
+        }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          external_product_id: string | null
+          external_sku: string | null
+          external_url: string | null
+          external_variant_reference: string | null
+          id: string
+          last_sync_error: string | null
+          last_synced_at: string | null
+          listing_status: Database["public"]["Enums"]["channel_listing_status"]
+          sales_channel_account_id: string
+          store_product_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sales_channel_product_listings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_courier_account_state: {
         Args: {
           _account_id: string
@@ -7557,6 +7939,32 @@ export type Database = {
         Args: { _lines: Json; _stocktake_id: string }
         Returns: undefined
       }
+      set_store_product_price: {
+        Args: { _id: string; _price: number; _reason?: string }
+        Returns: {
+          activated_at: string | null
+          archived_at: string | null
+          created_at: string
+          created_by: string | null
+          description_override: string | null
+          id: string
+          product_id: string
+          selling_price: number
+          status: Database["public"]["Enums"]["store_product_status"]
+          store_id: string
+          store_sku: string | null
+          title_override: string | null
+          updated_at: string
+          updated_by: string | null
+          visibility: Database["public"]["Enums"]["store_product_visibility"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "store_products"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_store_status: {
         Args: {
           _status: Database["public"]["Enums"]["store_status"]
@@ -7691,7 +8099,42 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      store_catalog_list: {
+        Args: {
+          _category_id?: string
+          _channel_id?: string
+          _limit?: number
+          _offset?: number
+          _search?: string
+          _status?: Database["public"]["Enums"]["store_product_status"]
+          _stock?: string
+          _store_id: string
+          _visibility?: Database["public"]["Enums"]["store_product_visibility"]
+        }
+        Returns: {
+          available_qty: number
+          category_name: string
+          id: string
+          is_purchasable: boolean
+          listing_count: number
+          master_sku: string
+          product_id: string
+          product_name: string
+          published_count: number
+          selling_price: number
+          status: Database["public"]["Enums"]["store_product_status"]
+          store_sku: string
+          total_count: number
+          updated_at: string
+          visibility: Database["public"]["Enums"]["store_product_visibility"]
+        }[]
+      }
+      store_catalog_summary: { Args: { _store_id: string }; Returns: Json }
       store_list: { Args: never; Returns: Json }
+      store_product_available_qty: {
+        Args: { _product_id: string }
+        Returns: number
+      }
       supplier_summaries: {
         Args: never
         Returns: {
@@ -7777,6 +8220,32 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "shipments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      update_store_product: {
+        Args: { _id: string; _payload: Json }
+        Returns: {
+          activated_at: string | null
+          archived_at: string | null
+          created_at: string
+          created_by: string | null
+          description_override: string | null
+          id: string
+          product_id: string
+          selling_price: number
+          status: Database["public"]["Enums"]["store_product_status"]
+          store_id: string
+          store_sku: string | null
+          title_override: string | null
+          updated_at: string
+          updated_by: string | null
+          visibility: Database["public"]["Enums"]["store_product_visibility"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "store_products"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -7884,6 +8353,19 @@ export type Database = {
         | "purchase_order.pending_approval"
         | "purchase_order.partially_received"
       brand_type: "standard" | "own_brand" | "generic"
+      channel_listing_event_type:
+        | "listing_created"
+        | "listing_updated"
+        | "listing_publish_requested"
+        | "listing_published"
+        | "listing_sync_failed"
+        | "listing_archived"
+      channel_listing_status:
+        | "not_published"
+        | "publishing"
+        | "published"
+        | "sync_failed"
+        | "archived"
       cost_change_source: "manual" | "purchase_receipt" | "correction"
       courier_environment: "sandbox" | "production"
       courier_event_processing_status:
@@ -8223,6 +8705,8 @@ export type Database = {
         | "lost"
         | "cancelled"
       stocktake_status: "draft" | "in_progress" | "completed" | "cancelled"
+      store_product_status: "draft" | "active" | "archived"
+      store_product_visibility: "hidden" | "visible"
       store_status: "active" | "inactive" | "archived"
       supply_model: "in_stock" | "local_sourcing" | "preorder" | "group_buy"
       variant_status: "active" | "inactive"
@@ -8463,6 +8947,21 @@ export const Constants = {
         "purchase_order.partially_received",
       ],
       brand_type: ["standard", "own_brand", "generic"],
+      channel_listing_event_type: [
+        "listing_created",
+        "listing_updated",
+        "listing_publish_requested",
+        "listing_published",
+        "listing_sync_failed",
+        "listing_archived",
+      ],
+      channel_listing_status: [
+        "not_published",
+        "publishing",
+        "published",
+        "sync_failed",
+        "archived",
+      ],
       cost_change_source: ["manual", "purchase_receipt", "correction"],
       courier_environment: ["sandbox", "production"],
       courier_event_processing_status: [
@@ -8835,6 +9334,8 @@ export const Constants = {
         "cancelled",
       ],
       stocktake_status: ["draft", "in_progress", "completed", "cancelled"],
+      store_product_status: ["draft", "active", "archived"],
+      store_product_visibility: ["hidden", "visible"],
       store_status: ["active", "inactive", "archived"],
       supply_model: ["in_stock", "local_sourcing", "preorder", "group_buy"],
       variant_status: ["active", "inactive"],
