@@ -302,16 +302,19 @@ function Page() {
             </div>
           </FormSection>
 
-          {correction && (
+          {editingItems && (
             <OrderItemsEditor order={order} open={editingItems} onOpenChange={setEditingItems} />
+          )}
 
-      <OrderCorrectionDialog
+          {correction && (
+            <OrderCorrectionDialog
               order={order}
               mode={correction}
               open
               onOpenChange={(next) => !next && setCorrection(null)}
             />
           )}
+
 
           <VerificationPanel order={order} canManage={canManage} />
 
