@@ -22,6 +22,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { RecordDeliveryOutcomeDialog } from "@/components/commerce/RecordDeliveryOutcomeDialog";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -67,7 +68,18 @@ import type {
   ShipmentAction,
   ShipmentFailureReason,
   ShipmentHoldReason,
+  ShipmentStatus,
 } from "@/types/shipping";
+
+/** Lifecycle states where a quantity-level courier outcome can still be recorded. */
+const OUTCOME_STATUSES: ShipmentStatus[] = [
+  "picked_up",
+  "in_transit",
+  "out_for_delivery",
+  "delivery_on_hold",
+  "delivery_failed",
+  "partial_delivered",
+];
 
 const TITLE = "Shipment Workspace · Commerce Operations";
 const DESCRIPTION = "Track and update one internal shipment through its courier lifecycle.";
@@ -100,6 +112,7 @@ function Page() {
   const [holdReason, setHoldReason] = useState<ShipmentHoldReason | "">("");
   const [failureReason, setFailureReason] = useState<ShipmentFailureReason | "">("");
   const [tracking, setTracking] = useState("");
+  const [outcomeOpen, setOutcomeOpen] = useState(false);
   const [consignment, setConsignment] = useState("");
 
   const [providerId, setProviderId] = useState("");
@@ -361,24 +374,70 @@ function Page() {
             </div>
           </FormSection>
 
-          <FormSection title="Items in this shipment">
+          <FormSection
+            title="Items in this shipment"
+            description="Delivered, refused, lost and damaged are the authoritative courier outcome. Refused or damaged units are only back in stock once the return is received and inspected."
+          >
             <div className="space-y-2">
-              {shipment.items.map((line) => (
-                <div
-                  key={line.id}
-                  className="flex items-center justify-between gap-3 rounded border border-border px-3 py-2"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate text-[13px] font-medium">{line.productName}</p>
-                    <p className="text-[11px] text-muted-foreground">
-                      {[line.variantName, line.sku].filter(Boolean).join(" · ") || "—"}
-                    </p>
+              <div className="grid grid-cols-[1fr_repeat(5,60px)] gap-2 px-1 text-[11px] font-medium text-muted-foreground">
+                <span>Item</span>
+                <span className="text-right">Shipped</span>
+                <span className="text-right">Deliv.</span>
+                <span className="text-right">Refused</span>
+                <span className="text-right">Lost</span>
+                <span className="text-right">Damaged</span>
+              </div>
+              {shipment.items.map((line) => {
+                const remaining =
+                  line.quantity -
+                  (line.delivered_quantity +
+                    line.refused_quantity +
+                    line.lost_quantity +
+                    line.damaged_quantity);
+                return (
+                  <div
+                    key={line.id}
+                    className="grid grid-cols-[1fr_repeat(5,60px)] items-center gap-2 rounded border border-border px-3 py-2"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-[13px] font-medium">{line.productName}</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        {[line.variantName, line.sku].filter(Boolean).join(" · ") || "—"}
+                        {remaining > 0 && shipment.delivery_outcome_recorded_at
+                          ? ` · ${remaining} unreconciled`
+                          : ""}
+                      </p>
+                    </div>
+                    <span className="text-right text-[13px] tabular-nums">{line.quantity}</span>
+                    <span className="text-right text-[13px] tabular-nums">
+                      {line.delivered_quantity}
+                    </span>
+                    <span className="text-right text-[13px] tabular-nums">
+                      {line.refused_quantity}
+                    </span>
+                    <span className="text-right text-[13px] tabular-nums">
+                      {line.lost_quantity}
+                    </span>
+                    <span className="text-right text-[13px] tabular-nums">
+                      {line.damaged_quantity}
+                    </span>
                   </div>
-                  <span className="text-[13px] tabular-nums">×{line.quantity}</span>
-                </div>
-              ))}
+                );
+              })}
+              {canManage && OUTCOME_STATUSES.includes(shipment.status) ? (
+                <Button size="sm" variant="outline" onClick={() => setOutcomeOpen(true)}>
+                  Record delivery outcome
+                </Button>
+              ) : null}
+              {shipment.delivery_outcome_recorded_at ? (
+                <p className="text-[11px] text-muted-foreground">
+                  Outcome recorded{" "}
+                  {new Date(shipment.delivery_outcome_recorded_at).toLocaleString()}.
+                </p>
+              ) : null}
             </div>
           </FormSection>
+
 
           <FormSection
             title="Courier"
@@ -856,7 +915,18 @@ function Page() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {outcomeOpen ? (
+        <RecordDeliveryOutcomeDialog
+          open={outcomeOpen}
+          onOpenChange={setOutcomeOpen}
+          shipmentId={id}
+          items={shipment.items}
+          onRecorded={invalidate}
+        />
+      ) : null}
     </>
+
   );
 }
 
