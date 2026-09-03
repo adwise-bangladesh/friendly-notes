@@ -24,7 +24,7 @@ import {
 } from "@/types/integrations";
 import type { IntegrationActivityEntry } from "@/types/integrations";
 import { CourierEventRecovery } from "@/components/shipping/CourierEventRecovery";
-import { useCommercePermissions } from "@/hooks/useCommercePermissions";
+import { useCommercePermissions } from "@/hooks/use-permissions";
 
 const TITLE = "Integration Activity · Commerce Operations";
 const DESCRIPTION =
