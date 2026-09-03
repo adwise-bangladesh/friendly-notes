@@ -1075,6 +1075,118 @@ export type Database = {
         }
         Relationships: []
       }
+      courier_settlement_discrepancies: {
+        Row: {
+          adjustment_id: string | null
+          created_at: string
+          created_by: string | null
+          difference: number
+          direction: string
+          expected_amount: number
+          id: string
+          order_id: string
+          resolution:
+            | Database["public"]["Enums"]["settlement_discrepancy_resolution"]
+            | null
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          settled_amount: number
+          settlement_id: string
+          settlement_item_id: string
+          shipment_id: string
+          status: Database["public"]["Enums"]["settlement_discrepancy_status"]
+          updated_at: string
+        }
+        Insert: {
+          adjustment_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          difference: number
+          direction: string
+          expected_amount: number
+          id?: string
+          order_id: string
+          resolution?:
+            | Database["public"]["Enums"]["settlement_discrepancy_resolution"]
+            | null
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          settled_amount: number
+          settlement_id: string
+          settlement_item_id: string
+          shipment_id: string
+          status?: Database["public"]["Enums"]["settlement_discrepancy_status"]
+          updated_at?: string
+        }
+        Update: {
+          adjustment_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          difference?: number
+          direction?: string
+          expected_amount?: number
+          id?: string
+          order_id?: string
+          resolution?:
+            | Database["public"]["Enums"]["settlement_discrepancy_resolution"]
+            | null
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          settled_amount?: number
+          settlement_id?: string
+          settlement_item_id?: string
+          shipment_id?: string
+          status?: Database["public"]["Enums"]["settlement_discrepancy_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_settlement_discrepancies_adjustment_id_fkey"
+            columns: ["adjustment_id"]
+            isOneToOne: false
+            referencedRelation: "order_financial_adjustments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_settlement_discrepancies_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_financial_rollup"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "courier_settlement_discrepancies_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_settlement_discrepancies_settlement_id_fkey"
+            columns: ["settlement_id"]
+            isOneToOne: false
+            referencedRelation: "courier_settlements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_settlement_discrepancies_settlement_item_id_fkey"
+            columns: ["settlement_item_id"]
+            isOneToOne: true
+            referencedRelation: "courier_settlement_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_settlement_discrepancies_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courier_settlement_items: {
         Row: {
           actual_collected_amount: number | null
@@ -2788,6 +2900,9 @@ export type Database = {
           courier_reason: string | null
           created_at: string
           created_by: string | null
+          financial_outcome: Database["public"]["Enums"]["return_financial_outcome"]
+          financial_recorded_at: string | null
+          financial_recorded_by: string | null
           id: string
           initiated_at: string | null
           inspected_at: string | null
@@ -2795,10 +2910,13 @@ export type Database = {
           order_id: string
           reason: string | null
           received_at: string | null
+          refund_adjustment_id: string | null
+          refund_amount: number
           requested_at: string
           resolution_note: string | null
           restocked_at: string | null
           restocked_by: string | null
+          retained_amount: number
           return_number: string
           return_type: Database["public"]["Enums"]["order_return_type"]
           shipment_id: string | null
@@ -2814,6 +2932,9 @@ export type Database = {
           courier_reason?: string | null
           created_at?: string
           created_by?: string | null
+          financial_outcome?: Database["public"]["Enums"]["return_financial_outcome"]
+          financial_recorded_at?: string | null
+          financial_recorded_by?: string | null
           id?: string
           initiated_at?: string | null
           inspected_at?: string | null
@@ -2821,10 +2942,13 @@ export type Database = {
           order_id: string
           reason?: string | null
           received_at?: string | null
+          refund_adjustment_id?: string | null
+          refund_amount?: number
           requested_at?: string
           resolution_note?: string | null
           restocked_at?: string | null
           restocked_by?: string | null
+          retained_amount?: number
           return_number: string
           return_type?: Database["public"]["Enums"]["order_return_type"]
           shipment_id?: string | null
@@ -2840,6 +2964,9 @@ export type Database = {
           courier_reason?: string | null
           created_at?: string
           created_by?: string | null
+          financial_outcome?: Database["public"]["Enums"]["return_financial_outcome"]
+          financial_recorded_at?: string | null
+          financial_recorded_by?: string | null
           id?: string
           initiated_at?: string | null
           inspected_at?: string | null
@@ -2847,10 +2974,13 @@ export type Database = {
           order_id?: string
           reason?: string | null
           received_at?: string | null
+          refund_adjustment_id?: string | null
+          refund_amount?: number
           requested_at?: string
           resolution_note?: string | null
           restocked_at?: string | null
           restocked_by?: string | null
+          retained_amount?: number
           return_number?: string
           return_type?: Database["public"]["Enums"]["order_return_type"]
           shipment_id?: string | null
@@ -3066,6 +3196,7 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          refunded_amount: number
           reservation_status: Database["public"]["Enums"]["reservation_status"]
           reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
@@ -3112,6 +3243,7 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["payment_status"]
           placed_at?: string | null
           product_discount?: number
+          refunded_amount?: number
           reservation_status?: Database["public"]["Enums"]["reservation_status"]
           reserved_at?: string | null
           risk_level?: Database["public"]["Enums"]["verification_risk_level"]
@@ -3158,6 +3290,7 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["payment_status"]
           placed_at?: string | null
           product_discount?: number
+          refunded_amount?: number
           reservation_status?: Database["public"]["Enums"]["reservation_status"]
           reserved_at?: string | null
           risk_level?: Database["public"]["Enums"]["verification_risk_level"]
@@ -5167,17 +5300,27 @@ export type Database = {
           est_product_cost: number | null
           estimated_profit: number | null
           grand_total: number | null
+          open_discrepancies: number | null
+          open_discrepancy_amount: number | null
           order_discount: number | null
           order_id: string | null
           other_courier_charges: number | null
+          packing_charge: number | null
           product_discount: number | null
+          refunded_amount: number | null
+          retained_amount: number | null
           return_charges: number | null
+          returned_units: number | null
           shipment_count: number | null
+          shipments_with_collection: number | null
+          shipments_with_fee: number | null
+          shipped_units: number | null
           shipping_charge: number | null
           source: Database["public"]["Enums"]["order_source"] | null
           status: Database["public"]["Enums"]["order_status"] | null
           subtotal: number | null
           units: number | null
+          unresolved_returns: number | null
         }
         Relationships: [
           {
@@ -5731,6 +5874,7 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          refunded_amount: number
           reservation_status: Database["public"]["Enums"]["reservation_status"]
           reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
@@ -6016,6 +6160,7 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          refunded_amount: number
           reservation_status: Database["public"]["Enums"]["reservation_status"]
           reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
@@ -6219,6 +6364,7 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          refunded_amount: number
           reservation_status: Database["public"]["Enums"]["reservation_status"]
           reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
@@ -6297,6 +6443,9 @@ export type Database = {
           courier_reason: string | null
           created_at: string
           created_by: string | null
+          financial_outcome: Database["public"]["Enums"]["return_financial_outcome"]
+          financial_recorded_at: string | null
+          financial_recorded_by: string | null
           id: string
           initiated_at: string | null
           inspected_at: string | null
@@ -6304,10 +6453,13 @@ export type Database = {
           order_id: string
           reason: string | null
           received_at: string | null
+          refund_adjustment_id: string | null
+          refund_amount: number
           requested_at: string
           resolution_note: string | null
           restocked_at: string | null
           restocked_by: string | null
+          retained_amount: number
           return_number: string
           return_type: Database["public"]["Enums"]["order_return_type"]
           shipment_id: string | null
@@ -6518,6 +6670,9 @@ export type Database = {
           courier_reason: string | null
           created_at: string
           created_by: string | null
+          financial_outcome: Database["public"]["Enums"]["return_financial_outcome"]
+          financial_recorded_at: string | null
+          financial_recorded_by: string | null
           id: string
           initiated_at: string | null
           inspected_at: string | null
@@ -6525,10 +6680,13 @@ export type Database = {
           order_id: string
           reason: string | null
           received_at: string | null
+          refund_adjustment_id: string | null
+          refund_amount: number
           requested_at: string
           resolution_note: string | null
           restocked_at: string | null
           restocked_by: string | null
+          retained_amount: number
           return_number: string
           return_type: Database["public"]["Enums"]["order_return_type"]
           shipment_id: string | null
@@ -6749,6 +6907,9 @@ export type Database = {
           courier_reason: string | null
           created_at: string
           created_by: string | null
+          financial_outcome: Database["public"]["Enums"]["return_financial_outcome"]
+          financial_recorded_at: string | null
+          financial_recorded_by: string | null
           id: string
           initiated_at: string | null
           inspected_at: string | null
@@ -6756,10 +6917,13 @@ export type Database = {
           order_id: string
           reason: string | null
           received_at: string | null
+          refund_adjustment_id: string | null
+          refund_amount: number
           requested_at: string
           resolution_note: string | null
           restocked_at: string | null
           restocked_by: string | null
+          retained_amount: number
           return_number: string
           return_type: Database["public"]["Enums"]["order_return_type"]
           shipment_id: string | null
@@ -7184,6 +7348,52 @@ export type Database = {
         Args: { _listing_id: string }
         Returns: Json
       }
+      record_return_financial_outcome: {
+        Args: {
+          _note?: string
+          _refund_amount?: number
+          _retained_amount?: number
+          _return_id: string
+        }
+        Returns: {
+          cancelled_at: string | null
+          completed_at: string | null
+          courier_reason: string | null
+          created_at: string
+          created_by: string | null
+          financial_outcome: Database["public"]["Enums"]["return_financial_outcome"]
+          financial_recorded_at: string | null
+          financial_recorded_by: string | null
+          id: string
+          initiated_at: string | null
+          inspected_at: string | null
+          notes: string | null
+          order_id: string
+          reason: string | null
+          received_at: string | null
+          refund_adjustment_id: string | null
+          refund_amount: number
+          requested_at: string
+          resolution_note: string | null
+          restocked_at: string | null
+          restocked_by: string | null
+          retained_amount: number
+          return_number: string
+          return_type: Database["public"]["Enums"]["order_return_type"]
+          shipment_id: string | null
+          source: string
+          status: Database["public"]["Enums"]["order_return_status"]
+          tracking_reference: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_returns"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       record_return_receipt: {
         Args: { _items: Json; _note?: string; _return_id: string }
         Returns: {
@@ -7192,6 +7402,9 @@ export type Database = {
           courier_reason: string | null
           created_at: string
           created_by: string | null
+          financial_outcome: Database["public"]["Enums"]["return_financial_outcome"]
+          financial_recorded_at: string | null
+          financial_recorded_by: string | null
           id: string
           initiated_at: string | null
           inspected_at: string | null
@@ -7199,10 +7412,13 @@ export type Database = {
           order_id: string
           reason: string | null
           received_at: string | null
+          refund_adjustment_id: string | null
+          refund_amount: number
           requested_at: string
           resolution_note: string | null
           restocked_at: string | null
           restocked_by: string | null
+          retained_amount: number
           return_number: string
           return_type: Database["public"]["Enums"]["order_return_type"]
           shipment_id: string | null
@@ -7368,6 +7584,7 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          refunded_amount: number
           reservation_status: Database["public"]["Enums"]["reservation_status"]
           reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
@@ -7403,6 +7620,7 @@ export type Database = {
         Args: { _order_id: string }
         Returns: undefined
       }
+      refresh_order_payment: { Args: { _order_id: string }; Returns: undefined }
       release_operational_work: {
         Args: {
           _note?: string
@@ -7440,6 +7658,7 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          refunded_amount: number
           reservation_status: Database["public"]["Enums"]["reservation_status"]
           reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
@@ -7504,6 +7723,7 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          refunded_amount: number
           reservation_status: Database["public"]["Enums"]["reservation_status"]
           reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
@@ -7538,6 +7758,41 @@ export type Database = {
           _phone: string
         }
         Returns: string
+      }
+      resolve_settlement_discrepancy: {
+        Args: {
+          _discrepancy_id: string
+          _note?: string
+          _resolution: Database["public"]["Enums"]["settlement_discrepancy_resolution"]
+        }
+        Returns: {
+          adjustment_id: string | null
+          created_at: string
+          created_by: string | null
+          difference: number
+          direction: string
+          expected_amount: number
+          id: string
+          order_id: string
+          resolution:
+            | Database["public"]["Enums"]["settlement_discrepancy_resolution"]
+            | null
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          settled_amount: number
+          settlement_id: string
+          settlement_item_id: string
+          shipment_id: string
+          status: Database["public"]["Enums"]["settlement_discrepancy_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "courier_settlement_discrepancies"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       restock_return_inventory: {
         Args: { _return_id: string }
@@ -7962,6 +8217,7 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          refunded_amount: number
           reservation_status: Database["public"]["Enums"]["reservation_status"]
           reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
@@ -8017,6 +8273,7 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          refunded_amount: number
           reservation_status: Database["public"]["Enums"]["reservation_status"]
           reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
@@ -8075,6 +8332,7 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          refunded_amount: number
           reservation_status: Database["public"]["Enums"]["reservation_status"]
           reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
@@ -8136,6 +8394,7 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          refunded_amount: number
           reservation_status: Database["public"]["Enums"]["reservation_status"]
           reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
@@ -8178,6 +8437,9 @@ export type Database = {
           courier_reason: string | null
           created_at: string
           created_by: string | null
+          financial_outcome: Database["public"]["Enums"]["return_financial_outcome"]
+          financial_recorded_at: string | null
+          financial_recorded_by: string | null
           id: string
           initiated_at: string | null
           inspected_at: string | null
@@ -8185,10 +8447,13 @@ export type Database = {
           order_id: string
           reason: string | null
           received_at: string | null
+          refund_adjustment_id: string | null
+          refund_amount: number
           requested_at: string
           resolution_note: string | null
           restocked_at: string | null
           restocked_by: string | null
+          retained_amount: number
           return_number: string
           return_type: Database["public"]["Enums"]["order_return_type"]
           shipment_id: string | null
@@ -8540,6 +8805,7 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          refunded_amount: number
           reservation_status: Database["public"]["Enums"]["reservation_status"]
           reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
@@ -8739,6 +9005,7 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           placed_at: string | null
           product_discount: number
+          refunded_amount: number
           reservation_status: Database["public"]["Enums"]["reservation_status"]
           reserved_at: string | null
           risk_level: Database["public"]["Enums"]["verification_risk_level"]
@@ -9045,6 +9312,8 @@ export type Database = {
         | "manual_income"
         | "settlement_adjustment"
         | "other"
+        | "refund"
+        | "settlement_shortfall"
       fulfillment_event_type:
         | "fulfillment_created"
         | "picking_started"
@@ -9241,6 +9510,11 @@ export type Database = {
         | "return_lost"
         | "provider_event"
         | "note_added"
+      return_financial_outcome:
+        | "pending"
+        | "refunded"
+        | "partially_refunded"
+        | "retained"
       return_item_condition:
         | "unknown"
         | "good"
@@ -9276,6 +9550,12 @@ export type Database = {
         | "stock_sync"
         | "status_refresh"
         | "unpublish"
+      settlement_discrepancy_resolution:
+        | "courier_corrected"
+        | "settlement_received"
+        | "merchant_adjustment"
+        | "written_off"
+      settlement_discrepancy_status: "open" | "resolved"
       shipment_event_type:
         | "shipment_created"
         | "ready_for_booking"
@@ -9687,6 +9967,8 @@ export const Constants = {
         "manual_income",
         "settlement_adjustment",
         "other",
+        "refund",
+        "settlement_shortfall",
       ],
       fulfillment_event_type: [
         "fulfillment_created",
@@ -9903,6 +10185,12 @@ export const Constants = {
         "provider_event",
         "note_added",
       ],
+      return_financial_outcome: [
+        "pending",
+        "refunded",
+        "partially_refunded",
+        "retained",
+      ],
       return_item_condition: [
         "unknown",
         "good",
@@ -9942,6 +10230,13 @@ export const Constants = {
         "status_refresh",
         "unpublish",
       ],
+      settlement_discrepancy_resolution: [
+        "courier_corrected",
+        "settlement_received",
+        "merchant_adjustment",
+        "written_off",
+      ],
+      settlement_discrepancy_status: ["open", "resolved"],
       shipment_event_type: [
         "shipment_created",
         "ready_for_booking",
