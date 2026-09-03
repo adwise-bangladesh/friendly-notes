@@ -144,7 +144,11 @@ export const FULFILLMENT_ACTION_LABELS: Record<FulfillmentAction, string> = {
   resume: "Resume",
 };
 
-/** The next operational step, used by the warehouse queue. */
+/**
+ * The next order-level step for the warehouse queue. Physical progress
+ * (picking → QC → packing → handover) now happens on fulfillment records, so
+ * the queue only offers reservation and hold/resume.
+ */
 export function nextFulfillmentAction(
   fulfillment: FulfillmentStatus,
   reservation: ReservationStatus,
@@ -152,29 +156,29 @@ export function nextFulfillmentAction(
   if (fulfillment === "on_hold") {
     return reservation === "reserved" || reservation === "not_required" ? "resume" : "retry_reservation";
   }
-  switch (fulfillment) {
-    case "not_started":
-      return reservation === "reserved" || reservation === "not_required" ? null : "reserve";
-    case "ready":
-      return "start_picking";
-    case "picking":
-      return "mark_picked";
-    case "picked":
-      return "start_packing";
-    case "packing":
-      return "mark_packed";
-    case "packed":
-      return "ready_for_courier";
-    default:
-      return null;
+  if (fulfillment === "not_started") {
+    return reservation === "reserved" || reservation === "not_required" ? null : "reserve";
   }
+  return null;
 }
 
+
+
+/**
+ * Order-level warehouse actions.
+ *
+ * Since the Step 20.1 fix the warehouse workflow lives on fulfillment records
+ * (`/fulfillment` workspace). The order page only offers stock reservation and
+ * an order-level hold/resume while no fulfillment record exists yet. Picking,
+ * packing, QC and handover — and therefore inventory commitment — happen on the
+ * fulfillment record and are projected back onto the order automatically.
+ */
 export function availableFulfillmentActions(args: {
   orderStatus: string;
   verificationStatus: string;
   fulfillment: FulfillmentStatus;
   reservation: ReservationStatus;
+  hasFulfillmentRecords?: boolean;
 }): FulfillmentAction[] {
   const { orderStatus, verificationStatus, fulfillment, reservation } = args;
   if (orderStatus === "cancelled") return [];
@@ -186,28 +190,11 @@ export function availableFulfillmentActions(args: {
     actions.push(reservation === "failed" || reservation === "released" ? "retry_reservation" : "reserve");
   }
 
-  switch (fulfillment) {
-    case "on_hold":
-      if (held) actions.push("resume");
-      break;
-    case "ready":
-      actions.push("start_picking", "hold");
-      break;
-    case "picking":
-      actions.push("mark_picked", "hold");
-      break;
-    case "picked":
-      actions.push("start_packing", "hold");
-      break;
-    case "packing":
-      actions.push("mark_packed", "hold");
-      break;
-    case "packed":
-      actions.push("ready_for_courier");
-      break;
-    default:
-      break;
-  }
+  if (args.hasFulfillmentRecords) return actions;
+
+  if (fulfillment === "on_hold" && held) actions.push("resume");
+  else if (fulfillment === "ready") actions.push("hold");
+
   return actions;
 }
 
@@ -215,6 +202,7 @@ export function availableFulfillmentActions(args: {
 export function isStockCommitted(fulfillment: FulfillmentStatus): boolean {
   return fulfillment === "packed" || fulfillment === "ready_for_courier";
 }
+
 
 /* ---------- Pick list ---------- */
 

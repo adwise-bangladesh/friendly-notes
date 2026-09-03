@@ -14,6 +14,7 @@ import {
   reserveOrderInventory,
   setFulfillmentState,
 } from "@/lib/fulfillment";
+import { getOrderFulfillments } from "@/lib/fulfillment-records";
 import type { FulfillmentStateAction } from "@/lib/fulfillment";
 import {
   FULFILLMENT_ACTION_LABELS,
@@ -33,9 +34,9 @@ import type { OrderWithDetails } from "@/types/orders";
 /**
  * Warehouse operations for one order.
  *
- * Nothing here writes stock directly: every button calls a database function
- * that validates the transition, and stock only leaves on hand once, when the
- * order is marked packed.
+ * Nothing here writes stock directly. This panel only reserves or releases
+ * held stock; picking, QC, packing and handover happen on fulfillment records
+ * below, and the order-level warehouse status is a projection of those records.
  */
 export function FulfillmentPanel({
   order,
@@ -54,6 +55,10 @@ export function FulfillmentPanel({
   const { data: pickList = [] } = useQuery({
     queryKey: ["pick-list", order.id],
     queryFn: () => getPickList(order.id),
+  });
+  const { data: fulfillmentRecords = [] } = useQuery({
+    queryKey: ["order-fulfillments", order.id],
+    queryFn: () => getOrderFulfillments(order.id),
   });
   const { data: reservations = [] } = useQuery({
     queryKey: ["order-reservations", order.id],
@@ -106,6 +111,7 @@ export function FulfillmentPanel({
     verificationStatus: order.verification_status,
     fulfillment,
     reservation,
+    hasFulfillmentRecords: fulfillmentRecords.some((f) => f.status !== "cancelled"),
   });
   const busy = reserveMutation.isPending || stateMutation.isPending || releaseMutation.isPending;
 
@@ -126,7 +132,7 @@ export function FulfillmentPanel({
   return (
     <FormSection
       title="Warehouse"
-      description="Inventory is held when verification is confirmed and deducted only when the order is packed."
+      description="Stock is held when verification is confirmed and leaves on hand exactly once, when a fulfillment is handed over to the courier."
     >
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <StatusBadge tone={FULFILLMENT_STATUS_TONE[fulfillment]}>

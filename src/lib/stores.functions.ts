@@ -222,8 +222,16 @@ async function importOrder(
     });
   }
 
-  // CONTROLLED CREATE — same authoritative path as a manual order
-  const { data: created, error: createError } = await client.rpc("create_order", {
+  // CONTROLLED CREATE + MAP + STORE — one atomic database operation.
+  // `import_external_order` runs create_order, the external mapping and the
+  // store assignment inside a single transaction, so a failure anywhere leaves
+  // no order, no mapping and no half-imported record behind. Re-importing the
+  // same external order returns the existing one instead of duplicating it.
+  const { data: result, error: importError } = await client.rpc("import_external_order", {
+    _account_id: accountId,
+    _store_id: storeId,
+    _external_id: order.external_id,
+    _external_reference: order.external_reference ?? null,
     _payload: {
       source: "api",
       customer_name: order.customer_name || "Online customer",
@@ -242,23 +250,13 @@ async function importOrder(
       items,
     },
   });
-  if (createError) {
-    return { outcome: "failed", reason: `Order ${order.external_id}: ${createError.message.slice(0, 160)}` };
+  if (importError) {
+    return { outcome: "failed", reason: `Order ${order.external_id}: ${importError.message.slice(0, 160)}` };
   }
-  const internalId = (created as { id?: string } | null)?.id;
-  if (!internalId) return { outcome: "failed", reason: `Order ${order.external_id}: order was not created` };
-
-  // MAP + STORE ASSOCIATION
-  const { error: mapError } = await client.rpc("upsert_external_mapping", {
-    _account_id: accountId,
-    _entity_type: "order",
-    _internal_id: internalId,
-    _external_id: order.external_id,
-    _external_reference: order.external_reference,
-  });
-  if (mapError) return { outcome: "failed", reason: `Order ${order.external_id}: ${mapError.message.slice(0, 160)}` };
-  await client.rpc("set_order_store", { _order_id: internalId, _store_id: storeId });
-
+  const outcome = (result as { outcome?: string } | null)?.outcome;
+  if (outcome === "skipped") {
+    return { outcome: "skipped", reason: `Order ${order.external_id}: already imported` };
+  }
   return { outcome: "created" };
 }
 

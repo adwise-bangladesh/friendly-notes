@@ -14,7 +14,8 @@ import { FULFILLMENT_QUEUE_STATUSES } from "@/types/fulfillment";
  * Reads use explicit projections (never internal product cost columns).
  * Every write goes through a SECURITY DEFINER database function:
  * `reserve_order_inventory`, `release_order_reservations` and
- * `set_order_fulfillment_state` (which commits stock when an order is packed).
+ * `set_order_fulfillment_state` (order-level hold/resume only — physical
+ * progress and inventory commitment live on fulfillment records).
  * Direct client writes to reservation or fulfillment columns are rejected by
  * database triggers, and `inventory_reservations` has no write policy at all.
  */
@@ -230,14 +231,12 @@ export async function releaseOrderReservations(orderId: string, reason: string):
   return data as unknown as Order;
 }
 
-export type FulfillmentStateAction =
-  | "start_picking"
-  | "mark_picked"
-  | "start_packing"
-  | "mark_packed"
-  | "ready_for_courier"
-  | "hold"
-  | "resume";
+/**
+ * Only order-level hold/resume remain here. Picking, packing, QC and courier
+ * handover are recorded on fulfillment records (`@/lib/fulfillment-records`),
+ * and the order-level status is projected from them by the database.
+ */
+export type FulfillmentStateAction = "hold" | "resume";
 
 export async function setFulfillmentState(args: {
   orderId: string;

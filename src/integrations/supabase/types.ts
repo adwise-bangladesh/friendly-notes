@@ -1808,6 +1808,7 @@ export type Database = {
         Row: {
           committed_at: string | null
           committed_by: string | null
+          committed_quantity: number
           created_at: string
           created_by: string | null
           id: string
@@ -1826,6 +1827,7 @@ export type Database = {
         Insert: {
           committed_at?: string | null
           committed_by?: string | null
+          committed_quantity?: number
           created_at?: string
           created_by?: string | null
           id?: string
@@ -1844,6 +1846,7 @@ export type Database = {
         Update: {
           committed_at?: string | null
           committed_by?: string | null
+          committed_quantity?: number
           created_at?: string
           created_by?: string | null
           id?: string
@@ -2436,6 +2439,8 @@ export type Database = {
           fulfillment_number: number
           hold_reason: string | null
           id: string
+          inventory_committed_at: string | null
+          inventory_committed_by: string | null
           location_id: string | null
           notes: string | null
           order_id: string
@@ -2454,6 +2459,8 @@ export type Database = {
           fulfillment_number: number
           hold_reason?: string | null
           id?: string
+          inventory_committed_at?: string | null
+          inventory_committed_by?: string | null
           location_id?: string | null
           notes?: string | null
           order_id: string
@@ -2472,6 +2479,8 @@ export type Database = {
           fulfillment_number?: number
           hold_reason?: string | null
           id?: string
+          inventory_committed_at?: string | null
+          inventory_committed_by?: string | null
           location_id?: string | null
           notes?: string | null
           order_id?: string
@@ -6044,60 +6053,9 @@ export type Database = {
         Args: { _lease_seconds?: number; _limit?: number; _worker_id?: string }
         Returns: Json
       }
-      commit_order_inventory: {
-        Args: { _order_id: string }
-        Returns: {
-          adjustment: number
-          cancelled_at: string | null
-          created_at: string
-          created_by: string | null
-          customer_email: string | null
-          customer_id: string | null
-          customer_name: string
-          customer_phone: string
-          delivery_charge: number
-          delivery_status: Database["public"]["Enums"]["order_delivery_status"]
-          due_amount: number | null
-          financial_status: Database["public"]["Enums"]["order_financial_status"]
-          fulfillment_hold_reason: string | null
-          fulfillment_location_id: string | null
-          fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
-          grand_total: number
-          id: string
-          order_discount: number
-          order_number: string
-          packed_at: string | null
-          packing_charge: number
-          paid_amount: number
-          payment_method: Database["public"]["Enums"]["payment_method"]
-          payment_status: Database["public"]["Enums"]["payment_status"]
-          placed_at: string | null
-          product_discount: number
-          reservation_status: Database["public"]["Enums"]["reservation_status"]
-          reserved_at: string | null
-          risk_level: Database["public"]["Enums"]["verification_risk_level"]
-          risk_reason: string | null
-          shipping_charge: number
-          source: Database["public"]["Enums"]["order_source"]
-          status: Database["public"]["Enums"]["order_status"]
-          store_id: string | null
-          subtotal: number
-          updated_at: string
-          updated_by: string | null
-          verification_attempt_count: number
-          verification_confirmed_at: string | null
-          verification_failure_reason: string | null
-          verification_last_attempt_at: string | null
-          verification_next_action_at: string | null
-          verification_priority: Database["public"]["Enums"]["verification_priority"]
-          verification_status: Database["public"]["Enums"]["order_verification_status"]
-        }
-        SetofOptions: {
-          from: "*"
-          to: "orders"
-          isOneToOne: true
-          isSetofReturn: false
-        }
+      commit_fulfillment_inventory: {
+        Args: { _fulfillment_id: string }
+        Returns: undefined
       }
       complete_sync_job: {
         Args: {
@@ -6292,6 +6250,8 @@ export type Database = {
           fulfillment_number: number
           hold_reason: string | null
           id: string
+          inventory_committed_at: string | null
+          inventory_committed_by: string | null
           location_id: string | null
           notes: string | null
           order_id: string
@@ -6680,6 +6640,16 @@ export type Database = {
         }
         Returns: boolean
       }
+      import_external_order: {
+        Args: {
+          _account_id: string
+          _external_id: string
+          _external_reference: string
+          _payload: Json
+          _store_id: string
+        }
+        Returns: Json
+      }
       ingest_courier_event: {
         Args: {
           _consignment_id?: string
@@ -6940,6 +6910,10 @@ export type Database = {
           remaining: number
         }[]
       }
+      order_operationally_locked: {
+        Args: { _order_id: string }
+        Returns: boolean
+      }
       product_store_assignments: {
         Args: { _product_id: string }
         Returns: {
@@ -7124,6 +7098,8 @@ export type Database = {
           fulfillment_number: number
           hold_reason: string | null
           id: string
+          inventory_committed_at: string | null
+          inventory_committed_by: string | null
           location_id: string | null
           notes: string | null
           order_id: string
@@ -7359,6 +7335,10 @@ export type Database = {
         Args: { _order_id: string }
         Returns: Database["public"]["Enums"]["order_delivery_status"]
       }
+      refresh_order_fulfillment_projection: {
+        Args: { _order_id: string }
+        Returns: undefined
+      }
       release_operational_work: {
         Args: {
           _note?: string
@@ -7425,6 +7405,12 @@ export type Database = {
       remove_settlement_item: { Args: { _item_id: string }; Returns: undefined }
       repeat_customer_threshold: { Args: never; Returns: number }
       requeue_sync_job: { Args: { _job_id: string }; Returns: string }
+      reservation_committed_quantity: {
+        Args: {
+          _r: Database["public"]["Tables"]["inventory_reservations"]["Row"]
+        }
+        Returns: number
+      }
       reserve_order_inventory: {
         Args: { _order_id: string }
         Returns: {
@@ -7826,6 +7812,8 @@ export type Database = {
           fulfillment_number: number
           hold_reason: string | null
           id: string
+          inventory_committed_at: string | null
+          inventory_committed_by: string | null
           location_id: string | null
           notes: string | null
           order_id: string
@@ -7853,6 +7841,8 @@ export type Database = {
           fulfillment_number: number
           hold_reason: string | null
           id: string
+          inventory_committed_at: string | null
+          inventory_committed_by: string | null
           location_id: string | null
           notes: string | null
           order_id: string
@@ -8620,6 +8610,91 @@ export type Database = {
         Returns: Json
       }
       sync_queue_overview: { Args: { _store_id?: string }; Returns: Json }
+      update_order_address: {
+        Args: { _address: Json; _order_id: string }
+        Returns: {
+          address_line: string
+          address_type: string
+          area: string | null
+          country: string
+          created_at: string
+          district: string | null
+          division: string | null
+          id: string
+          order_id: string
+          phone: string
+          postal_code: string | null
+          recipient_name: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_addresses"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      update_order_customer: {
+        Args: {
+          _customer_email?: string
+          _customer_id?: string
+          _customer_name: string
+          _customer_phone: string
+          _order_id: string
+        }
+        Returns: {
+          adjustment: number
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_id: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_charge: number
+          delivery_status: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount: number | null
+          financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason: string | null
+          fulfillment_location_id: string | null
+          fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total: number
+          id: string
+          order_discount: number
+          order_number: string
+          packed_at: string | null
+          packing_charge: number
+          paid_amount: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          placed_at: string | null
+          product_discount: number
+          reservation_status: Database["public"]["Enums"]["reservation_status"]
+          reserved_at: string | null
+          risk_level: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason: string | null
+          shipping_charge: number
+          source: Database["public"]["Enums"]["order_source"]
+          status: Database["public"]["Enums"]["order_status"]
+          store_id: string | null
+          subtotal: number
+          updated_at: string
+          updated_by: string | null
+          verification_attempt_count: number
+          verification_confirmed_at: string | null
+          verification_failure_reason: string | null
+          verification_last_attempt_at: string | null
+          verification_next_action_at: string | null
+          verification_priority: Database["public"]["Enums"]["verification_priority"]
+          verification_status: Database["public"]["Enums"]["order_verification_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       update_shipment_details: {
         Args: {
           _cash_on_delivery_amount?: number

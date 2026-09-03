@@ -290,3 +290,52 @@ export function isPlausibleBdPhone(value: string): boolean {
   const p = normalisePhone(value);
   return /^(?:\+?880|0)1[3-9]\d{8}$/.test(p);
 }
+
+/* ---------- Controlled order corrections (Step 20.1 fix) ---------- */
+
+/**
+ * Orders are immutable after creation except through these explicit controlled
+ * corrections. Both are rejected by the database once the order is
+ * operationally locked — that is, once stock has been committed at courier
+ * handover or a shipment has left the draft stage. Item, price and money
+ * editing does not exist: a wrong order is cancelled and re-created.
+ */
+export async function isOrderOperationallyLocked(orderId: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc("order_operationally_locked", { _order_id: orderId });
+  if (error) throw error;
+  return Boolean(data);
+}
+
+export async function updateOrderCustomer(args: {
+  orderId: string;
+  name: string;
+  phone: string;
+  email?: string | null;
+}): Promise<Order> {
+  const { data, error } = await supabase.rpc("update_order_customer", {
+    _order_id: args.orderId,
+    _customer_name: args.name,
+    _customer_phone: args.phone,
+    ...(args.email ? { _customer_email: args.email } : {}),
+  });
+  if (error) throw error;
+  return data as unknown as Order;
+}
+
+export interface OrderAddressInput {
+  recipient_name: string;
+  phone: string;
+  address_line: string;
+  area?: string | null;
+  district?: string | null;
+  division?: string | null;
+  postal_code?: string | null;
+}
+
+export async function updateOrderAddress(orderId: string, address: OrderAddressInput): Promise<void> {
+  const { error } = await supabase.rpc("update_order_address", {
+    _order_id: orderId,
+    _address: address as unknown as Json,
+  });
+  if (error) throw error;
+}

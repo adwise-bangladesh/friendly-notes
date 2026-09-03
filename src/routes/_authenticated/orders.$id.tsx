@@ -18,6 +18,7 @@ import { OrderFulfillmentsPanel } from "@/components/orders/OrderFulfillmentsPan
 import { OrderShipmentsPanel } from "@/components/orders/OrderShipmentsPanel";
 import { OrderReturnsPanel } from "@/components/orders/OrderReturnsPanel";
 import { OrderFinancialsPanel } from "@/components/orders/OrderFinancialsPanel";
+import { OrderCorrectionDialog } from "@/components/orders/OrderCorrectionDialog";
 import { AIEntityPanel } from "@/components/ai/AIEntityPanel";
 
 import { useCommercePermissions } from "@/hooks/use-permissions";
@@ -26,7 +27,6 @@ import { addOrderNote, cancelOrder, getOrderById } from "@/lib/orders";
 import {
   DELIVERY_STATUS_LABELS,
   DELIVERY_STATUS_TONE,
-  FINANCIAL_STATUS_LABELS,
   FULFILLMENT_STATUS_LABELS,
   NOTE_TYPE_LABELS,
   ORDER_SOURCE_LABELS,
@@ -79,6 +79,7 @@ function Page() {
   const { canManage, canRead, canDelete } = useCommercePermissions();
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [noteDraft, setNoteDraft] = useState("");
+  const [correction, setCorrection] = useState<"customer" | "address" | null>(null);
 
   const { data: order, isLoading } = useQuery({
     queryKey: ["order", id],
@@ -170,7 +171,6 @@ function Page() {
         <StatusBadge tone={DELIVERY_STATUS_TONE[order.delivery_status]}>
           Delivery · {DELIVERY_STATUS_LABELS[order.delivery_status]}
         </StatusBadge>
-        <StatusBadge>Settlement · {FINANCIAL_STATUS_LABELS[order.financial_status]}</StatusBadge>
         <span className="text-[12px] text-muted-foreground">
           {ORDER_SOURCE_LABELS[order.source]} · {new Date(order.created_at).toLocaleString()}
         </span>
@@ -185,6 +185,16 @@ function Page() {
                 <Item label="Phone" value={order.customer_phone} />
                 <Item label="Email" value={order.customer_email ?? "—"} />
               </dl>
+              {canManage && order.status !== "cancelled" && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="mt-2 h-7"
+                  onClick={() => setCorrection("customer")}
+                >
+                  Correct customer
+                </Button>
+              )}
             </FormSection>
             <FormSection title="Shipping address">
               {order.address ? (
@@ -208,7 +218,18 @@ function Page() {
               ) : (
                 <p className="text-[13px] text-muted-foreground">No address recorded.</p>
               )}
+              {canManage && order.status !== "cancelled" && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="mt-2 h-7"
+                  onClick={() => setCorrection("address")}
+                >
+                  Correct address
+                </Button>
+              )}
             </FormSection>
+
           </div>
 
           <FormSection
@@ -253,6 +274,15 @@ function Page() {
               </table>
             </div>
           </FormSection>
+
+          {correction && (
+            <OrderCorrectionDialog
+              order={order}
+              mode={correction}
+              open
+              onOpenChange={(next) => !next && setCorrection(null)}
+            />
+          )}
 
           <VerificationPanel order={order} canManage={canManage} />
 
