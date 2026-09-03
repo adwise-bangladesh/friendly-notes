@@ -58,11 +58,11 @@ export function OrderFulfillmentsPanel({
   const [notes, setNotes] = useState("");
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
-  const { data: fulfillments = [] } = useQuery({
+  const { data: fulfillments = [], isPending: fulfillmentsPending } = useQuery({
     queryKey: ["order-fulfillments", order.id],
     queryFn: () => getOrderFulfillments(order.id),
   });
-  const { data: summary } = useQuery({
+  const { data: summary, isPending: summaryPending } = useQuery({
     queryKey: ["order-fulfillment-summary", order.id],
     queryFn: () => getOrderFulfillmentSummary(order.id),
   });
@@ -157,9 +157,11 @@ export function OrderFulfillmentsPanel({
                     )}
                   </td>
                   <td className="py-1.5 px-2 text-right tabular-nums">{item.quantity}</td>
-                  <td className="py-1.5 px-2 text-right tabular-nums">{line?.fulfilled ?? 0}</td>
+                  <td className="py-1.5 px-2 text-right tabular-nums">
+                    {summaryPending ? "…" : (line?.fulfilled ?? 0)}
+                  </td>
                   <td className="py-1.5 pl-2 text-right tabular-nums">
-                    {line?.remaining ?? item.quantity}
+                    {summaryPending ? "…" : (line?.remaining ?? item.quantity)}
                   </td>
                 </tr>
               );
@@ -169,7 +171,9 @@ export function OrderFulfillmentsPanel({
       </div>
 
       <div className="space-y-1.5">
-        {fulfillments.length === 0 ? (
+        {fulfillmentsPending ? (
+          <p className="text-[12.5px] text-muted-foreground">Loading fulfillments…</p>
+        ) : fulfillments.length === 0 ? (
           <p className="text-[12.5px] text-muted-foreground">No fulfillment has been created yet.</p>
         ) : (
           fulfillments.map((f) => (

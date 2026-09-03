@@ -27,7 +27,7 @@ export function OrderShipmentsPanel({
 }) {
   const [creatingFor, setCreatingFor] = useState<string | null>(null);
 
-  const { data: shipments = [] } = useQuery({
+  const { data: shipments = [], isPending: shipmentsPending } = useQuery({
     queryKey: ["order-shipments", order.id],
     queryFn: () => getOrderShipments(order.id),
   });
@@ -46,7 +46,9 @@ export function OrderShipmentsPanel({
       title="Shipping"
       description="Internal shipment records. Courier assignment is recorded manually; no courier system is contacted."
     >
-      {shipments.length === 0 ? (
+      {shipmentsPending ? (
+        <p className="text-[12.5px] text-muted-foreground">Loading shipments…</p>
+      ) : shipments.length === 0 ? (
         <EmptyState
           title="No shipments yet"
           description="A shipment can be created once a fulfillment is ready for handover."
