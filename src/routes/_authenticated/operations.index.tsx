@@ -15,6 +15,8 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { AttentionTable } from "@/components/operations/AttentionTable";
 import { AttentionDrawer } from "@/components/operations/AttentionDrawer";
+import { OperationalAlertsPanel } from "@/components/operations/OperationalAlertsPanel";
+
 import {
   computeCounters,
   filterAndSortAttention,
