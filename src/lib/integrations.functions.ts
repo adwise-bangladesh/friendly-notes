@@ -283,7 +283,8 @@ export const saveIntegrationCredentials = createServerFn({ method: "POST" })
 
     const { setCourierCredentials } = await import("./couriers/credentials.server");
     try {
-      await setCourierCredentials(data.accountId, {
+      await setCourierCredentials({
+        accountId: data.accountId,
         clientId: data.clientId ?? null,
         username: data.username ?? null,
         clientSecret: data.clientSecret ?? null,
