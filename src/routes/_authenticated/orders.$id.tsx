@@ -49,6 +49,7 @@ import {
 } from "@/types/fulfillment";
 
 const DESCRIPTION = "Order snapshot, items, payment and operational notes.";
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const Route = createFileRoute("/_authenticated/orders/$id")({
   head: () => ({
