@@ -27,14 +27,15 @@ export async function getStoreCatalog(
   storeId: string,
   filters: StoreCatalogFilters = {},
 ): Promise<{ rows: StoreCatalogRow[]; total: number }> {
+  const search = filters.search?.trim();
   const { data, error } = await supabase.rpc("store_catalog_list", {
     _store_id: storeId,
-    _search: filters.search?.trim() ? filters.search.trim() : undefined,
-    _status: filters.status ?? undefined,
-    _visibility: filters.visibility ?? undefined,
-    _category_id: filters.categoryId ?? undefined,
-    _stock: filters.stock ?? undefined,
-    _channel_id: filters.channelId ?? undefined,
+    ...(search ? { _search: search } : {}),
+    ...(filters.status ? { _status: filters.status } : {}),
+    ...(filters.visibility ? { _visibility: filters.visibility } : {}),
+    ...(filters.categoryId ? { _category_id: filters.categoryId } : {}),
+    ...(filters.stock ? { _stock: filters.stock } : {}),
+    ...(filters.channelId ? { _channel_id: filters.channelId } : {}),
     _limit: filters.limit ?? 50,
     _offset: filters.offset ?? 0,
   });
@@ -133,8 +134,10 @@ export async function addProductToStore(input: {
   const { data, error } = await supabase.rpc("add_product_to_store", {
     _store_id: input.storeId,
     _product_id: input.productId,
-    _selling_price: input.sellingPrice ?? undefined,
-    _store_sku: input.storeSku ?? undefined,
+    ...(input.sellingPrice === null || input.sellingPrice === undefined
+      ? {}
+      : { _selling_price: input.sellingPrice }),
+    ...(input.storeSku ? { _store_sku: input.storeSku } : {}),
   });
   if (error) throw error;
   return data as unknown as StoreProduct;
@@ -165,7 +168,7 @@ export async function setStoreProductPrice(
   const { data, error } = await supabase.rpc("set_store_product_price", {
     _id: id,
     _price: price,
-    _reason: reason ?? undefined,
+    ...(reason ? { _reason: reason } : {}),
   });
   if (error) throw error;
   return data as unknown as StoreProduct;
@@ -208,7 +211,7 @@ export async function setChannelListingStatus(
   const { data, error } = await supabase.rpc("set_channel_listing_status", {
     _listing_id: listingId,
     _status: status,
-    _message: message ?? undefined,
+    ...(message ? { _message: message } : {}),
   });
   if (error) throw error;
   return data as unknown as ChannelListing;
