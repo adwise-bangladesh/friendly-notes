@@ -5741,6 +5741,60 @@ export type Database = {
         }
         Relationships: []
       }
+      worker_runs: {
+        Row: {
+          claimed: number
+          created_at: string
+          duration_ms: number | null
+          error_class: string | null
+          failed: number
+          finished_at: string | null
+          id: string
+          processed: number
+          skipped: number
+          started_at: string
+          status: string
+          succeeded: number
+          trigger_source: string
+          updated_at: string
+          worker: string
+        }
+        Insert: {
+          claimed?: number
+          created_at?: string
+          duration_ms?: number | null
+          error_class?: string | null
+          failed?: number
+          finished_at?: string | null
+          id?: string
+          processed?: number
+          skipped?: number
+          started_at?: string
+          status?: string
+          succeeded?: number
+          trigger_source: string
+          updated_at?: string
+          worker: string
+        }
+        Update: {
+          claimed?: number
+          created_at?: string
+          duration_ms?: number | null
+          error_class?: string | null
+          failed?: number
+          finished_at?: string | null
+          id?: string
+          processed?: number
+          skipped?: number
+          started_at?: string
+          status?: string
+          succeeded?: number
+          trigger_source?: string
+          updated_at?: string
+          worker?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       order_financial_rollup: {
@@ -7561,6 +7615,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      ensure_worker_secret: { Args: { _worker: string }; Returns: string }
       exception_quick_view: { Args: { _exception_id: string }; Returns: Json }
       exception_resolution_class: {
         Args: { _type: Database["public"]["Enums"]["shipment_exception_type"] }
@@ -7678,6 +7733,19 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      finish_worker_run: {
+        Args: {
+          _claimed?: number
+          _error_class?: string
+          _failed?: number
+          _processed?: number
+          _run_id: string
+          _skipped?: number
+          _status: string
+          _succeeded?: number
+        }
+        Returns: undefined
       }
       fulfillment_shippable_summary: {
         Args: { _fulfillment_id: string }
@@ -8048,6 +8116,7 @@ export type Database = {
           visibility: Database["public"]["Enums"]["store_product_visibility"]
         }[]
       }
+      prune_worker_runs: { Args: never; Returns: number }
       queue_listing_sync: {
         Args: {
           _listing_id: string
@@ -10231,6 +10300,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      start_worker_run: {
+        Args: { _trigger_source: string; _worker: string }
+        Returns: string
+      }
       store_catalog_list: {
         Args: {
           _category_id?: string
@@ -10319,6 +10392,10 @@ export type Database = {
         Returns: Json
       }
       sync_queue_overview: { Args: { _store_id?: string }; Returns: Json }
+      trigger_worker: {
+        Args: { _base_url: string; _path: string; _worker: string }
+        Returns: number
+      }
       update_order_address: {
         Args: { _address: Json; _order_id: string }
         Returns: {
@@ -10612,6 +10689,11 @@ export type Database = {
           _from: Database["public"]["Enums"]["order_verification_status"]
           _to: Database["public"]["Enums"]["order_verification_status"]
         }
+        Returns: boolean
+      }
+      worker_run_health: { Args: { _stale_minutes?: number }; Returns: Json }
+      worker_secret_matches: {
+        Args: { _presented: string; _worker: string }
         Returns: boolean
       }
     }

@@ -29,6 +29,7 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { getQueueHealth, getSyncJobs } from "@/lib/sync-queue";
 import { processSyncQueueNow } from "@/lib/sync-queue.functions";
+import { WorkerHealthPanel } from "@/components/operations/WorkerHealthPanel";
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import {
   JOB_TYPE_LABELS,
@@ -163,6 +164,8 @@ function JobsPage() {
           </div>
         }
       />
+
+      <WorkerHealthPanel />
 
       <div className="mb-3 grid gap-3 sm:grid-cols-3 lg:grid-cols-7">
         <Stat label="Waiting" value={h?.queue_depth ?? 0} />
