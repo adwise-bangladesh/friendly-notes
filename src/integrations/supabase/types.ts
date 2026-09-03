@@ -7048,6 +7048,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      courier_status_key: { Args: { _value: string }; Returns: string }
       courier_vault_put: {
         Args: { _name: string; _ref: string; _value: string }
         Returns: string
@@ -8024,6 +8025,10 @@ export type Database = {
         Returns: Json
       }
       orders_console_list: { Args: { _payload?: Json }; Returns: Json }
+      parse_statement_amount: {
+        Args: { _raw: string }
+        Returns: Record<string, unknown>
+      }
       populate_courier_settlement: {
         Args: { _limit?: number; _settlement_id: string }
         Returns: Json

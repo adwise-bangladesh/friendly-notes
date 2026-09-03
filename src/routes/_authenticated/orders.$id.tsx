@@ -49,6 +49,7 @@ import {
 } from "@/types/fulfillment";
 
 const DESCRIPTION = "Order snapshot, items, payment and operational notes.";
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const Route = createFileRoute("/_authenticated/orders/$id")({
   head: () => ({
@@ -85,15 +86,27 @@ function Page() {
   const [correction, setCorrection] = useState<"customer" | "address" | null>(null);
   const [editingItems, setEditingItems] = useState(false);
 
-  const { data: order, isLoading } = useQuery({
+  // A malformed link must never reach the database: an unparseable id used to
+  // produce a raw 400 from PostgREST and a blank page.
+  const idIsValid = UUID_RE.test(id);
+
+  const {
+    data: order,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["order", id],
     queryFn: () => getOrderById(id),
+    enabled: idIsValid,
+    retry: false,
   });
 
   const { data: editBlockReason, isPending: editCheckPending } = useQuery({
     queryKey: ["order-edit-block", id],
     queryFn: () => getOrderEditBlockReason(id),
-    enabled: canManage,
+    enabled: canManage && idIsValid,
+    retry: false,
   });
 
   const cancelMutation = useMutation({
@@ -121,17 +134,37 @@ function Page() {
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Could not add note"),
   });
 
+  const backToOrders = (
+    <Button asChild size="sm" className="h-8">
+      <Link to="/orders">Back to orders</Link>
+    </Button>
+  );
+
+  if (!idIsValid) {
+    return (
+      <EmptyState
+        title="Invalid order link"
+        description="This link does not point at a real order reference. Open the order from the orders console."
+        action={backToOrders}
+      />
+    );
+  }
   if (isLoading) return <LoadingState rows={8} label="Loading order" />;
+  if (isError) {
+    return (
+      <EmptyState
+        title="Could not load this order"
+        description={error instanceof Error ? error.message : "Something went wrong while loading the order."}
+        action={backToOrders}
+      />
+    );
+  }
   if (!order) {
     return (
       <EmptyState
         title="Order not found"
         description="This order may have been removed or you do not have access."
-        action={
-          <Button asChild size="sm" className="h-8">
-            <Link to="/orders">Back to orders</Link>
-          </Button>
-        }
+        action={backToOrders}
       />
     );
   }
