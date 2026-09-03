@@ -5917,6 +5917,32 @@ export type Database = {
         }
         Returns: undefined
       }
+      background_jobs_attention: {
+        Args: {
+          _backlog_warning?: number
+          _limit?: number
+          _retry_warning_attempts?: number
+          _stale_wait_hours?: number
+        }
+        Returns: {
+          assignable: boolean
+          assigned_to: string
+          assigned_to_name: string
+          assignment_source_type: string
+          category: string
+          due_at: string
+          href: string
+          id: string
+          occurred_at: string
+          reason: string
+          severity: string
+          source_id: string
+          source_type: string
+          state: string
+          subtitle: string
+          title: string
+        }[]
+      }
       begin_listing_operation: {
         Args: {
           _listing_id: string
@@ -6014,10 +6040,16 @@ export type Database = {
         Args: { _listing_id: string }
         Returns: Json
       }
-      claim_sync_jobs: {
-        Args: { _lease_seconds?: number; _limit?: number }
-        Returns: Json
-      }
+      claim_sync_jobs:
+        | { Args: { _lease_seconds?: number; _limit?: number }; Returns: Json }
+        | {
+            Args: {
+              _lease_seconds?: number
+              _limit?: number
+              _worker_id?: string
+            }
+            Returns: Json
+          }
       commit_order_inventory: {
         Args: { _order_id: string }
         Returns: {
@@ -6073,17 +6105,30 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      complete_sync_job: {
-        Args: {
-          _failure_class?: Database["public"]["Enums"]["sync_failure_class"]
-          _job_id: string
-          _lease_token: string
-          _message?: string
-          _ok: boolean
-          _run_id?: string
-        }
-        Returns: Json
-      }
+      complete_sync_job:
+        | {
+            Args: {
+              _failure_class?: Database["public"]["Enums"]["sync_failure_class"]
+              _job_id: string
+              _lease_token: string
+              _message?: string
+              _ok: boolean
+              _run_id?: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              _failure_class?: Database["public"]["Enums"]["sync_failure_class"]
+              _job_id: string
+              _lease_token: string
+              _message?: string
+              _ok: boolean
+              _retry_after?: string
+              _run_id?: string
+            }
+            Returns: Json
+          }
       create_courier_settlement: {
         Args: {
           _courier_account_id: string
@@ -6645,6 +6690,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      get_sync_job: { Args: { _job_id: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -6785,16 +6831,35 @@ export type Database = {
         Returns: boolean
       }
       is_service_context: { Args: never; Returns: boolean }
-      list_sync_jobs: {
-        Args: {
-          _limit?: number
-          _listing_id?: string
-          _offset?: number
-          _status?: Database["public"]["Enums"]["sync_job_status"]
-          _store_id?: string
-        }
-        Returns: Json
-      }
+      list_sync_jobs:
+        | {
+            Args: {
+              _limit?: number
+              _listing_id?: string
+              _offset?: number
+              _status?: Database["public"]["Enums"]["sync_job_status"]
+              _store_id?: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              _account_id?: string
+              _failure_class?: Database["public"]["Enums"]["sync_failure_class"]
+              _from?: string
+              _job_type?: string
+              _limit?: number
+              _listing_id?: string
+              _offset?: number
+              _operation?: Database["public"]["Enums"]["sales_channel_sync_type"]
+              _search?: string
+              _sort?: string
+              _status?: Database["public"]["Enums"]["sync_job_status"]
+              _store_id?: string
+              _to?: string
+            }
+            Returns: Json
+          }
       listing_content_hash: { Args: { _listing_id: string }; Returns: string }
       log_fulfillment_event: {
         Args: {
@@ -7318,6 +7383,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      recover_stale_sync_job: { Args: { _job_id: string }; Returns: Json }
       refresh_order_delivery_status: {
         Args: { _order_id: string }
         Returns: Database["public"]["Enums"]["order_delivery_status"]
@@ -8578,6 +8644,7 @@ export type Database = {
         }[]
       }
       sync_job_backoff: { Args: { _attempt: number }; Returns: string }
+      sync_queue_health: { Args: { _store_id?: string }; Returns: Json }
       sync_queue_overview: { Args: { _store_id?: string }; Returns: Json }
       update_shipment_details: {
         Args: {
