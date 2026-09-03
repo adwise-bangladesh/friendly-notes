@@ -2,6 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type {
   AutomationCondition,
   AutomationExecution,
+  AutomationReplayResult,
   AutomationRegistry,
   AutomationRule,
   AutomationRuleStatus,
@@ -64,6 +65,21 @@ export async function setAutomationRuleStatus(
     _status: status,
   });
   if (error) throw error;
+}
+
+/**
+ * Replay a failed automation execution. Admin-only and capped by the database
+ * at three replay attempts; the original execution row is never modified —
+ * the replay is recorded as a new execution.
+ */
+export async function replayAutomationExecution(
+  executionId: string,
+): Promise<AutomationReplayResult> {
+  const { data, error } = await supabase.rpc("automation_replay_execution", {
+    _execution_id: executionId,
+  });
+  if (error) throw error;
+  return data as unknown as AutomationReplayResult;
 }
 
 export interface ExecutionFilters {

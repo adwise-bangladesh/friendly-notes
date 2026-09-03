@@ -22,7 +22,7 @@ import type {
 const RUN_COLUMNS =
   "id, analysis_type, entity_type, entity_id, status, provider, model, source, requested_by, started_at, completed_at, duration_ms, error_message, insight_count, recommendation_count, summary, created_at";
 const INSIGHT_COLUMNS =
-  "id, analysis_run_id, entity_type, entity_id, category, severity, title, summary, confidence, evidence, status, reviewed_at, created_at, expires_at";
+  "id, analysis_run_id, entity_type, entity_id, category, severity, title, summary, confidence, evidence, status, reviewed_at, created_at, expires_at, superseded_at, superseded_by_run_id";
 const RECOMMENDATION_COLUMNS =
   "id, analysis_run_id, insight_id, entity_type, entity_id, recommendation_type, priority, title, description, suggested_action, action_target, confidence, status, reviewed_at, created_at";
 
