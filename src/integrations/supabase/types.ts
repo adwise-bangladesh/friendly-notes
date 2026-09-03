@@ -5875,6 +5875,7 @@ export type Database = {
           risk: string
           threshold: number
           variant_name: string
+          variant_sku: string
         }[]
       }
       analytics_store_guard: { Args: { _store_id: string }; Returns: undefined }
@@ -9823,7 +9824,7 @@ export type Database = {
         | "cancelled"
         | "superseded"
         | "dead_letter"
-      variant_status: "active" | "inactive"
+      variant_status: "active" | "inactive" | "archived"
       verification_attempt_outcome:
         | "pending"
         | "answered"
@@ -10512,7 +10513,7 @@ export const Constants = {
         "superseded",
         "dead_letter",
       ],
-      variant_status: ["active", "inactive"],
+      variant_status: ["active", "inactive", "archived"],
       verification_attempt_outcome: [
         "pending",
         "answered",
