@@ -41,11 +41,13 @@ import {
 import {
   FULFILLMENT_STATUSES,
   FULFILLMENT_STATUS_LABELS,
+  RESERVATION_STATUS_LABELS,
   ORDER_SOURCES,
   ORDER_SOURCE_LABELS,
 } from "@/types/orders";
 import type {
   DeliveryStatus,
+  ReservationStatus,
   FulfillmentStatus,
   OrderSource,
   OrderStatus,
@@ -551,6 +553,7 @@ function Page() {
                   <th className="px-3 py-2 text-right font-medium">COD due</th>
                   <th className="px-3 py-2 text-left font-medium">Payment</th>
                   <th className="px-3 py-2 text-left font-medium">Verification</th>
+                  <th className="px-3 py-2 text-left font-medium">Warehouse</th>
                   <th className="px-3 py-2 text-left font-medium">Delivery</th>
                   <th className="px-3 py-2 text-left font-medium">Courier</th>
                   <th className="px-3 py-2 text-left font-medium">Owner</th>
@@ -592,14 +595,19 @@ function Page() {
                           />
                         ) : null}
                       </div>
+                      <div className="text-[11.5px] text-muted-foreground">
+                        {o.store_name ?? ORDER_SOURCE_LABELS[o.source]}
+                      </div>
                       <div className="flex gap-1 pt-0.5">
                         <StatusBadge tone={ORDER_TONE[o.status]}>
                           {ORDER_STATUS_LABELS[o.status]}
                         </StatusBadge>
                         {o.risk_level !== "none" ? (
-                          <StatusBadge tone={RISK_LEVEL_TONE[o.risk_level]}>
-                            {o.risk_level}
-                          </StatusBadge>
+                          <span title={o.risk_reason ?? `${o.risk_level} risk`}>
+                            <StatusBadge tone={RISK_LEVEL_TONE[o.risk_level]}>
+                              {o.risk_level}
+                            </StatusBadge>
+                          </span>
                         ) : null}
                       </div>
                     </td>
@@ -617,6 +625,11 @@ function Page() {
                     </td>
                     <td className="px-3 py-2 text-right tabular-nums">
                       {formatMoney(Number(o.grand_total))}
+                      {Number(o.paid_amount) > 0 ? (
+                        <div className="text-[11.5px] text-muted-foreground">
+                          {formatMoney(Number(o.paid_amount))} collected
+                        </div>
+                      ) : null}
                     </td>
                     <td className="px-3 py-2 text-right tabular-nums">
                       {formatMoney(Number(o.due_amount))}
@@ -636,10 +649,28 @@ function Page() {
                         </span>
                       ) : null}
                     </td>
+                    <td className="px-3 py-2 text-muted-foreground">
+                      <div>{RESERVATION_STATUS_LABELS[o.reservation_status as ReservationStatus] ?? o.reservation_status}</div>
+                      <div className="text-[11.5px]">
+                        {o.ready_for_warehouse
+                          ? "Ready for warehouse"
+                          : FULFILLMENT_STATUS_LABELS[o.fulfillment_status]}
+                      </div>
+                    </td>
                     <td className="px-3 py-2">
                       <StatusBadge tone={DELIVERY_STATUS_TONE[o.delivery_status]}>
                         {DELIVERY_STATUS_LABELS[o.delivery_status]}
                       </StatusBadge>
+                      {o.shipment_status ? (
+                        <div className="text-[11.5px] text-muted-foreground">
+                          {o.shipment_status.replace(/_/g, " ")}
+                        </div>
+                      ) : null}
+                      {o.open_returns > 0 ? (
+                        <div className="text-[11.5px] text-destructive">
+                          {o.open_returns} open return{o.open_returns > 1 ? "s" : ""}
+                        </div>
+                      ) : null}
                     </td>
                     <td className="px-3 py-2 text-muted-foreground">
                       {o.courier_name ?? "—"}
@@ -651,7 +682,13 @@ function Page() {
                       {o.assigned_is_mine ? "You" : (o.assigned_name ?? "—")}
                     </td>
                     <td className="px-3 py-2 text-muted-foreground">
-                      {new Date(o.created_at).toLocaleDateString()}
+                      <div>{new Date(o.created_at).toLocaleDateString()}</div>
+                      <div className="text-[11.5px]">
+                        {new Date(o.created_at).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </div>
                     </td>
                   </tr>
                 ))}
