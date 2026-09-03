@@ -1126,6 +1126,7 @@ export type Database = {
           created_by: string | null
           difference: number
           direction: string
+          discrepancy_type: string
           expected_amount: number
           id: string
           order_id: string
@@ -1148,6 +1149,7 @@ export type Database = {
           created_by?: string | null
           difference: number
           direction: string
+          discrepancy_type?: string
           expected_amount: number
           id?: string
           order_id: string
@@ -1170,6 +1172,7 @@ export type Database = {
           created_by?: string | null
           difference?: number
           direction?: string
+          discrepancy_type?: string
           expected_amount?: number
           id?: string
           order_id?: string
@@ -1218,7 +1221,7 @@ export type Database = {
           {
             foreignKeyName: "courier_settlement_discrepancies_settlement_item_id_fkey"
             columns: ["settlement_item_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "courier_settlement_items"
             referencedColumns: ["id"]
           },
@@ -1237,11 +1240,18 @@ export type Database = {
           cod_charge: number | null
           created_at: string
           delivery_charge: number | null
+          eligibility_reason: string | null
+          expected_cod_fee: number
           expected_collected_amount: number
+          expected_delivery_fee: number
+          expected_net_amount: number
+          expected_other_charge: number
+          expected_return_charge: number
           id: string
           net_settlement_amount: number | null
           order_id: string
           other_charge: number | null
+          reconciled_at: string | null
           return_charge: number | null
           settlement_id: string
           shipment_id: string
@@ -1252,11 +1262,18 @@ export type Database = {
           cod_charge?: number | null
           created_at?: string
           delivery_charge?: number | null
+          eligibility_reason?: string | null
+          expected_cod_fee?: number
           expected_collected_amount?: number
+          expected_delivery_fee?: number
+          expected_net_amount?: number
+          expected_other_charge?: number
+          expected_return_charge?: number
           id?: string
           net_settlement_amount?: number | null
           order_id: string
           other_charge?: number | null
+          reconciled_at?: string | null
           return_charge?: number | null
           settlement_id: string
           shipment_id: string
@@ -1267,11 +1284,18 @@ export type Database = {
           cod_charge?: number | null
           created_at?: string
           delivery_charge?: number | null
+          eligibility_reason?: string | null
+          expected_cod_fee?: number
           expected_collected_amount?: number
+          expected_delivery_fee?: number
+          expected_net_amount?: number
+          expected_other_charge?: number
+          expected_return_charge?: number
           id?: string
           net_settlement_amount?: number | null
           order_id?: string
           other_charge?: number | null
+          reconciled_at?: string | null
           return_charge?: number | null
           settlement_id?: string
           shipment_id?: string
@@ -1363,6 +1387,194 @@ export type Database = {
             columns: ["courier_account_id"]
             isOneToOne: false
             referencedRelation: "courier_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courier_statement_imports: {
+        Row: {
+          ambiguous_rows: number
+          applied_rows: number
+          confirmed_at: string | null
+          confirmed_by: string | null
+          conflict_rows: number
+          courier_account_id: string
+          created_at: string
+          duplicate_rows: number
+          id: string
+          imported_by: string | null
+          invalid_rows: number
+          matched_rows: number
+          period_end: string | null
+          period_start: string | null
+          provider_id: string
+          settlement_id: string | null
+          source_name: string | null
+          statement_reference: string
+          status: string
+          total_rows: number
+          unmatched_rows: number
+          updated_at: string
+        }
+        Insert: {
+          ambiguous_rows?: number
+          applied_rows?: number
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          conflict_rows?: number
+          courier_account_id: string
+          created_at?: string
+          duplicate_rows?: number
+          id?: string
+          imported_by?: string | null
+          invalid_rows?: number
+          matched_rows?: number
+          period_end?: string | null
+          period_start?: string | null
+          provider_id: string
+          settlement_id?: string | null
+          source_name?: string | null
+          statement_reference: string
+          status?: string
+          total_rows?: number
+          unmatched_rows?: number
+          updated_at?: string
+        }
+        Update: {
+          ambiguous_rows?: number
+          applied_rows?: number
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          conflict_rows?: number
+          courier_account_id?: string
+          created_at?: string
+          duplicate_rows?: number
+          id?: string
+          imported_by?: string | null
+          invalid_rows?: number
+          matched_rows?: number
+          period_end?: string | null
+          period_start?: string | null
+          provider_id?: string
+          settlement_id?: string | null
+          source_name?: string | null
+          statement_reference?: string
+          status?: string
+          total_rows?: number
+          unmatched_rows?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_statement_imports_courier_account_id_fkey"
+            columns: ["courier_account_id"]
+            isOneToOne: false
+            referencedRelation: "courier_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_statement_imports_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "courier_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_statement_imports_settlement_id_fkey"
+            columns: ["settlement_id"]
+            isOneToOne: false
+            referencedRelation: "courier_settlements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courier_statement_rows: {
+        Row: {
+          applied_at: string | null
+          cod_fee: number | null
+          collected_amount: number | null
+          consignment_id: string | null
+          created_at: string
+          delivery_fee: number | null
+          id: string
+          import_id: string
+          match_note: string | null
+          match_status: string
+          merchant_order_reference: string | null
+          net_amount: number | null
+          other_charge: number | null
+          provider_status: string | null
+          raw_row: Json | null
+          return_charge: number | null
+          row_fingerprint: string
+          row_number: number
+          settlement_item_id: string | null
+          shipment_id: string | null
+        }
+        Insert: {
+          applied_at?: string | null
+          cod_fee?: number | null
+          collected_amount?: number | null
+          consignment_id?: string | null
+          created_at?: string
+          delivery_fee?: number | null
+          id?: string
+          import_id: string
+          match_note?: string | null
+          match_status?: string
+          merchant_order_reference?: string | null
+          net_amount?: number | null
+          other_charge?: number | null
+          provider_status?: string | null
+          raw_row?: Json | null
+          return_charge?: number | null
+          row_fingerprint: string
+          row_number: number
+          settlement_item_id?: string | null
+          shipment_id?: string | null
+        }
+        Update: {
+          applied_at?: string | null
+          cod_fee?: number | null
+          collected_amount?: number | null
+          consignment_id?: string | null
+          created_at?: string
+          delivery_fee?: number | null
+          id?: string
+          import_id?: string
+          match_note?: string | null
+          match_status?: string
+          merchant_order_reference?: string | null
+          net_amount?: number | null
+          other_charge?: number | null
+          provider_status?: string | null
+          raw_row?: Json | null
+          return_charge?: number | null
+          row_fingerprint?: string
+          row_number?: number
+          settlement_item_id?: string | null
+          shipment_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courier_statement_rows_import_id_fkey"
+            columns: ["import_id"]
+            isOneToOne: false
+            referencedRelation: "courier_statement_imports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_statement_rows_settlement_item_id_fkey"
+            columns: ["settlement_item_id"]
+            isOneToOne: false
+            referencedRelation: "courier_settlement_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_statement_rows_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
             referencedColumns: ["id"]
           },
         ]
@@ -5612,11 +5824,18 @@ export type Database = {
           cod_charge: number | null
           created_at: string
           delivery_charge: number | null
+          eligibility_reason: string | null
+          expected_cod_fee: number
           expected_collected_amount: number
+          expected_delivery_fee: number
+          expected_net_amount: number
+          expected_other_charge: number
+          expected_return_charge: number
           id: string
           net_settlement_amount: number | null
           order_id: string
           other_charge: number | null
+          reconciled_at: string | null
           return_charge: number | null
           settlement_id: string
           shipment_id: string
@@ -6380,6 +6599,46 @@ export type Database = {
           title: string
         }[]
       }
+      begin_courier_statement_import: {
+        Args: {
+          _courier_account_id: string
+          _period_end?: string
+          _period_start?: string
+          _settlement_id?: string
+          _source_name?: string
+          _statement_reference: string
+        }
+        Returns: {
+          ambiguous_rows: number
+          applied_rows: number
+          confirmed_at: string | null
+          confirmed_by: string | null
+          conflict_rows: number
+          courier_account_id: string
+          created_at: string
+          duplicate_rows: number
+          id: string
+          imported_by: string | null
+          invalid_rows: number
+          matched_rows: number
+          period_end: string | null
+          period_start: string | null
+          provider_id: string
+          settlement_id: string | null
+          source_name: string | null
+          statement_reference: string
+          status: string
+          total_rows: number
+          unmatched_rows: number
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "courier_statement_imports"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       begin_listing_operation: {
         Args: {
           _listing_id: string
@@ -6541,6 +6800,10 @@ export type Database = {
           _retry_after?: string
           _run_id?: string
         }
+        Returns: Json
+      }
+      confirm_courier_statement_import: {
+        Args: { _import_id: string }
         Returns: Json
       }
       courier_apply_event: {
@@ -7018,6 +7281,10 @@ export type Database = {
       customer_timeline: {
         Args: { _customer_id: string; _limit?: number; _offset?: number }
         Returns: Json
+      }
+      detect_settlement_item_discrepancies: {
+        Args: { _item_id: string }
+        Returns: number
       }
       effective_store_product_data: {
         Args: { _store_product_id: string }
@@ -7568,7 +7835,15 @@ export type Database = {
         Returns: boolean
       }
       order_quick_view: { Args: { _order_id: string }; Returns: Json }
+      order_settlement_discrepancy_summary: {
+        Args: { _order_id: string }
+        Returns: Json
+      }
       orders_console_list: { Args: { _payload?: Json }; Returns: Json }
+      populate_courier_settlement: {
+        Args: { _limit?: number; _settlement_id: string }
+        Returns: Json
+      }
       product_store_assignments: {
         Args: { _product_id: string }
         Returns: {
@@ -8073,11 +8348,18 @@ export type Database = {
           cod_charge: number | null
           created_at: string
           delivery_charge: number | null
+          eligibility_reason: string | null
+          expected_cod_fee: number
           expected_collected_amount: number
+          expected_delivery_fee: number
+          expected_net_amount: number
+          expected_other_charge: number
+          expected_return_charge: number
           id: string
           net_settlement_amount: number | null
           order_id: string
           other_charge: number | null
+          reconciled_at: string | null
           return_charge: number | null
           settlement_id: string
           shipment_id: string
@@ -8440,6 +8722,7 @@ export type Database = {
           created_by: string | null
           difference: number
           direction: string
+          discrepancy_type: string
           expected_amount: number
           id: string
           order_id: string
@@ -9608,6 +9891,41 @@ export type Database = {
         }
         Returns: undefined
       }
+      settlement_candidate_shipments: {
+        Args: { _courier_account_id: string; _limit?: number; _offset?: number }
+        Returns: {
+          already_settled: boolean
+          booked_delivery_fee: number
+          collected_amount: number
+          consignment_id: string
+          courier_account_name: string
+          eligibility_reason: string
+          expected_collected: number
+          expected_delivery_fee: number
+          expected_net: number
+          expected_return_charge: number
+          order_id: string
+          order_number: string
+          provider_name: string
+          settlement_reference: string
+          shipment_id: string
+          shipment_number: string
+          status: string
+        }[]
+      }
+      settlement_expected_values: {
+        Args: { _shipment_id: string }
+        Returns: {
+          eligible: boolean
+          expected_cod_fee: number
+          expected_collected: number
+          expected_delivery_fee: number
+          expected_net: number
+          expected_other_charge: number
+          expected_return_charge: number
+          reason: string
+        }[]
+      }
       shipment_expected_return_items: {
         Args: { _shipment_id: string }
         Returns: {
@@ -9627,6 +9945,10 @@ export type Database = {
           _to: Database["public"]["Enums"]["shipment_status"]
         }
         Returns: boolean
+      }
+      stage_courier_statement_rows: {
+        Args: { _import_id: string; _rows: Json }
+        Returns: Json
       }
       start_order_verification: {
         Args: {
