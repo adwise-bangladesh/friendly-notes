@@ -35,11 +35,13 @@ import {
   getShipmentCourierEvents,
   getShipmentById,
   getShipmentEvents,
+  resolveUnknownCourierBooking,
   setShipmentState,
   updateShipmentDetails,
 } from "@/lib/shipping";
 import {
   bookShipmentWithCourier,
+  cancelShipmentWithCourier,
   quoteShipmentDeliveryFee,
   refreshShipmentCourierStatus,
 } from "@/lib/couriers.functions";
@@ -91,6 +93,10 @@ function Page() {
 
   const [action, setAction] = useState<ShipmentAction | null>(null);
   const [reason, setReason] = useState("");
+  // unknown-booking recovery inputs
+  const [recoveryConsignment, setRecoveryConsignment] = useState("");
+  const [recoveryReason, setRecoveryReason] = useState("");
+  const [cancelReason, setCancelReason] = useState("");
   const [holdReason, setHoldReason] = useState<ShipmentHoldReason | "">("");
   const [failureReason, setFailureReason] = useState<ShipmentFailureReason | "">("");
   const [tracking, setTracking] = useState("");
@@ -199,8 +205,9 @@ function Page() {
   const quoteFn = useServerFn(quoteShipmentDeliveryFee);
 
   /**
-   * Courier API actions. Each one is safe to press twice: booking is guarded by
-   * an existing consignment, status refresh runs through the same idempotent
+   * Courier API actions. Each one is safe to press twice: booking claims the
+   * attempt under a row lock before the courier is contacted, so a second press
+   * is answered locally; status refresh runs through the same idempotent
    * ingestion path as a webhook.
    */
   const apiMutation = useMutation({
@@ -211,6 +218,35 @@ function Page() {
     },
     onSuccess: (result) => {
       toast.success(result.message);
+      invalidate();
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const cancelWithCourierFn = useServerFn(cancelShipmentWithCourier);
+  const cancelCourierMutation = useMutation({
+    mutationFn: () => cancelWithCourierFn({ data: { shipmentId: id, reason: cancelReason } }),
+    onSuccess: (result) => {
+      toast.success(result.message);
+      setCancelReason("");
+      invalidate();
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  /** Operator recovery when a booking attempt ended with an unknown outcome. */
+  const recoveryMutation = useMutation({
+    mutationFn: (resolution: "confirm" | "abandon") =>
+      resolveUnknownCourierBooking({
+        shipmentId: id,
+        resolution,
+        consignmentId: recoveryConsignment,
+        reason: recoveryReason,
+      }),
+    onSuccess: () => {
+      toast.success("Booking outcome resolved");
+      setRecoveryConsignment("");
+      setRecoveryReason("");
       invalidate();
     },
     onError: (error: Error) => toast.error(error.message),
@@ -470,7 +506,59 @@ function Page() {
                   <dd className="tabular-nums">{shipment.return_tracking_number}</dd>
                 </div>
               )}
+              <div>
+                <dt className="text-[11px] text-muted-foreground">Booking attempts</dt>
+                <dd className="tabular-nums">{shipment.booking_attempt_count ?? 0}</dd>
+              </div>
             </dl>
+
+            {shipment.booking_outcome_unknown && (
+              <div className="mt-3 space-y-2 rounded border border-destructive/40 bg-destructive/5 p-3">
+                <p className="text-[12.5px] font-medium text-destructive">
+                  The result of the last booking attempt is unknown
+                </p>
+                <p className="text-[12px] text-muted-foreground">
+                  {shipment.booking_last_error ??
+                    "The courier may or may not have created a parcel."}{" "}
+                  Booking is blocked until someone confirms with the courier which happened.
+                </p>
+                {canManage && (
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Input
+                        value={recoveryConsignment}
+                        onChange={(e) => setRecoveryConsignment(e.target.value)}
+                        placeholder="Consignment the courier created"
+                        className="h-8 max-w-xs text-[12.5px]"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => recoveryMutation.mutate("confirm")}
+                        disabled={recoveryMutation.isPending || !recoveryConsignment.trim()}
+                      >
+                        A parcel exists
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Input
+                        value={recoveryReason}
+                        onChange={(e) => setRecoveryReason(e.target.value)}
+                        placeholder="Who confirmed no parcel exists"
+                        className="h-8 max-w-xs text-[12.5px]"
+                      />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => recoveryMutation.mutate("abandon")}
+                        disabled={recoveryMutation.isPending || !recoveryReason.trim()}
+                      >
+                        No parcel — allow retry
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {canManage && (
               <div className="mt-3 flex flex-wrap gap-2">
@@ -489,10 +577,11 @@ function Page() {
                   disabled={
                     apiMutation.isPending ||
                     !shipment.courier_account_id ||
+                    shipment.booking_outcome_unknown ||
                     Boolean(shipment.external_consignment_id)
                   }
                 >
-                  Book with courier
+                  {apiMutation.isPending ? "Booking…" : "Book with courier"}
                 </Button>
                 <Button
                   size="sm"
@@ -501,6 +590,25 @@ function Page() {
                   disabled={apiMutation.isPending || !shipment.external_consignment_id}
                 >
                   Refresh status
+                </Button>
+                <Input
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  placeholder="Cancellation reason"
+                  className="h-8 max-w-[200px] text-[12.5px]"
+                />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => cancelCourierMutation.mutate()}
+                  disabled={
+                    cancelCourierMutation.isPending ||
+                    !shipment.external_consignment_id ||
+                    cancelReason.trim().length < 3
+                  }
+                  title="Only couriers whose integration supports API cancellation accept this."
+                >
+                  Cancel with courier
                 </Button>
               </div>
             )}

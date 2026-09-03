@@ -42,7 +42,9 @@ const SHIPMENT_COLUMNS = `
   courier_account_id, provider_status, provider_status_slug, provider_status_at,
   last_synced_at, quoted_delivery_fee, booked_delivery_fee,
   return_tracking_number, return_reason, partial_delivery_note,
-  provider_recipient_city_id, provider_recipient_zone_id, provider_recipient_area_id
+  provider_recipient_city_id, provider_recipient_zone_id, provider_recipient_area_id,
+  booking_idempotency_key, booking_snapshot, booking_attempt_started_at,
+  booking_attempt_count, booking_last_error, booking_outcome_unknown
 `;
 
 /* ---------- Courier providers ---------- */
@@ -386,6 +388,30 @@ export async function setShipmentReturnTracking(args: {
     _shipment_id: args.shipmentId,
     _return_tracking_number: tracking ?? "",
     ...(reason ? { _return_reason: reason } : {}),
+  });
+  if (error) throw error;
+  return data as unknown as Shipment;
+}
+
+/**
+ * Resolves a booking whose outcome is unknown (the courier was contacted but
+ * the answer was lost). `confirm` records the consignment the courier really
+ * created; `abandon` proves no parcel exists and issues a fresh booking key so
+ * a retry can never collide with the previous attempt.
+ */
+export async function resolveUnknownCourierBooking(args: {
+  shipmentId: string;
+  resolution: "confirm" | "abandon";
+  consignmentId?: string | null;
+  reason?: string | null;
+}): Promise<Shipment> {
+  const consignment = args.consignmentId?.trim();
+  const reason = args.reason?.trim();
+  const { data, error } = await supabase.rpc("resolve_unknown_courier_booking", {
+    _shipment_id: args.shipmentId,
+    _resolution: args.resolution,
+    ...(consignment ? { _consignment_id: consignment } : {}),
+    ...(reason ? { _reason: reason } : {}),
   });
   if (error) throw error;
   return data as unknown as Shipment;
