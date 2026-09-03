@@ -118,6 +118,7 @@ export interface QueueHealth {
   cancelled_count: number;
   succeeded_24h: number;
   oldest_waiting_at: string | null;
+  overdue_count: number;
   stale_lease_count: number;
   auth_failure_count: number;
   rate_limited_count: number;
