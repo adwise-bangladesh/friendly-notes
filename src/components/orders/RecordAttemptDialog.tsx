@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
+import { invalidateOrderSurfaces } from "@/lib/order-cache";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -89,10 +90,7 @@ export function RecordAttemptDialog({
       });
     },
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ["order", orderId] });
-      void qc.invalidateQueries({ queryKey: ["verification", orderId] });
-      void qc.invalidateQueries({ queryKey: ["verification-queue"] });
-      void qc.invalidateQueries({ queryKey: ["orders"] });
+      invalidateOrderSurfaces(qc, orderId);
       toast.success("Attempt recorded");
       onOpenChange(false);
     },
