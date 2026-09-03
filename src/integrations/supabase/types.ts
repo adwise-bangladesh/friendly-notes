@@ -2794,6 +2794,8 @@ export type Database = {
           received_at: string | null
           requested_at: string
           resolution_note: string | null
+          restocked_at: string | null
+          restocked_by: string | null
           return_number: string
           return_type: Database["public"]["Enums"]["order_return_type"]
           shipment_id: string | null
@@ -2818,6 +2820,8 @@ export type Database = {
           received_at?: string | null
           requested_at?: string
           resolution_note?: string | null
+          restocked_at?: string | null
+          restocked_by?: string | null
           return_number: string
           return_type?: Database["public"]["Enums"]["order_return_type"]
           shipment_id?: string | null
@@ -2842,6 +2846,8 @@ export type Database = {
           received_at?: string | null
           requested_at?: string
           resolution_note?: string | null
+          restocked_at?: string | null
+          restocked_by?: string | null
           return_number?: string
           return_type?: Database["public"]["Enums"]["order_return_type"]
           shipment_id?: string | null
@@ -6297,6 +6303,8 @@ export type Database = {
           received_at: string | null
           requested_at: string
           resolution_note: string | null
+          restocked_at: string | null
+          restocked_by: string | null
           return_number: string
           return_type: Database["public"]["Enums"]["order_return_type"]
           shipment_id: string | null
@@ -6492,6 +6500,47 @@ export type Database = {
       ensure_inventory_level_internal: {
         Args: { _location_id: string; _product_id: string; _variant_id: string }
         Returns: string
+      }
+      ensure_shipment_return: {
+        Args: {
+          _at: string
+          _provider_event?: string
+          _reason: string
+          _shipment_id: string
+          _target: Database["public"]["Enums"]["order_return_status"]
+        }
+        Returns: {
+          cancelled_at: string | null
+          completed_at: string | null
+          courier_reason: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          initiated_at: string | null
+          inspected_at: string | null
+          notes: string | null
+          order_id: string
+          reason: string | null
+          received_at: string | null
+          requested_at: string
+          resolution_note: string | null
+          restocked_at: string | null
+          restocked_by: string | null
+          return_number: string
+          return_type: Database["public"]["Enums"]["order_return_type"]
+          shipment_id: string | null
+          source: string
+          status: Database["public"]["Enums"]["order_return_status"]
+          tracking_reference: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_returns"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       finalize_goods_receipt: {
         Args: { _receipt_id: string }
@@ -6702,6 +6751,8 @@ export type Database = {
           received_at: string | null
           requested_at: string
           resolution_note: string | null
+          restocked_at: string | null
+          restocked_by: string | null
           return_number: string
           return_type: Database["public"]["Enums"]["order_return_type"]
           shipment_id: string | null
@@ -6909,6 +6960,10 @@ export type Database = {
           ordered: number
           remaining: number
         }[]
+      }
+      order_item_returnable_quantity: {
+        Args: { _order_item_id: string }
+        Returns: number
       }
       order_operationally_locked: {
         Args: { _order_id: string }
@@ -7139,6 +7194,8 @@ export type Database = {
           received_at: string | null
           requested_at: string
           resolution_note: string | null
+          restocked_at: string | null
+          restocked_by: string | null
           return_number: string
           return_type: Database["public"]["Enums"]["order_return_type"]
           shipment_id: string | null
@@ -7474,6 +7531,10 @@ export type Database = {
           _phone: string
         }
         Returns: string
+      }
+      restock_return_inventory: {
+        Args: { _return_id: string }
+        Returns: undefined
       }
       return_transition_valid: {
         Args: {
@@ -8119,6 +8180,8 @@ export type Database = {
           received_at: string | null
           requested_at: string
           resolution_note: string | null
+          restocked_at: string | null
+          restocked_by: string | null
           return_number: string
           return_type: Database["public"]["Enums"]["order_return_type"]
           shipment_id: string | null
