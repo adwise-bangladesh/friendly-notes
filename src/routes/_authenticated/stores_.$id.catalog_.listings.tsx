@@ -31,7 +31,7 @@ import type { StatusTone } from "@/components/shared/StatusBadge";
 const TITLE = "Channel listings · Commerce Operations";
 const DESCRIPTION = "Publish state and synchronisation health for every external channel listing.";
 
-export const Route = createFileRoute("/_authenticated/stores_/$id/catalog/listings")({
+export const Route = createFileRoute("/_authenticated/stores_/$id/catalog_/listings")({
   head: () => ({
     meta: [
       { title: TITLE },
