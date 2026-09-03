@@ -18,6 +18,8 @@ export interface WorkerOptions {
   batchSize?: number;
   leaseSeconds?: number;
   timeBudgetMs?: number;
+  /** Identifies this run in the append-only attempt history. */
+  workerId?: string;
 }
 
 export interface WorkerJobOutcome {
@@ -61,9 +63,11 @@ export async function runSyncWorker(
   const budgetMs = Math.min(Math.max(options.timeBudgetMs ?? DEFAULT_BUDGET_MS, 2_000), 45_000);
   const startedAt = Date.now();
 
+  const workerId = (options.workerId ?? "worker").slice(0, 60);
   const { data, error } = await client.rpc("claim_sync_jobs", {
     _limit: batchSize,
     _lease_seconds: leaseSeconds,
+    _worker_id: workerId,
   });
   if (error) throw new Error(error.message);
   const jobs = (Array.isArray(data) ? data : []) as ClaimedJob[];
@@ -85,6 +89,7 @@ export async function runSyncWorker(
     let message = "The operation failed";
     let failureClass: string = "unknown";
     let runId: string | null = null;
+    let retryAfter: string | null = null;
     try {
       const result = await executeListingOperation(
         client,
@@ -95,6 +100,7 @@ export async function runSyncWorker(
       message = result.message;
       failureClass = result.failureClass ?? "unknown";
       runId = result.runId;
+      retryAfter = result.retryAfter;
     } catch (caught) {
       message = caught instanceof Error ? caught.message.slice(0, 300) : "The operation failed";
       failureClass = "transient";
@@ -107,6 +113,7 @@ export async function runSyncWorker(
       _message: message,
       _failure_class: failureClass,
       _run_id: runId,
+      _retry_after: retryAfter,
     });
     if (completeError) throw new Error(completeError.message);
     const status = (completion as { status?: string } | null)?.status ?? "unknown";
