@@ -12,6 +12,7 @@ import {
   formatNumber,
   formatPercent,
   getOverview,
+  getProfitability,
   getSalesTrend,
   percentChange,
   previousRange,
@@ -55,6 +56,10 @@ function AnalyticsOverviewPage() {
   const baseline = useQuery({
     queryKey: ["analytics", "overview-prev", preset, source, storeId],
     queryFn: () => getOverview(prev, source, storeId),
+  });
+  const profit = useQuery({
+    queryKey: ["analytics", "profitability", preset, storeId],
+    queryFn: () => getProfitability(range, storeId),
   });
   const trend = useQuery({
     queryKey: ["analytics", "sales-trend", preset, activeGrain, source, storeId],
@@ -163,6 +168,70 @@ function AnalyticsOverviewPage() {
               hint={`${formatNumber(o.new_customers)} new / ${formatNumber(o.repeat_customers)} repeat customers`}
             />
           </div>
+
+          {profit.data ? (
+            <div className="grid gap-4 lg:grid-cols-3">
+              <div className="lg:col-span-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <MetricCard
+                  label="Estimated profit (period)"
+                  value={formatMoney(profit.data.estimated_profit)}
+                  hint="Frozen order-line price and cost snapshots"
+                  badge="estimated"
+                />
+                <MetricCard
+                  label="Realized profit (period)"
+                  value={formatMoney(profit.data.realized_profit)}
+                  hint={`${formatNumber(profit.data.orders_reconciled)} of ${formatNumber(profit.data.orders)} orders reconciled`}
+                  badge="actual"
+                />
+                <MetricCard
+                  label="Estimate vs actual gap"
+                  value={formatMoney(profit.data.profit_difference)}
+                  invert
+                  hint={`${formatMoney(profit.data.open_discrepancy_amount)} still disputed with couriers`}
+                />
+                <MetricCard
+                  label="Loss on returns"
+                  value={formatMoney(profit.data.return_loss)}
+                  invert
+                  hint={`${formatNumber(profit.data.returned_units)} accepted return units`}
+                />
+                <MetricCard
+                  label="Courier charges"
+                  value={formatMoney(profit.data.courier_charges)}
+                  invert
+                  hint={`Refunds ${formatMoney(profit.data.refunds)}`}
+                />
+                <MetricCard
+                  label="Lost & damaged units"
+                  value={formatNumber(profit.data.lost_units + profit.data.damaged_units)}
+                  invert
+                  hint={`${formatNumber(profit.data.delivered_units)} delivered · ${formatNumber(profit.data.refused_units)} refused`}
+                />
+              </div>
+
+              <StatList
+                title="Estimated vs realized"
+                description="Estimated comes from order snapshots. Realized only counts money actually collected and courier charges actually recorded."
+                rows={[
+                  { label: "Estimated revenue", value: formatMoney(profit.data.estimated_revenue) },
+                  { label: "Realized revenue", value: formatMoney(profit.data.realized_revenue) },
+                  {
+                    label: "Estimated product cost",
+                    value: formatMoney(profit.data.estimated_product_cost),
+                  },
+                  {
+                    label: "Realized product cost",
+                    value: formatMoney(profit.data.realized_product_cost),
+                  },
+                  {
+                    label: "Awaiting reconciliation",
+                    value: formatNumber(profit.data.orders_pending_reconciliation),
+                  },
+                ]}
+              />
+            </div>
+          ) : null}
 
           <div className="grid gap-4 lg:grid-cols-3">
             <div className="lg:col-span-2">

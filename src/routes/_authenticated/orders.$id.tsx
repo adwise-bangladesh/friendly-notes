@@ -18,6 +18,7 @@ import { OrderFulfillmentsPanel } from "@/components/orders/OrderFulfillmentsPan
 import { OrderShipmentsPanel } from "@/components/orders/OrderShipmentsPanel";
 import { OrderReturnsPanel } from "@/components/orders/OrderReturnsPanel";
 import { OrderFinancialsPanel } from "@/components/orders/OrderFinancialsPanel";
+import { OrderProfitabilityPanel } from "@/components/finance/ProfitabilityPanel";
 import { OrderCorrectionDialog } from "@/components/orders/OrderCorrectionDialog";
 import { OrderItemsEditor } from "@/components/orders/OrderItemsEditor";
 import { CustomerIntelligencePanel } from "@/components/orders/CustomerIntelligencePanel";
@@ -327,6 +328,7 @@ function Page() {
           <OrderReturnsPanel order={order} canManage={canManage} />
 
           {internalVisible && <OrderFinancialsPanel orderId={order.id} canManage={canManage} />}
+          {internalVisible && <OrderProfitabilityPanel orderId={order.id} />}
 
           <AIEntityPanel entityType="order" entityId={order.id} analysisType="order_review" />
 

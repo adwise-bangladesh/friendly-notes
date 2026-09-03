@@ -27,6 +27,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { FormSection } from "@/components/commerce/FormSection";
+import { ShipmentProfitabilityPanel } from "@/components/finance/ProfitabilityPanel";
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import { formatMoney } from "@/lib/currency";
 import {
@@ -788,6 +789,8 @@ function Page() {
         </div>
 
         <div className="space-y-4">
+          <ShipmentProfitabilityPanel shipmentId={shipment.id} />
+
           <FormSection title="Shipment facts">
             <dl className="space-y-2 text-[13px]">
               <Fact label="Tracking number" value={shipment.tracking_number ?? "—"} />

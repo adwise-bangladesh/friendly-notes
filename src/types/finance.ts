@@ -282,3 +282,149 @@ export interface ReturnFinancialSummary {
   refund_adjustment_id: string | null;
 }
 
+
+/* ---------- Estimated vs realized profitability (Step 20.8.3.7) ---------- */
+
+/**
+ * How much of a profit figure is real money rather than a projection.
+ * Mirrors the database `profit_status` / `reconciliation_status` values.
+ */
+export type ProfitStatus =
+  | "estimated"
+  | "partially_actual"
+  | "pending_settlement"
+  | "reconciled"
+  | "finalized"
+  | "actual";
+
+export const PROFIT_STATUS_LABELS: Record<ProfitStatus, string> = {
+  estimated: "Estimated only",
+  partially_actual: "Partly actual",
+  pending_settlement: "Awaiting courier settlement",
+  reconciled: "Reconciled",
+  finalized: "Finalised",
+  actual: "Actual",
+};
+
+export const PROFIT_STATUS_TONE: Record<ProfitStatus, StatusTone> = {
+  estimated: "warning",
+  partially_actual: "info",
+  pending_settlement: "warning",
+  reconciled: "success",
+  finalized: "success",
+  actual: "success",
+};
+
+/** Mirrors shipment_profitability(uuid). */
+export interface ShipmentProfitability {
+  shipment_id: string;
+  shipment_number: string;
+  order_id: string;
+  order_number: string;
+  shipment_status: string;
+  quantities: {
+    shipped: number;
+    delivered: number;
+    refused: number;
+    lost: number;
+    damaged: number;
+    return_declared: number;
+    return_received: number;
+    return_accepted: number;
+  };
+  estimated: {
+    attributed_revenue: number;
+    attributed_product_cost: number;
+    expected_delivery_fee: number | null;
+    expected_cod: number | null;
+    profit: number;
+  };
+  realized: {
+    attributed_revenue: number;
+    attributed_product_cost: number;
+    collected_amount: number | null;
+    actual_delivery_fee: number | null;
+    actual_cod_fee: number | null;
+    actual_return_charge: number | null;
+    actual_other_charge: number | null;
+    adjustment: number;
+    profit: number;
+  };
+  cost_snapshot_complete: boolean;
+  open_discrepancies: number;
+  settlement_status: string | null;
+  profit_status: ProfitStatus;
+  /** Plain-language reasons the realized figure is not final yet. */
+  missing: string[];
+}
+
+/** Mirrors order_profitability(uuid). */
+export interface OrderProfitability {
+  order_id: string;
+  order_number: string;
+  store_id: string | null;
+  estimated: {
+    revenue: number;
+    product_cost: number;
+    courier_cost: number;
+    packing_cost: number;
+    profit: number;
+  };
+  realized: {
+    revenue: number;
+    product_cost: number;
+    delivery_fee: number;
+    cod_fee: number;
+    return_charge: number;
+    other_courier_charge: number;
+    packing_cost: number;
+    refund_amount: number;
+    adjustment_income: number;
+    adjustment_expense: number;
+    open_discrepancy_amount: number;
+    profit: number;
+  };
+  difference: number;
+  quantities: {
+    ordered: number;
+    shipped: number;
+    delivered: number;
+    refused: number;
+    lost: number;
+    damaged: number;
+    returned_declared: number;
+    returned_accepted: number;
+  };
+  shipment_count: number;
+  cost_snapshot_complete: boolean;
+  profit_status: ProfitStatus;
+  reconciliation_status: ProfitStatus;
+  missing: string[];
+  shipments: ShipmentProfitability[];
+}
+
+/** Mirrors analytics_profitability(from, to, store). */
+export interface ProfitabilitySummary {
+  orders: number;
+  estimated_revenue: number;
+  estimated_product_cost: number;
+  estimated_courier_cost: number;
+  estimated_profit: number;
+  realized_revenue: number;
+  realized_product_cost: number;
+  courier_charges: number;
+  refunds: number;
+  adjustment_income: number;
+  adjustment_expense: number;
+  realized_profit: number;
+  profit_difference: number;
+  orders_pending_reconciliation: number;
+  orders_reconciled: number;
+  open_discrepancy_amount: number;
+  return_loss: number;
+  delivered_units: number;
+  refused_units: number;
+  lost_units: number;
+  damaged_units: number;
+  returned_units: number;
+}

@@ -14,6 +14,8 @@ import type {
   DiscrepancyResolution,
   DiscrepancyWithContext,
   ReturnFinancialSummary,
+  OrderProfitability,
+  ShipmentProfitability,
 } from "@/types/finance";
 
 /**
@@ -475,4 +477,27 @@ export function financialErrorMessage(raw: string): string {
     return "Could not reach the server. Check your connection and try again.";
   }
   return text || "Something went wrong. Please try again.";
+}
+
+/* ---------- Estimated vs realized profitability ---------- */
+
+/**
+ * Profit projections. Everything is derived in the database from immutable
+ * order-line snapshots, per-item delivery outcomes, accepted returns and
+ * recorded courier money — nothing is stored or recomputed on the client.
+ */
+export async function getOrderProfitability(orderId: string): Promise<OrderProfitability> {
+  const { data, error } = await supabase.rpc("order_profitability", { _order_id: orderId });
+  if (error) throw error;
+  return data as unknown as OrderProfitability;
+}
+
+export async function getShipmentProfitability(
+  shipmentId: string,
+): Promise<ShipmentProfitability> {
+  const { data, error } = await supabase.rpc("shipment_profitability", {
+    _shipment_id: shipmentId,
+  });
+  if (error) throw error;
+  return data as unknown as ShipmentProfitability;
 }
