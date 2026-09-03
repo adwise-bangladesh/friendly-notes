@@ -204,8 +204,9 @@ function Page() {
   const quoteFn = useServerFn(quoteShipmentDeliveryFee);
 
   /**
-   * Courier API actions. Each one is safe to press twice: booking is guarded by
-   * an existing consignment, status refresh runs through the same idempotent
+   * Courier API actions. Each one is safe to press twice: booking claims the
+   * attempt under a row lock before the courier is contacted, so a second press
+   * is answered locally; status refresh runs through the same idempotent
    * ingestion path as a webhook.
    */
   const apiMutation = useMutation({
@@ -216,6 +217,35 @@ function Page() {
     },
     onSuccess: (result) => {
       toast.success(result.message);
+      invalidate();
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const cancelWithCourierFn = useServerFn(cancelShipmentWithCourier);
+  const cancelCourierMutation = useMutation({
+    mutationFn: () => cancelWithCourierFn({ data: { shipmentId: id, reason } }),
+    onSuccess: (result) => {
+      toast.success(result.message);
+      setReason("");
+      invalidate();
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  /** Operator recovery when a booking attempt ended with an unknown outcome. */
+  const recoveryMutation = useMutation({
+    mutationFn: (resolution: "confirm" | "abandon") =>
+      resolveUnknownCourierBooking({
+        shipmentId: id,
+        resolution,
+        consignmentId: recoveryConsignment,
+        reason: recoveryReason,
+      }),
+    onSuccess: () => {
+      toast.success("Booking outcome resolved");
+      setRecoveryConsignment("");
+      setRecoveryReason("");
       invalidate();
     },
     onError: (error: Error) => toast.error(error.message),
