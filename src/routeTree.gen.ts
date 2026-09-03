@@ -56,6 +56,7 @@ import { Route as AuthenticatedStoresIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedStoresIdRouteImport } from './routes/_authenticated/stores.$id'
 import { Route as AuthenticatedSuppliersIndexRouteImport } from './routes/_authenticated/suppliers.index'
 import { Route as AuthenticatedSuppliersIdRouteImport } from './routes/_authenticated/suppliers.$id'
+import { Route as ApiPublicSyncWorkerRouteImport } from './routes/api/public/sync-worker'
 import { Route as AuthenticatedAiBrainRunsIdRouteImport } from './routes/_authenticated/ai-brain.runs.$id'
 import { Route as AuthenticatedFinanceCourierSettlementsIdRouteImport } from './routes/_authenticated/finance.courier-settlements_.$id'
 import { Route as AuthenticatedIntegrationsCouriersIdRouteImport } from './routes/_authenticated/integrations.couriers.$id'
@@ -69,6 +70,7 @@ import { Route as AuthenticatedProcurementPurchaseOrdersNewRouteImport } from '.
 import { Route as AuthenticatedStoresIdCatalogRouteImport } from './routes/_authenticated/stores_.$id.catalog'
 import { Route as AuthenticatedStoresIdCatalogStoreProductIdRouteImport } from './routes/_authenticated/stores_.$id.catalog_.$storeProductId'
 import { Route as AuthenticatedStoresIdCatalogListingsRouteImport } from './routes/_authenticated/stores_.$id.catalog_.listings'
+import { Route as AuthenticatedStoresIdCatalogSyncRouteImport } from './routes/_authenticated/stores_.$id.catalog_.sync'
 import { Route as ApiPublicCouriersProviderWebhookRouteImport } from './routes/api/public/couriers.$provider.webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -339,6 +341,11 @@ const AuthenticatedSuppliersIdRoute =
     path: '/suppliers/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicSyncWorkerRoute = ApiPublicSyncWorkerRouteImport.update({
+  id: '/api/public/sync-worker',
+  path: '/api/public/sync-worker',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAiBrainRunsIdRoute =
   AuthenticatedAiBrainRunsIdRouteImport.update({
     id: '/ai-brain/runs/$id',
@@ -417,6 +424,12 @@ const AuthenticatedStoresIdCatalogListingsRoute =
     path: '/stores/$id/catalog/listings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedStoresIdCatalogSyncRoute =
+  AuthenticatedStoresIdCatalogSyncRouteImport.update({
+    id: '/stores_/$id/catalog_/sync',
+    path: '/stores/$id/catalog/sync',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicCouriersProviderWebhookRoute =
   ApiPublicCouriersProviderWebhookRouteImport.update({
     id: '/api/public/couriers/$provider/webhook',
@@ -460,6 +473,7 @@ export interface FileRoutesByFullPath {
   '/returns/$id': typeof AuthenticatedReturnsIdRoute
   '/stores/$id': typeof AuthenticatedStoresIdRoute
   '/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
+  '/api/public/sync-worker': typeof ApiPublicSyncWorkerRoute
   '/ai-brain/': typeof AuthenticatedAiBrainIndexRoute
   '/analytics/': typeof AuthenticatedAnalyticsIndexRoute
   '/automation/': typeof AuthenticatedAutomationIndexRoute
@@ -484,6 +498,7 @@ export interface FileRoutesByFullPath {
   '/procurement/purchase-orders/': typeof AuthenticatedProcurementPurchaseOrdersIndexRoute
   '/stores/$id/catalog/$storeProductId': typeof AuthenticatedStoresIdCatalogStoreProductIdRoute
   '/stores/$id/catalog/listings': typeof AuthenticatedStoresIdCatalogListingsRoute
+  '/stores/$id/catalog/sync': typeof AuthenticatedStoresIdCatalogSyncRoute
   '/api/public/couriers/$provider/webhook': typeof ApiPublicCouriersProviderWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -522,6 +537,7 @@ export interface FileRoutesByTo {
   '/returns/$id': typeof AuthenticatedReturnsIdRoute
   '/stores/$id': typeof AuthenticatedStoresIdRoute
   '/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
+  '/api/public/sync-worker': typeof ApiPublicSyncWorkerRoute
   '/ai-brain': typeof AuthenticatedAiBrainIndexRoute
   '/analytics': typeof AuthenticatedAnalyticsIndexRoute
   '/automation': typeof AuthenticatedAutomationIndexRoute
@@ -546,6 +562,7 @@ export interface FileRoutesByTo {
   '/procurement/purchase-orders': typeof AuthenticatedProcurementPurchaseOrdersIndexRoute
   '/stores/$id/catalog/$storeProductId': typeof AuthenticatedStoresIdCatalogStoreProductIdRoute
   '/stores/$id/catalog/listings': typeof AuthenticatedStoresIdCatalogListingsRoute
+  '/stores/$id/catalog/sync': typeof AuthenticatedStoresIdCatalogSyncRoute
   '/api/public/couriers/$provider/webhook': typeof ApiPublicCouriersProviderWebhookRoute
 }
 export interface FileRoutesById {
@@ -586,6 +603,7 @@ export interface FileRoutesById {
   '/_authenticated/returns_/$id': typeof AuthenticatedReturnsIdRoute
   '/_authenticated/stores/$id': typeof AuthenticatedStoresIdRoute
   '/_authenticated/suppliers/$id': typeof AuthenticatedSuppliersIdRoute
+  '/api/public/sync-worker': typeof ApiPublicSyncWorkerRoute
   '/_authenticated/ai-brain/': typeof AuthenticatedAiBrainIndexRoute
   '/_authenticated/analytics/': typeof AuthenticatedAnalyticsIndexRoute
   '/_authenticated/automation/': typeof AuthenticatedAutomationIndexRoute
@@ -610,6 +628,7 @@ export interface FileRoutesById {
   '/_authenticated/procurement/purchase-orders/': typeof AuthenticatedProcurementPurchaseOrdersIndexRoute
   '/_authenticated/stores_/$id/catalog_/$storeProductId': typeof AuthenticatedStoresIdCatalogStoreProductIdRoute
   '/_authenticated/stores_/$id/catalog_/listings': typeof AuthenticatedStoresIdCatalogListingsRoute
+  '/_authenticated/stores_/$id/catalog_/sync': typeof AuthenticatedStoresIdCatalogSyncRoute
   '/api/public/couriers/$provider/webhook': typeof ApiPublicCouriersProviderWebhookRoute
 }
 export interface FileRouteTypes {
@@ -650,6 +669,7 @@ export interface FileRouteTypes {
     | '/returns/$id'
     | '/stores/$id'
     | '/suppliers/$id'
+    | '/api/public/sync-worker'
     | '/ai-brain/'
     | '/analytics/'
     | '/automation/'
@@ -674,6 +694,7 @@ export interface FileRouteTypes {
     | '/procurement/purchase-orders/'
     | '/stores/$id/catalog/$storeProductId'
     | '/stores/$id/catalog/listings'
+    | '/stores/$id/catalog/sync'
     | '/api/public/couriers/$provider/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -712,6 +733,7 @@ export interface FileRouteTypes {
     | '/returns/$id'
     | '/stores/$id'
     | '/suppliers/$id'
+    | '/api/public/sync-worker'
     | '/ai-brain'
     | '/analytics'
     | '/automation'
@@ -736,6 +758,7 @@ export interface FileRouteTypes {
     | '/procurement/purchase-orders'
     | '/stores/$id/catalog/$storeProductId'
     | '/stores/$id/catalog/listings'
+    | '/stores/$id/catalog/sync'
     | '/api/public/couriers/$provider/webhook'
   id:
     | '__root__'
@@ -775,6 +798,7 @@ export interface FileRouteTypes {
     | '/_authenticated/returns_/$id'
     | '/_authenticated/stores/$id'
     | '/_authenticated/suppliers/$id'
+    | '/api/public/sync-worker'
     | '/_authenticated/ai-brain/'
     | '/_authenticated/analytics/'
     | '/_authenticated/automation/'
@@ -799,6 +823,7 @@ export interface FileRouteTypes {
     | '/_authenticated/procurement/purchase-orders/'
     | '/_authenticated/stores_/$id/catalog_/$storeProductId'
     | '/_authenticated/stores_/$id/catalog_/listings'
+    | '/_authenticated/stores_/$id/catalog_/sync'
     | '/api/public/couriers/$provider/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -809,6 +834,7 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
+  ApiPublicSyncWorkerRoute: typeof ApiPublicSyncWorkerRoute
   ApiPublicCouriersProviderWebhookRoute: typeof ApiPublicCouriersProviderWebhookRoute
 }
 
@@ -1143,6 +1169,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSuppliersIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/sync-worker': {
+      id: '/api/public/sync-worker'
+      path: '/api/public/sync-worker'
+      fullPath: '/api/public/sync-worker'
+      preLoaderRoute: typeof ApiPublicSyncWorkerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/ai-brain/runs/$id': {
       id: '/_authenticated/ai-brain/runs/$id'
       path: '/ai-brain/runs/$id'
@@ -1234,6 +1267,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStoresIdCatalogListingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/stores_/$id/catalog_/sync': {
+      id: '/_authenticated/stores_/$id/catalog_/sync'
+      path: '/stores/$id/catalog/sync'
+      fullPath: '/stores/$id/catalog/sync'
+      preLoaderRoute: typeof AuthenticatedStoresIdCatalogSyncRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/couriers/$provider/webhook': {
       id: '/api/public/couriers/$provider/webhook'
       path: '/api/public/couriers/$provider/webhook'
@@ -1299,6 +1339,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProcurementPurchaseOrdersIndexRoute: typeof AuthenticatedProcurementPurchaseOrdersIndexRoute
   AuthenticatedStoresIdCatalogStoreProductIdRoute: typeof AuthenticatedStoresIdCatalogStoreProductIdRoute
   AuthenticatedStoresIdCatalogListingsRoute: typeof AuthenticatedStoresIdCatalogListingsRoute
+  AuthenticatedStoresIdCatalogSyncRoute: typeof AuthenticatedStoresIdCatalogSyncRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -1369,6 +1410,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedStoresIdCatalogStoreProductIdRoute,
   AuthenticatedStoresIdCatalogListingsRoute:
     AuthenticatedStoresIdCatalogListingsRoute,
+  AuthenticatedStoresIdCatalogSyncRoute: AuthenticatedStoresIdCatalogSyncRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -1382,6 +1424,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
+  ApiPublicSyncWorkerRoute: ApiPublicSyncWorkerRoute,
   ApiPublicCouriersProviderWebhookRoute: ApiPublicCouriersProviderWebhookRoute,
 }
 export const routeTree = rootRouteImport

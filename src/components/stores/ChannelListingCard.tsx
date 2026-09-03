@@ -19,6 +19,10 @@ import { OPERATION_LABELS, supportsOperation } from "@/lib/sales-channels/capabi
 import type { ListingOperation } from "@/lib/sales-channels/capabilities";
 import { CHANNEL_LISTING_STATUS_LABELS } from "@/types/store-catalog";
 import type { ChannelListing, ChannelListingStatus } from "@/types/store-catalog";
+import { queueListingSync, cancelSyncJob } from "@/lib/sync-queue.functions";
+import { getSyncJobs } from "@/lib/sync-queue";
+import { SYNC_JOB_STATUS_LABELS, SYNC_OPERATION_LABELS } from "@/types/sync-queue";
+import type { QueueableOperation } from "@/types/sync-queue";
 
 const LISTING_TONE: Record<ChannelListingStatus, StatusTone> = {
   not_published: "neutral",
@@ -31,6 +35,9 @@ const LISTING_TONE: Record<ChannelListingStatus, StatusTone> = {
   paused: "warning",
   archived: "warning",
 };
+
+/** Only representation refreshes may run unattended. */
+const QUEUEABLE: QueueableOperation[] = ["listing_update", "price_sync", "stock_sync"];
 
 const BEFORE_PUBLISH: ListingOperation[] = ["listing_publish"];
 const AFTER_PUBLISH: ListingOperation[] = [
@@ -101,6 +108,40 @@ export function ChannelListingCard({
     },
     onError: (error: unknown) =>
       toast.error(error instanceof Error ? error.message : "The listing could not be updated"),
+  });
+
+  const queueSync = useServerFn(queueListingSync);
+  const cancelJob = useServerFn(cancelSyncJob);
+
+  const jobsQuery = useQuery({
+    queryKey: ["listing-sync-jobs", listing.id, listing.updated_at],
+    queryFn: () => getSyncJobs(undefined, { listingId: listing.id, limit: 5 }),
+  });
+  const jobs = jobsQuery.data?.rows ?? [];
+
+  const refreshJobs = () => {
+    void qc.invalidateQueries({ queryKey: ["listing-sync-jobs", listing.id] });
+  };
+
+  const queueMutation = useMutation({
+    mutationFn: (operation: QueueableOperation) =>
+      queueSync({ data: { listingId: listing.id, operation } }),
+    onSuccess: () => {
+      toast.success("Queued for background synchronisation");
+      refreshJobs();
+    },
+    onError: (error: unknown) =>
+      toast.error(error instanceof Error ? error.message : "The job could not be queued"),
+  });
+
+  const cancelMutation = useMutation({
+    mutationFn: (jobId: string) => cancelJob({ data: { jobId } }),
+    onSuccess: () => {
+      toast.success("Job cancelled");
+      refreshJobs();
+    },
+    onError: (error: unknown) =>
+      toast.error(error instanceof Error ? error.message : "The job could not be cancelled"),
   });
 
   const readinessMutation = useMutation({
@@ -196,6 +237,62 @@ export function ChannelListingCard({
           </div>
         )}
       </div>
+
+      {/* background queue — jobs the engine will run without an operator */}
+      {published ? (
+        <div className="mt-3 rounded-md border border-border p-3 text-[12px]">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="font-medium">Background queue</span>
+            {canManage ? (
+              <div className="flex flex-wrap gap-1.5">
+                {QUEUEABLE.filter((operation) => supportsOperation(provider, operation)).map(
+                  (operation) => (
+                    <Button
+                      key={operation}
+                      size="sm"
+                      variant="ghost"
+                      disabled={queueMutation.isPending}
+                      onClick={() => queueMutation.mutate(operation)}
+                    >
+                      Queue {SYNC_OPERATION_LABELS[operation].toLowerCase()}
+                    </Button>
+                  ),
+                )}
+              </div>
+            ) : null}
+          </div>
+          {jobs.length === 0 ? (
+            <p className="mt-1.5 text-muted-foreground">No background jobs for this listing.</p>
+          ) : (
+            <ul className="mt-1.5 space-y-1">
+              {jobs.map((job) => (
+                <li key={job.id} className="flex flex-wrap items-center gap-2">
+                  <span className="font-medium">{SYNC_OPERATION_LABELS[job.operation]}</span>
+                  <span className="text-muted-foreground">
+                    {SYNC_JOB_STATUS_LABELS[job.status]} · attempt {job.attempts}/{job.max_attempts}
+                    {job.status === "retry_wait"
+                      ? ` · retries ${new Date(job.available_at).toLocaleTimeString()}`
+                      : ""}
+                  </span>
+                  {job.last_error ? (
+                    <span className="text-destructive">{job.last_error}</span>
+                  ) : null}
+                  {canManage && (job.status === "pending" || job.status === "retry_wait") ? (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled={cancelMutation.isPending}
+                      onClick={() => cancelMutation.mutate(job.id)}
+                    >
+                      Cancel
+                    </Button>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) : null}
 
       {canManage ? (
         <div className="mt-3 flex flex-wrap gap-2">

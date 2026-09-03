@@ -203,6 +203,11 @@ function Page() {
                 Channel listings
               </Link>
             </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/stores/$id/catalog/sync" params={{ id }}>
+                Sync queue
+              </Link>
+            </Button>
             {perms.canManage && store.status !== "archived" ? (
               <Button size="sm" onClick={() => setAddOpen(true)}>
                 <PackagePlus className="mr-1.5 h-3.5 w-3.5" />

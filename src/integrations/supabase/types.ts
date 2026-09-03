@@ -3839,6 +3839,7 @@ export type Database = {
           sales_channel_account_id: string
           store_product_id: string
           sync_started_at: string | null
+          synced_content_hash: string | null
           synced_price: number | null
           synced_qty: number | null
           updated_at: string
@@ -3860,6 +3861,7 @@ export type Database = {
           sales_channel_account_id: string
           store_product_id: string
           sync_started_at?: string | null
+          synced_content_hash?: string | null
           synced_price?: number | null
           synced_qty?: number | null
           updated_at?: string
@@ -3881,6 +3883,7 @@ export type Database = {
           sales_channel_account_id?: string
           store_product_id?: string
           sync_started_at?: string | null
+          synced_content_hash?: string | null
           synced_price?: number | null
           synced_qty?: number | null
           updated_at?: string
@@ -3899,6 +3902,116 @@ export type Database = {
             columns: ["store_product_id"]
             isOneToOne: false
             referencedRelation: "store_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_channel_sync_jobs: {
+        Row: {
+          attempts: number
+          available_at: string
+          claimed_at: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          failure_class:
+            | Database["public"]["Enums"]["sync_failure_class"]
+            | null
+          id: string
+          last_error: string | null
+          last_run_id: string | null
+          lease_expires_at: string | null
+          lease_token: string | null
+          listing_id: string
+          max_attempts: number
+          operation: Database["public"]["Enums"]["sales_channel_sync_type"]
+          priority: number
+          sales_channel_account_id: string
+          source: string
+          source_reference: string | null
+          status: Database["public"]["Enums"]["sync_job_status"]
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          available_at?: string
+          claimed_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          failure_class?:
+            | Database["public"]["Enums"]["sync_failure_class"]
+            | null
+          id?: string
+          last_error?: string | null
+          last_run_id?: string | null
+          lease_expires_at?: string | null
+          lease_token?: string | null
+          listing_id: string
+          max_attempts?: number
+          operation: Database["public"]["Enums"]["sales_channel_sync_type"]
+          priority?: number
+          sales_channel_account_id: string
+          source?: string
+          source_reference?: string | null
+          status?: Database["public"]["Enums"]["sync_job_status"]
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          available_at?: string
+          claimed_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          failure_class?:
+            | Database["public"]["Enums"]["sync_failure_class"]
+            | null
+          id?: string
+          last_error?: string | null
+          last_run_id?: string | null
+          lease_expires_at?: string | null
+          lease_token?: string | null
+          listing_id?: string
+          max_attempts?: number
+          operation?: Database["public"]["Enums"]["sales_channel_sync_type"]
+          priority?: number
+          sales_channel_account_id?: string
+          source?: string
+          source_reference?: string | null
+          status?: Database["public"]["Enums"]["sync_job_status"]
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_channel_sync_jobs_last_run_id_fkey"
+            columns: ["last_run_id"]
+            isOneToOne: false
+            referencedRelation: "sales_channel_sync_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_channel_sync_jobs_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "sales_channel_product_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_channel_sync_jobs_sales_channel_account_id_fkey"
+            columns: ["sales_channel_account_id"]
+            isOneToOne: false
+            referencedRelation: "sales_channel_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_channel_sync_jobs_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
             referencedColumns: ["id"]
           },
         ]
@@ -5702,7 +5815,9 @@ export type Database = {
         Returns: number
       }
       can_manage_commerce: { Args: { _user_id: string }; Returns: boolean }
+      can_read_channels: { Args: never; Returns: boolean }
       can_read_commerce: { Args: { _user_id: string }; Returns: boolean }
+      can_sync_channels: { Args: never; Returns: boolean }
       cancel_goods_receipt: {
         Args: { _reason?: string; _receipt_id: string }
         Returns: undefined
@@ -5766,6 +5881,7 @@ export type Database = {
         Args: { _reason: string; _stocktake_id: string }
         Returns: undefined
       }
+      cancel_sync_job: { Args: { _job_id: string }; Returns: Json }
       category_product_counts: {
         Args: never
         Returns: {
@@ -5775,6 +5891,10 @@ export type Database = {
       }
       channel_listing_readiness: {
         Args: { _listing_id: string }
+        Returns: Json
+      }
+      claim_sync_jobs: {
+        Args: { _lease_seconds?: number; _limit?: number }
         Returns: Json
       }
       commit_order_inventory: {
@@ -5831,6 +5951,17 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      complete_sync_job: {
+        Args: {
+          _failure_class?: Database["public"]["Enums"]["sync_failure_class"]
+          _job_id: string
+          _lease_token: string
+          _message?: string
+          _ok: boolean
+          _run_id?: string
+        }
+        Returns: Json
       }
       create_courier_settlement: {
         Args: {
@@ -5931,6 +6062,7 @@ export type Database = {
           sales_channel_account_id: string
           store_product_id: string
           sync_started_at: string | null
+          synced_content_hash: string | null
           synced_price: number | null
           synced_qty: number | null
           updated_at: string
@@ -6222,6 +6354,33 @@ export type Database = {
         Args: { _store_product_id: string }
         Returns: Json
       }
+      enqueue_listing_sync: {
+        Args: {
+          _delay?: string
+          _listing_id: string
+          _operation: Database["public"]["Enums"]["sales_channel_sync_type"]
+          _priority?: number
+          _reference?: string
+          _source?: string
+        }
+        Returns: string
+      }
+      enqueue_sync_for_product: {
+        Args: {
+          _operation: Database["public"]["Enums"]["sales_channel_sync_type"]
+          _product_id: string
+          _source: string
+        }
+        Returns: number
+      }
+      enqueue_sync_for_store_product: {
+        Args: {
+          _operation: Database["public"]["Enums"]["sales_channel_sync_type"]
+          _source: string
+          _store_product_id: string
+        }
+        Returns: number
+      }
       ensure_inventory_level_internal: {
         Args: { _location_id: string; _product_id: string; _variant_id: string }
         Returns: string
@@ -6289,6 +6448,7 @@ export type Database = {
           sales_channel_account_id: string
           store_product_id: string
           sync_started_at: string | null
+          synced_content_hash: string | null
           synced_price: number | null
           synced_qty: number | null
           updated_at: string
@@ -6503,6 +6663,18 @@ export type Database = {
         Args: { _product_id: string; _variant_id: string }
         Returns: boolean
       }
+      is_service_context: { Args: never; Returns: boolean }
+      list_sync_jobs: {
+        Args: {
+          _limit?: number
+          _listing_id?: string
+          _offset?: number
+          _status?: Database["public"]["Enums"]["sync_job_status"]
+          _store_id?: string
+        }
+        Returns: Json
+      }
+      listing_content_hash: { Args: { _listing_id: string }; Returns: string }
       log_fulfillment_event: {
         Args: {
           _event: Database["public"]["Enums"]["fulfillment_event_type"]
@@ -6626,10 +6798,18 @@ export type Database = {
           visibility: Database["public"]["Enums"]["store_product_visibility"]
         }[]
       }
+      queue_listing_sync: {
+        Args: {
+          _listing_id: string
+          _operation: Database["public"]["Enums"]["sales_channel_sync_type"]
+        }
+        Returns: string
+      }
       recalculate_purchase_order_totals: {
         Args: { _po_id: string }
         Returns: undefined
       }
+      reclaim_stale_sync_jobs: { Args: never; Returns: number }
       record_courier_booking: {
         Args: {
           _consignment_id: string
@@ -7086,6 +7266,7 @@ export type Database = {
       }
       remove_settlement_item: { Args: { _item_id: string }; Returns: undefined }
       repeat_customer_threshold: { Args: never; Returns: number }
+      requeue_sync_job: { Args: { _job_id: string }; Returns: string }
       reserve_order_inventory: {
         Args: { _order_id: string }
         Returns: {
@@ -7344,6 +7525,7 @@ export type Database = {
           sales_channel_account_id: string
           store_product_id: string
           sync_started_at: string | null
+          synced_content_hash: string | null
           synced_price: number | null
           synced_qty: number | null
           updated_at: string
@@ -8274,6 +8456,8 @@ export type Database = {
           supplier_id: string
         }[]
       }
+      sync_job_backoff: { Args: { _attempt: number }; Returns: string }
+      sync_queue_overview: { Args: { _store_id?: string }; Returns: Json }
       update_shipment_details: {
         Args: {
           _cash_on_delivery_amount?: number
@@ -8863,6 +9047,15 @@ export type Database = {
       store_product_visibility: "hidden" | "visible"
       store_status: "active" | "inactive" | "archived"
       supply_model: "in_stock" | "local_sourcing" | "preorder" | "group_buy"
+      sync_failure_class: "transient" | "permanent" | "unknown"
+      sync_job_status:
+        | "pending"
+        | "retry_wait"
+        | "processing"
+        | "succeeded"
+        | "failed"
+        | "cancelled"
+        | "superseded"
       variant_status: "active" | "inactive"
       verification_attempt_outcome:
         | "pending"
@@ -9518,6 +9711,16 @@ export const Constants = {
       store_product_visibility: ["hidden", "visible"],
       store_status: ["active", "inactive", "archived"],
       supply_model: ["in_stock", "local_sourcing", "preorder", "group_buy"],
+      sync_failure_class: ["transient", "permanent", "unknown"],
+      sync_job_status: [
+        "pending",
+        "retry_wait",
+        "processing",
+        "succeeded",
+        "failed",
+        "cancelled",
+        "superseded",
+      ],
       variant_status: ["active", "inactive"],
       verification_attempt_outcome: [
         "pending",

@@ -94,11 +94,18 @@ function Page() {
         title="Channel listings"
         description={storeQuery.data ? `${storeQuery.data.name} · external publish state` : "Store"}
         actions={
-          <Button asChild size="sm" variant="outline">
-            <Link to="/stores/$id/catalog" params={{ id }}>
-              <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Catalog
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild size="sm" variant="outline">
+              <Link to="/stores/$id/catalog" params={{ id }}>
+                <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Catalog
+              </Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link to="/stores/$id/catalog/sync" params={{ id }}>
+                Sync queue
+              </Link>
+            </Button>
+          </div>
         }
       />
 
