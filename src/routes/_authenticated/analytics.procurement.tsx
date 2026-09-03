@@ -184,7 +184,8 @@ function ProcurementAnalyticsPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Product</TableHead>
+                      <TableHead>Item</TableHead>
+                      <TableHead>SKU</TableHead>
                       <TableHead className="text-right">Qty ordered</TableHead>
                       <TableHead className="text-right">Qty received</TableHead>
                       <TableHead className="text-right">Ordered value</TableHead>
@@ -192,8 +193,9 @@ function ProcurementAnalyticsPage() {
                   </TableHeader>
                   <TableBody>
                     {(purchased.data ?? []).map((row) => (
-                      <TableRow key={row.product_id}>
+                      <TableRow key={row.variant_id ?? row.product_id ?? row.product_name}>
                         <TableCell>{row.product_name}</TableCell>
+                        <TableCell className="text-muted-foreground">{row.sku ?? "—"}</TableCell>
                         <TableCell className="text-right tabular-nums">
                           {row.quantity_ordered}
                         </TableCell>

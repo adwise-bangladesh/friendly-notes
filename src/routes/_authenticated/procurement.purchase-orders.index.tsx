@@ -138,7 +138,9 @@ function Page() {
                         {po.purchase_order_number}
                       </Link>
                     </td>
-                    <td className="px-3 py-1.5">{po.supplier?.name ?? "—"}</td>
+                    <td className="px-3 py-1.5">
+                      {po.supplier_name_snapshot ?? po.supplier?.name ?? "—"}
+                    </td>
                     <td className="px-3 py-1.5 text-muted-foreground">{po.order_date}</td>
                     <td className="px-3 py-1.5 text-muted-foreground">
                       {po.expected_delivery_date ?? "—"}

@@ -128,9 +128,17 @@ export function PurchaseOrderEditor({ existing }: { existing?: PurchaseOrderDeta
     mutationFn: async () => {
       if (!supplierId) throw new Error("Choose a supplier.");
       if (items.length === 0) throw new Error("Add at least one item.");
+      const seen = new Set<string>();
       for (const item of items) {
         if (item.quantityOrdered < 1) throw new Error("Every line needs a quantity of at least 1.");
         if (item.unitCost < 0) throw new Error("Unit cost cannot be negative.");
+        const key = item.variantId ?? item.productId ?? "";
+        if (seen.has(key)) {
+          throw new Error(
+            `${item.displayName} appears on more than one line. Combine the quantities into one line.`,
+          );
+        }
+        seen.add(key);
       }
       const rate = Number(exchangeRate);
       if (!Number.isFinite(rate) || rate <= 0) throw new Error("Exchange rate must be above zero.");

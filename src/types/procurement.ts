@@ -173,6 +173,8 @@ export interface PurchaseOrderListRow {
   currency: string;
   grand_total: number;
   created_at: string;
+  supplier_name_snapshot: string | null;
+  supplier_code_snapshot: string | null;
   supplier: { id: string; name: string; supplier_code: string } | null;
   item_count: { count: number }[];
 }

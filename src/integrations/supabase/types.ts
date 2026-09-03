@@ -3886,7 +3886,9 @@ export type Database = {
           status: Database["public"]["Enums"]["purchase_order_status"]
           submitted_at: string | null
           subtotal: number
+          supplier_code_snapshot: string | null
           supplier_id: string
+          supplier_name_snapshot: string | null
           updated_at: string
           updated_by: string | null
         }
@@ -3914,7 +3916,9 @@ export type Database = {
           status?: Database["public"]["Enums"]["purchase_order_status"]
           submitted_at?: string | null
           subtotal?: number
+          supplier_code_snapshot?: string | null
           supplier_id: string
+          supplier_name_snapshot?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -3942,7 +3946,9 @@ export type Database = {
           status?: Database["public"]["Enums"]["purchase_order_status"]
           submitted_at?: string | null
           subtotal?: number
+          supplier_code_snapshot?: string | null
           supplier_id?: string
+          supplier_name_snapshot?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -5718,6 +5724,8 @@ export type Database = {
           product_name: string
           quantity_ordered: number
           quantity_received: number
+          sku: string
+          variant_id: string
         }[]
       }
       analytics_sales_trend: {
@@ -8421,6 +8429,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      set_preferred_supplier_product: {
+        Args: { _supplier_product_id: string }
+        Returns: undefined
       }
       set_purchase_order_status: {
         Args: {
