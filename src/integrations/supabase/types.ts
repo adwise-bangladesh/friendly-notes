@@ -7400,173 +7400,90 @@ export type Database = {
         Returns: undefined
       }
       reclaim_stale_sync_jobs: { Args: never; Returns: number }
-      record_courier_booking:
-        | {
-            Args: {
-              _consignment_id: string
-              _delivery_fee?: number
-              _provider_status?: string
-              _shipment_id: string
-              _tracking_number?: string
-            }
-            Returns: {
-              actual_delivery_fee: number | null
-              booked_at: string | null
-              booked_delivery_fee: number | null
-              booking_attempt_count: number
-              booking_attempt_started_at: string | null
-              booking_idempotency_key: string
-              booking_last_error: string | null
-              booking_outcome_unknown: boolean
-              booking_snapshot: Json | null
-              cancelled_at: string | null
-              cash_on_delivery_amount: number
-              cod_fee: number | null
-              collected_amount: number | null
-              courier_account_id: string | null
-              created_at: string
-              created_by: string | null
-              declared_value: number | null
-              delivered_at: string | null
-              delivery_address: string
-              delivery_area: string | null
-              delivery_city: string | null
-              delivery_zone: string | null
-              external_consignment_id: string | null
-              failure_reason:
-                | Database["public"]["Enums"]["shipment_failure_reason"]
-                | null
-              financials_recorded_at: string | null
-              financials_recorded_by: string | null
-              fulfillment_id: string | null
-              hold_reason:
-                | Database["public"]["Enums"]["shipment_hold_reason"]
-                | null
-              id: string
-              internal_notes: string | null
-              last_synced_at: string | null
-              notes: string | null
-              order_id: string
-              other_courier_charge: number | null
-              package_count: number
-              partial_delivery_note: string | null
-              picked_up_at: string | null
-              postal_code: string | null
-              provider_id: string | null
-              provider_recipient_area_id: string | null
-              provider_recipient_city_id: string | null
-              provider_recipient_zone_id: string | null
-              provider_reference: string | null
-              provider_status: string | null
-              provider_status_at: string | null
-              provider_status_slug: string | null
-              quoted_delivery_fee: number | null
-              recipient_name: string
-              recipient_phone: string
-              return_charge: number | null
-              return_reason: string | null
-              return_tracking_number: string | null
-              service_type:
-                | Database["public"]["Enums"]["courier_service_type"]
-                | null
-              shipment_number: string
-              status: Database["public"]["Enums"]["shipment_status"]
-              tracking_number: string | null
-              updated_at: string
-              updated_by: string | null
-              weight: number | null
-            }
-            SetofOptions: {
-              from: "*"
-              to: "shipments"
-              isOneToOne: true
-              isSetofReturn: false
-            }
-          }
-        | {
-            Args: {
-              _booking_snapshot?: Json
-              _consignment_id: string
-              _delivery_fee?: number
-              _idempotency_key?: string
-              _provider_status?: string
-              _shipment_id: string
-              _tracking_number?: string
-            }
-            Returns: {
-              actual_delivery_fee: number | null
-              booked_at: string | null
-              booked_delivery_fee: number | null
-              booking_attempt_count: number
-              booking_attempt_started_at: string | null
-              booking_idempotency_key: string
-              booking_last_error: string | null
-              booking_outcome_unknown: boolean
-              booking_snapshot: Json | null
-              cancelled_at: string | null
-              cash_on_delivery_amount: number
-              cod_fee: number | null
-              collected_amount: number | null
-              courier_account_id: string | null
-              created_at: string
-              created_by: string | null
-              declared_value: number | null
-              delivered_at: string | null
-              delivery_address: string
-              delivery_area: string | null
-              delivery_city: string | null
-              delivery_zone: string | null
-              external_consignment_id: string | null
-              failure_reason:
-                | Database["public"]["Enums"]["shipment_failure_reason"]
-                | null
-              financials_recorded_at: string | null
-              financials_recorded_by: string | null
-              fulfillment_id: string | null
-              hold_reason:
-                | Database["public"]["Enums"]["shipment_hold_reason"]
-                | null
-              id: string
-              internal_notes: string | null
-              last_synced_at: string | null
-              notes: string | null
-              order_id: string
-              other_courier_charge: number | null
-              package_count: number
-              partial_delivery_note: string | null
-              picked_up_at: string | null
-              postal_code: string | null
-              provider_id: string | null
-              provider_recipient_area_id: string | null
-              provider_recipient_city_id: string | null
-              provider_recipient_zone_id: string | null
-              provider_reference: string | null
-              provider_status: string | null
-              provider_status_at: string | null
-              provider_status_slug: string | null
-              quoted_delivery_fee: number | null
-              recipient_name: string
-              recipient_phone: string
-              return_charge: number | null
-              return_reason: string | null
-              return_tracking_number: string | null
-              service_type:
-                | Database["public"]["Enums"]["courier_service_type"]
-                | null
-              shipment_number: string
-              status: Database["public"]["Enums"]["shipment_status"]
-              tracking_number: string | null
-              updated_at: string
-              updated_by: string | null
-              weight: number | null
-            }
-            SetofOptions: {
-              from: "*"
-              to: "shipments"
-              isOneToOne: true
-              isSetofReturn: false
-            }
-          }
+      record_courier_booking: {
+        Args: {
+          _booking_snapshot?: Json
+          _consignment_id: string
+          _delivery_fee?: number
+          _idempotency_key?: string
+          _provider_status?: string
+          _shipment_id: string
+          _tracking_number?: string
+        }
+        Returns: {
+          actual_delivery_fee: number | null
+          booked_at: string | null
+          booked_delivery_fee: number | null
+          booking_attempt_count: number
+          booking_attempt_started_at: string | null
+          booking_idempotency_key: string
+          booking_last_error: string | null
+          booking_outcome_unknown: boolean
+          booking_snapshot: Json | null
+          cancelled_at: string | null
+          cash_on_delivery_amount: number
+          cod_fee: number | null
+          collected_amount: number | null
+          courier_account_id: string | null
+          created_at: string
+          created_by: string | null
+          declared_value: number | null
+          delivered_at: string | null
+          delivery_address: string
+          delivery_area: string | null
+          delivery_city: string | null
+          delivery_zone: string | null
+          external_consignment_id: string | null
+          failure_reason:
+            | Database["public"]["Enums"]["shipment_failure_reason"]
+            | null
+          financials_recorded_at: string | null
+          financials_recorded_by: string | null
+          fulfillment_id: string | null
+          hold_reason:
+            | Database["public"]["Enums"]["shipment_hold_reason"]
+            | null
+          id: string
+          internal_notes: string | null
+          last_synced_at: string | null
+          notes: string | null
+          order_id: string
+          other_courier_charge: number | null
+          package_count: number
+          partial_delivery_note: string | null
+          picked_up_at: string | null
+          postal_code: string | null
+          provider_id: string | null
+          provider_recipient_area_id: string | null
+          provider_recipient_city_id: string | null
+          provider_recipient_zone_id: string | null
+          provider_reference: string | null
+          provider_status: string | null
+          provider_status_at: string | null
+          provider_status_slug: string | null
+          quoted_delivery_fee: number | null
+          recipient_name: string
+          recipient_phone: string
+          return_charge: number | null
+          return_reason: string | null
+          return_tracking_number: string | null
+          service_type:
+            | Database["public"]["Enums"]["courier_service_type"]
+            | null
+          shipment_number: string
+          status: Database["public"]["Enums"]["shipment_status"]
+          tracking_number: string | null
+          updated_at: string
+          updated_by: string | null
+          weight: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shipments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       record_courier_booking_failure: {
         Args: {
           _idempotency_key?: string

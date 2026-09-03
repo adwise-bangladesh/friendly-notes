@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.record_courier_booking(uuid, text, text, numeric, text);
