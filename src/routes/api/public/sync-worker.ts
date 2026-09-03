@@ -40,8 +40,11 @@ export const Route = createFileRoute("/api/public/sync-worker")({
         const { startWorkerRun, finishWorkerRun, classifyWorkerError } = await import(
           "@/lib/workers/run.server"
         );
+        const { correlationFromRequest } = await import("@/lib/observability/correlation");
+        const { recordFailure } = await import("@/lib/observability/diagnostics.server");
 
-        const runId = await startWorkerRun(client, "sync_queue", triggerSource);
+        const correlationId = correlationFromRequest(request, "sync");
+        const runId = await startWorkerRun(client, "sync_queue", triggerSource, correlationId);
 
         try {
           const summary = await runSyncWorker(
@@ -62,6 +65,7 @@ export const Route = createFileRoute("/api/public/sync-worker")({
           });
           return Response.json({
             run_id: runId,
+            correlation_id: correlationId,
             claimed: summary.claimed,
             processed: summary.processed,
             succeeded: summary.succeeded,
@@ -69,6 +73,14 @@ export const Route = createFileRoute("/api/public/sync-worker")({
           });
         } catch (error) {
           await finishWorkerRun(client, runId, "failed", {}, classifyWorkerError(error));
+          await recordFailure(client, error, {
+            subsystem: "worker",
+            operation: "sync_queue_run",
+            severity: "critical",
+            stage: "recovery",
+            correlationId,
+            workerRunId: runId,
+          });
           // never echo an internal message to an external caller
           return new Response("Worker run failed", { status: 500 });
         }

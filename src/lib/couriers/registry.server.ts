@@ -57,7 +57,11 @@ export function courierCapability(providerCode: string, operation: CourierOperat
 }
 
 
-/** Safe operational logging of a courier API call. Never receives secrets. */
+/**
+ * Safe operational logging of one courier API call. Never receives secrets:
+ * no headers, no tokens, no raw provider bodies. The authoritative provider
+ * payload lives in `courier_provider_events`; this row is diagnostics only.
+ */
 export async function logCourierCall(entry: {
   providerId?: string | null;
   accountId?: string | null;
@@ -68,6 +72,9 @@ export async function logCourierCall(entry: {
   errorCategory?: string | null;
   safeMessage?: string | null;
   retryable?: boolean;
+  durationMs?: number | null;
+  failureStage?: string | null;
+  correlationId?: string | null;
 }): Promise<void> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   await supabaseAdmin.from("courier_api_logs").insert({
@@ -80,5 +87,8 @@ export async function logCourierCall(entry: {
     error_category: entry.errorCategory ?? null,
     safe_message: entry.safeMessage?.slice(0, 500) ?? null,
     retryable: entry.retryable ?? false,
+    duration_ms: entry.durationMs == null ? null : Math.max(0, Math.round(entry.durationMs)),
+    failure_stage: entry.failureStage ?? null,
+    correlation_id: entry.correlationId ?? null,
   });
 }

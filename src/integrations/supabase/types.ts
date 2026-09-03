@@ -872,8 +872,11 @@ export type Database = {
       courier_api_logs: {
         Row: {
           account_id: string | null
+          correlation_id: string | null
           created_at: string
+          duration_ms: number | null
           error_category: string | null
+          failure_stage: string | null
           id: string
           operation: string
           provider_id: string | null
@@ -885,8 +888,11 @@ export type Database = {
         }
         Insert: {
           account_id?: string | null
+          correlation_id?: string | null
           created_at?: string
+          duration_ms?: number | null
           error_category?: string | null
+          failure_stage?: string | null
           id?: string
           operation: string
           provider_id?: string | null
@@ -898,8 +904,11 @@ export type Database = {
         }
         Update: {
           account_id?: string | null
+          correlation_id?: string | null
           created_at?: string
+          duration_ms?: number | null
           error_category?: string | null
+          failure_stage?: string | null
           id?: string
           operation?: string
           provider_id?: string | null
@@ -2679,6 +2688,77 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      operational_diagnostics: {
+        Row: {
+          account_id: string | null
+          correlation_id: string | null
+          created_at: string
+          duration_ms: number | null
+          entity_id: string | null
+          entity_type: string | null
+          error_category: string
+          failure_stage: string | null
+          id: string
+          message: string
+          metadata: Json
+          occurred_at: string
+          operation: string
+          provider_code: string | null
+          retryable: boolean
+          severity: string
+          subsystem: string
+          worker_run_id: string | null
+        }
+        Insert: {
+          account_id?: string | null
+          correlation_id?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          entity_id?: string | null
+          entity_type?: string | null
+          error_category?: string
+          failure_stage?: string | null
+          id?: string
+          message: string
+          metadata?: Json
+          occurred_at?: string
+          operation: string
+          provider_code?: string | null
+          retryable?: boolean
+          severity?: string
+          subsystem: string
+          worker_run_id?: string | null
+        }
+        Update: {
+          account_id?: string | null
+          correlation_id?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          entity_id?: string | null
+          entity_type?: string | null
+          error_category?: string
+          failure_stage?: string | null
+          id?: string
+          message?: string
+          metadata?: Json
+          occurred_at?: string
+          operation?: string
+          provider_code?: string | null
+          retryable?: boolean
+          severity?: string
+          subsystem?: string
+          worker_run_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operational_diagnostics_worker_run_id_fkey"
+            columns: ["worker_run_id"]
+            isOneToOne: false
+            referencedRelation: "worker_runs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_addresses: {
         Row: {
@@ -5819,6 +5899,7 @@ export type Database = {
       worker_runs: {
         Row: {
           claimed: number
+          correlation_id: string | null
           created_at: string
           duration_ms: number | null
           error_class: string | null
@@ -5836,6 +5917,7 @@ export type Database = {
         }
         Insert: {
           claimed?: number
+          correlation_id?: string | null
           created_at?: string
           duration_ms?: number | null
           error_class?: string | null
@@ -5853,6 +5935,7 @@ export type Database = {
         }
         Update: {
           claimed?: number
+          correlation_id?: string | null
           created_at?: string
           duration_ms?: number | null
           error_class?: string | null
@@ -8021,6 +8104,18 @@ export type Database = {
         Returns: boolean
       }
       is_service_context: { Args: never; Returns: boolean }
+      list_operational_diagnostics: {
+        Args: {
+          _correlation_id?: string
+          _error_category?: string
+          _limit?: number
+          _offset?: number
+          _severity?: string
+          _since_hours?: number
+          _subsystem?: string
+        }
+        Returns: Json
+      }
       list_sync_jobs: {
         Args: {
           _account_id?: string
@@ -8096,6 +8191,11 @@ export type Database = {
       next_stocktake_number: { Args: never; Returns: string }
       next_transfer_number: { Args: never; Returns: string }
       normalize_bd_phone: { Args: { _phone: string }; Returns: string }
+      operational_alert_evidence: { Args: { _alert_id: string }; Returns: Json }
+      operational_diagnostic_trail: {
+        Args: { _correlation_id: string }
+        Returns: Json
+      }
       operational_health_overview: { Args: never; Returns: Json }
       operations_attention_feed: {
         Args: {
@@ -8197,6 +8297,7 @@ export type Database = {
           visibility: Database["public"]["Enums"]["store_product_visibility"]
         }[]
       }
+      prune_operational_telemetry: { Args: { _days?: number }; Returns: Json }
       prune_worker_runs: { Args: never; Returns: number }
       queue_listing_sync: {
         Args: {
@@ -8585,6 +8686,26 @@ export type Database = {
       record_listing_readiness_check: {
         Args: { _listing_id: string }
         Returns: Json
+      }
+      record_operational_diagnostic: {
+        Args: {
+          _account_id?: string
+          _correlation_id?: string
+          _duration_ms?: number
+          _entity_id?: string
+          _entity_type?: string
+          _error_category?: string
+          _failure_stage?: string
+          _message: string
+          _metadata?: Json
+          _operation: string
+          _provider_code?: string
+          _retryable?: boolean
+          _severity?: string
+          _subsystem: string
+          _worker_run_id?: string
+        }
+        Returns: string
       }
       record_return_financial_outcome: {
         Args: {
@@ -10381,10 +10502,19 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      start_worker_run: {
-        Args: { _trigger_source: string; _worker: string }
-        Returns: string
-      }
+      start_worker_run:
+        | {
+            Args: { _trigger_source: string; _worker: string }
+            Returns: string
+          }
+        | {
+            Args: {
+              _correlation_id?: string
+              _trigger_source: string
+              _worker: string
+            }
+            Returns: string
+          }
       store_catalog_list: {
         Args: {
           _category_id?: string
