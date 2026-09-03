@@ -43,7 +43,7 @@ export const Route = createFileRoute("/_authenticated/orders/shipments")({
 
 function Page() {
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<ShipmentStatus | "all" | "active">("active");
+  const [status, setStatus] = useState<ShipmentStatus | "all" | "active">("all");
   const [providerId, setProviderId] = useState<string>("all");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -82,7 +82,7 @@ function Page() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="active">Needs attention</SelectItem>
+            <SelectItem value="active">Needs attention (open shipments)</SelectItem>
             <SelectItem value="all">All statuses</SelectItem>
             {SHIPMENT_STATUSES.map((s) => (
               <SelectItem key={s} value={s}>

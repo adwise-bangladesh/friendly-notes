@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Ban, MessageSquarePlus } from "lucide-react";
+import { ArrowLeft, Ban, MessageSquarePlus, PencilLine } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,11 +19,13 @@ import { OrderShipmentsPanel } from "@/components/orders/OrderShipmentsPanel";
 import { OrderReturnsPanel } from "@/components/orders/OrderReturnsPanel";
 import { OrderFinancialsPanel } from "@/components/orders/OrderFinancialsPanel";
 import { OrderCorrectionDialog } from "@/components/orders/OrderCorrectionDialog";
+import { OrderItemsEditor } from "@/components/orders/OrderItemsEditor";
+import { CustomerIntelligencePanel } from "@/components/orders/CustomerIntelligencePanel";
 import { AIEntityPanel } from "@/components/ai/AIEntityPanel";
 
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import { formatMoney } from "@/lib/currency";
-import { addOrderNote, cancelOrder, getOrderById } from "@/lib/orders";
+import { addOrderNote, cancelOrder, getOrderById, getOrderEditBlockReason } from "@/lib/orders";
 import {
   DELIVERY_STATUS_LABELS,
   DELIVERY_STATUS_TONE,
@@ -80,10 +82,17 @@ function Page() {
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [noteDraft, setNoteDraft] = useState("");
   const [correction, setCorrection] = useState<"customer" | "address" | null>(null);
+  const [editingItems, setEditingItems] = useState(false);
 
   const { data: order, isLoading } = useQuery({
     queryKey: ["order", id],
     queryFn: () => getOrderById(id),
+  });
+
+  const { data: editBlockReason, isPending: editCheckPending } = useQuery({
+    queryKey: ["order-edit-block", id],
+    queryFn: () => getOrderEditBlockReason(id),
+    enabled: canManage,
   });
 
   const cancelMutation = useMutation({
@@ -140,6 +149,18 @@ function Page() {
                 <ArrowLeft className="mr-1 h-3.5 w-3.5" /> Orders
               </Link>
             </Button>
+            {canManage && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8"
+                disabled={editCheckPending || !!editBlockReason}
+                title={editBlockReason ?? "Correct the products, quantities or prices"}
+                onClick={() => setEditingItems(true)}
+              >
+                <PencilLine className="mr-1 h-3.5 w-3.5" /> Edit items
+              </Button>
+            )}
             {canManage && canCancel(order.status) && (
               <Button
                 variant="outline"
@@ -232,9 +253,15 @@ function Page() {
 
           </div>
 
+          <CustomerIntelligencePanel orderId={order.id} />
+
           <FormSection
             title="Items"
-            description="Historical snapshot — later product edits never change these values."
+            description={
+              canManage && editBlockReason
+                ? `Historical snapshot — later product edits never change these values. ${editBlockReason}`
+                : "Historical snapshot — later product edits never change these values."
+            }
           >
             <div className="overflow-x-auto rounded border border-border">
               <table className="w-full text-[13px]">
@@ -275,6 +302,10 @@ function Page() {
             </div>
           </FormSection>
 
+          {editingItems && (
+            <OrderItemsEditor order={order} open={editingItems} onOpenChange={setEditingItems} />
+          )}
+
           {correction && (
             <OrderCorrectionDialog
               order={order}
@@ -283,6 +314,7 @@ function Page() {
               onOpenChange={(next) => !next && setCorrection(null)}
             />
           )}
+
 
           <VerificationPanel order={order} canManage={canManage} />
 

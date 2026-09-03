@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -15,7 +17,14 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { formatMoney } from "@/lib/currency";
-import { getVerificationQueue } from "@/lib/verification";
+import {
+  claimVerificationWork,
+  getVerificationAssignments,
+  getVerificationQueue,
+  releaseVerificationWork,
+} from "@/lib/verification";
+import { useProfile } from "@/hooks/use-profile";
+import { useCommercePermissions } from "@/hooks/use-permissions";
 import { ORDER_SOURCE_LABELS } from "@/types/orders";
 import type { OrderSource } from "@/types/orders";
 import {
@@ -60,6 +69,9 @@ const SOURCES: OrderSource[] = [
 ];
 
 function Page() {
+  const queryClient = useQueryClient();
+  const { data: profile } = useProfile();
+  const { canManage } = useCommercePermissions();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<VerificationStatus | "all">("all");
   const [method, setMethod] = useState<VerificationMethod | "all">("all");
@@ -78,6 +90,30 @@ function Page() {
         ...(from ? { from: new Date(`${from}T00:00:00`).toISOString() } : {}),
         ...(to ? { to: new Date(`${to}T23:59:59`).toISOString() } : {}),
       }),
+  });
+
+  const assignments = useQuery({
+    queryKey: ["verification-assignments", rows.map((r) => r.id).join(",")],
+    queryFn: () => getVerificationAssignments(rows.map((r) => r.id)),
+    enabled: rows.length > 0,
+  });
+
+  const claim = useMutation({
+    mutationFn: (orderId: string) => claimVerificationWork(orderId),
+    onSuccess: () => {
+      toast.success("You are now handling this order");
+      void queryClient.invalidateQueries({ queryKey: ["verification-assignments"] });
+    },
+    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Could not claim"),
+  });
+
+  const release = useMutation({
+    mutationFn: (orderId: string) => releaseVerificationWork(orderId),
+    onSuccess: () => {
+      toast.success("Released back to the queue");
+      void queryClient.invalidateQueries({ queryKey: ["verification-assignments"] });
+    },
+    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Could not release"),
   });
 
   return (
@@ -171,6 +207,7 @@ function Page() {
                   <th className="px-3 py-2 text-left font-medium">Last attempt</th>
                   <th className="px-3 py-2 text-left font-medium">Next action</th>
                   <th className="px-3 py-2 text-left font-medium">Created</th>
+                  <th className="px-3 py-2 text-left font-medium">Handled by</th>
                 </tr>
               </thead>
               <tbody>
@@ -229,6 +266,48 @@ function Page() {
                     </td>
                     <td className="px-3 py-2 text-muted-foreground">
                       {new Date(r.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-3 py-2">
+                      {(() => {
+                        const owner = assignments.data?.get(r.id);
+                        if (assignments.isPending) {
+                          return <span className="text-muted-foreground">Loading…</span>;
+                        }
+                        if (!owner) {
+                          return canManage ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7"
+                              disabled={claim.isPending}
+                              onClick={() => claim.mutate(r.id)}
+                            >
+                              Claim
+                            </Button>
+                          ) : (
+                            <span className="text-muted-foreground">Unassigned</span>
+                          );
+                        }
+                        const mine = owner.assigned_to === profile?.id;
+                        return (
+                          <span className="flex items-center gap-2">
+                            <span className={mine ? "font-medium" : "text-muted-foreground"}>
+                              {mine ? "You" : owner.assignee?.full_name ?? "Another operator"}
+                            </span>
+                            {mine && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-7"
+                                disabled={release.isPending}
+                                onClick={() => release.mutate(r.id)}
+                              >
+                                Release
+                              </Button>
+                            )}
+                          </span>
+                        );
+                      })()}
                     </td>
                   </tr>
                 ))}

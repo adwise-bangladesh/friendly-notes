@@ -287,3 +287,66 @@ export interface VerificationProvider {
 
 /** Registry — intentionally empty until a real provider is integrated. */
 export const verificationProviders: Record<string, VerificationProvider> = {};
+
+/* ---------- Claiming verification work (Step 20.8.1) ---------- */
+
+export interface VerificationAssignment {
+  id: string;
+  source_id: string;
+  assigned_to: string;
+  assigned_at: string;
+  assignee: { id: string; full_name: string | null } | null;
+}
+
+/**
+ * Takes ownership of an order's verification. The database serialises
+ * competing claims on the order row, so exactly one operator wins; the other
+ * gets a message naming the current owner.
+ */
+export async function claimVerificationWork(orderId: string, note?: string): Promise<void> {
+  const { error } = await supabase.rpc("claim_verification_work", {
+    _order_id: orderId,
+    ...(note?.trim() ? { _note: note.trim() } : {}),
+  });
+  if (error) throw error;
+}
+
+export async function releaseVerificationWork(orderId: string): Promise<void> {
+  const { error } = await supabase.rpc("release_operational_work", {
+    _source_type: "order_verification",
+    _source_id: orderId,
+  });
+  if (error) throw error;
+}
+
+/** Current verification owner per order, for the queue and the order page. */
+export async function getVerificationAssignments(
+  orderIds: string[],
+): Promise<Map<string, VerificationAssignment>> {
+  const result = new Map<string, VerificationAssignment>();
+  if (orderIds.length === 0) return result;
+
+  const { data, error } = await supabase
+    .from("operational_assignments")
+    .select("id, source_id, assigned_to, assigned_at")
+    .eq("source_type", "order_verification")
+    .is("released_at", null)
+    .in("source_id", orderIds);
+  if (error) throw error;
+
+  const rows = data ?? [];
+  const assigneeIds = [...new Set(rows.map((r) => r.assigned_to))];
+  const profiles = new Map<string, { id: string; full_name: string | null }>();
+  if (assigneeIds.length > 0) {
+    const { data: people } = await supabase
+      .from("profiles")
+      .select("id, full_name")
+      .in("id", assigneeIds);
+    for (const p of people ?? []) profiles.set(p.id, p);
+  }
+
+  for (const r of rows) {
+    result.set(r.source_id, { ...r, assignee: profiles.get(r.assigned_to) ?? null });
+  }
+  return result;
+}

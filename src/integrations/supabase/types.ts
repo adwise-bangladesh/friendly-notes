@@ -6342,6 +6342,10 @@ export type Database = {
         Returns: undefined
       }
       cancel_sync_job: { Args: { _job_id: string }; Returns: Json }
+      canonical_contact_phone: {
+        Args: { _label?: string; _phone: string }
+        Returns: string
+      }
       category_product_counts: {
         Args: never
         Returns: {
@@ -6356,6 +6360,28 @@ export type Database = {
       claim_sync_jobs: {
         Args: { _lease_seconds?: number; _limit?: number; _worker_id?: string }
         Returns: Json
+      }
+      claim_verification_work: {
+        Args: { _note?: string; _order_id: string }
+        Returns: {
+          assigned_at: string
+          assigned_by: string | null
+          assigned_to: string
+          created_at: string
+          id: string
+          note: string | null
+          released_at: string | null
+          released_by: string | null
+          source_id: string
+          source_type: Database["public"]["Enums"]["operation_source_type"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "operational_assignments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       commit_fulfillment_inventory: {
         Args: { _fulfillment_id: string }
@@ -7233,6 +7259,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      merge_order_item_payload: { Args: { _items: Json }; Returns: Json }
       next_goods_receipt_number: { Args: never; Returns: string }
       next_order_number: { Args: never; Returns: string }
       next_purchase_order_number: { Args: never; Returns: string }
@@ -7284,6 +7311,11 @@ export type Database = {
           reference: string
         }[]
       }
+      order_customer_intelligence: {
+        Args: { _order_id: string }
+        Returns: Json
+      }
+      order_edit_block_reason: { Args: { _order_id: string }; Returns: string }
       order_financials: { Args: { _order_id: string }; Returns: Json }
       order_fulfillment_summary: {
         Args: { _order_id: string }
@@ -7297,6 +7329,10 @@ export type Database = {
       order_item_returnable_quantity: {
         Args: { _order_item_id: string }
         Returns: number
+      }
+      order_item_snapshot: {
+        Args: { _product_id: string; _variant_id: string }
+        Returns: Json
       }
       order_operationally_locked: {
         Args: { _order_id: string }
@@ -9154,6 +9190,62 @@ export type Database = {
           _order_id: string
           _reason?: string
         }
+        Returns: {
+          adjustment: number
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_email: string | null
+          customer_id: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_charge: number
+          delivery_status: Database["public"]["Enums"]["order_delivery_status"]
+          due_amount: number | null
+          financial_status: Database["public"]["Enums"]["order_financial_status"]
+          fulfillment_hold_reason: string | null
+          fulfillment_location_id: string | null
+          fulfillment_status: Database["public"]["Enums"]["order_fulfillment_status"]
+          grand_total: number
+          id: string
+          order_discount: number
+          order_number: string
+          packed_at: string | null
+          packing_charge: number
+          paid_amount: number
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          placed_at: string | null
+          product_discount: number
+          refunded_amount: number
+          reservation_status: Database["public"]["Enums"]["reservation_status"]
+          reserved_at: string | null
+          risk_level: Database["public"]["Enums"]["verification_risk_level"]
+          risk_reason: string | null
+          shipping_charge: number
+          source: Database["public"]["Enums"]["order_source"]
+          status: Database["public"]["Enums"]["order_status"]
+          store_id: string | null
+          subtotal: number
+          updated_at: string
+          updated_by: string | null
+          verification_attempt_count: number
+          verification_confirmed_at: string | null
+          verification_failure_reason: string | null
+          verification_last_attempt_at: string | null
+          verification_next_action_at: string | null
+          verification_priority: Database["public"]["Enums"]["verification_priority"]
+          verification_status: Database["public"]["Enums"]["order_verification_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      update_order_items: {
+        Args: { _order_id: string; _payload: Json }
         Returns: {
           adjustment: number
           cancelled_at: string | null
