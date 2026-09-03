@@ -68,6 +68,7 @@ function Page() {
   const queryClient = useQueryClient();
   const { canManage, canDelete: isAdmin } = useCommercePermissions();
   const [addOpen, setAddOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["courier-settlement", id],
