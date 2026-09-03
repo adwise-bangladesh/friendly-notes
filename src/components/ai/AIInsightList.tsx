@@ -77,9 +77,9 @@ export function AIInsightList({
                 {(() => {
                   const f = FRESHNESS[insightFreshness(insight)]!;
                   return (
-                    <StatusBadge tone={f.tone} title={f.hint}>
-                      {f.label}
-                    </StatusBadge>
+                    <span title={f.hint}>
+                      <StatusBadge tone={f.tone}>{f.label}</StatusBadge>
+                    </span>
                   );
                 })()}
                 <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
