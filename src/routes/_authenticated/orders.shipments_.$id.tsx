@@ -505,7 +505,59 @@ function Page() {
                   <dd className="tabular-nums">{shipment.return_tracking_number}</dd>
                 </div>
               )}
+              <div>
+                <dt className="text-[11px] text-muted-foreground">Booking attempts</dt>
+                <dd className="tabular-nums">{shipment.booking_attempt_count ?? 0}</dd>
+              </div>
             </dl>
+
+            {shipment.booking_outcome_unknown && (
+              <div className="mt-3 space-y-2 rounded border border-destructive/40 bg-destructive/5 p-3">
+                <p className="text-[12.5px] font-medium text-destructive">
+                  The result of the last booking attempt is unknown
+                </p>
+                <p className="text-[12px] text-muted-foreground">
+                  {shipment.booking_last_error ??
+                    "The courier may or may not have created a parcel."}{" "}
+                  Booking is blocked until someone confirms with the courier which happened.
+                </p>
+                {canManage && (
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Input
+                        value={recoveryConsignment}
+                        onChange={(e) => setRecoveryConsignment(e.target.value)}
+                        placeholder="Consignment the courier created"
+                        className="h-8 max-w-xs text-[12.5px]"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => recoveryMutation.mutate("confirm")}
+                        disabled={recoveryMutation.isPending || !recoveryConsignment.trim()}
+                      >
+                        A parcel exists
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Input
+                        value={recoveryReason}
+                        onChange={(e) => setRecoveryReason(e.target.value)}
+                        placeholder="Who confirmed no parcel exists"
+                        className="h-8 max-w-xs text-[12.5px]"
+                      />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => recoveryMutation.mutate("abandon")}
+                        disabled={recoveryMutation.isPending || !recoveryReason.trim()}
+                      >
+                        No parcel — allow retry
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {canManage && (
               <div className="mt-3 flex flex-wrap gap-2">
@@ -524,10 +576,11 @@ function Page() {
                   disabled={
                     apiMutation.isPending ||
                     !shipment.courier_account_id ||
+                    shipment.booking_outcome_unknown ||
                     Boolean(shipment.external_consignment_id)
                   }
                 >
-                  Book with courier
+                  {apiMutation.isPending ? "Booking…" : "Book with courier"}
                 </Button>
                 <Button
                   size="sm"
@@ -536,6 +589,19 @@ function Page() {
                   disabled={apiMutation.isPending || !shipment.external_consignment_id}
                 >
                   Refresh status
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => cancelCourierMutation.mutate()}
+                  disabled={
+                    cancelCourierMutation.isPending ||
+                    !shipment.external_consignment_id ||
+                    !reason.trim()
+                  }
+                  title="Enter a reason in the action dialog field first. Only couriers that support API cancellation accept this."
+                >
+                  Cancel with courier
                 </Button>
               </div>
             )}
