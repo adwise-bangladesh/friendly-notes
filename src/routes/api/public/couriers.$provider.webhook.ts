@@ -27,13 +27,6 @@ const SECRET_HEADERS = [
   "x-webhook-signature",
 ] as const;
 
-function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i += 1) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return diff === 0;
-}
-
 function str(value: unknown): string | null {
   return typeof value === "string" && value.trim() !== "" ? value.trim() : null;
 }
@@ -50,30 +43,14 @@ export const Route = createFileRoute("/api/public/couriers/$provider/webhook")({
         }
         if (!presented) return new Response("Unauthorized", { status: 401 });
 
+        // The secret never leaves the database: the account is identified by
+        // comparing fixed-length digests inside a service-role-only function.
+        const { matchCourierWebhookAccount } = await import("@/lib/couriers/credentials.server");
+        const matchedAccountId = await matchCourierWebhookAccount(providerCode, presented);
+        if (!matchedAccountId) return new Response("Unauthorized", { status: 401 });
+
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-        const { data: provider } = await supabaseAdmin
-          .from("courier_providers")
-          .select("id, code, status")
-          .eq("code", providerCode)
-          .maybeSingle();
-        if (!provider || provider.status !== "active") {
-          return new Response("Unauthorized", { status: 401 });
-        }
-
-        const { data: accounts } = await supabaseAdmin
-          .from("courier_accounts")
-          .select("id, courier_account_credentials(webhook_secret)")
-          .eq("provider_id", provider.id)
-          .eq("status", "active");
-
-        const matched = (accounts ?? []).find((account) => {
-          const secret = (
-            account.courier_account_credentials as { webhook_secret: string | null } | null
-          )?.webhook_secret;
-          return Boolean(secret) && timingSafeEqual(secret!, presented!);
-        });
-        if (!matched) return new Response("Unauthorized", { status: 401 });
 
         let payload: Record<string, unknown>;
         try {

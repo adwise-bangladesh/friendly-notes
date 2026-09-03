@@ -749,46 +749,46 @@ export type Database = {
       }
       courier_account_credentials: {
         Row: {
-          access_token: string | null
+          access_token_ref: string | null
           account_id: string
           client_id: string | null
-          client_secret: string | null
+          client_secret_ref: string | null
           created_at: string
-          password: string | null
-          refresh_token: string | null
+          password_ref: string | null
+          refresh_token_ref: string | null
           token_expires_at: string | null
           token_refreshed_at: string | null
           updated_at: string
           username: string | null
-          webhook_secret: string | null
+          webhook_secret_ref: string | null
         }
         Insert: {
-          access_token?: string | null
+          access_token_ref?: string | null
           account_id: string
           client_id?: string | null
-          client_secret?: string | null
+          client_secret_ref?: string | null
           created_at?: string
-          password?: string | null
-          refresh_token?: string | null
+          password_ref?: string | null
+          refresh_token_ref?: string | null
           token_expires_at?: string | null
           token_refreshed_at?: string | null
           updated_at?: string
           username?: string | null
-          webhook_secret?: string | null
+          webhook_secret_ref?: string | null
         }
         Update: {
-          access_token?: string | null
+          access_token_ref?: string | null
           account_id?: string
           client_id?: string | null
-          client_secret?: string | null
+          client_secret_ref?: string | null
           created_at?: string
-          password?: string | null
-          refresh_token?: string | null
+          password_ref?: string | null
+          refresh_token_ref?: string | null
           token_expires_at?: string | null
           token_refreshed_at?: string | null
           updated_at?: string
           username?: string | null
-          webhook_secret?: string | null
+          webhook_secret_ref?: string | null
         }
         Relationships: [
           {
@@ -814,6 +814,7 @@ export type Database = {
           provider_id: string
           settings: Json
           status: Database["public"]["Enums"]["entity_status"]
+          store_id: string | null
           updated_at: string
           updated_by: string | null
         }
@@ -830,6 +831,7 @@ export type Database = {
           provider_id: string
           settings?: Json
           status?: Database["public"]["Enums"]["entity_status"]
+          store_id?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -846,6 +848,7 @@ export type Database = {
           provider_id?: string
           settings?: Json
           status?: Database["public"]["Enums"]["entity_status"]
+          store_id?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -855,6 +858,13 @@ export type Database = {
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "courier_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courier_accounts_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
             referencedColumns: ["id"]
           },
         ]
@@ -6427,6 +6437,43 @@ export type Database = {
         }
         Returns: Json
       }
+      courier_credential_status: {
+        Args: { _account_id: string }
+        Returns: Json
+      }
+      courier_credentials_resolve: {
+        Args: { _account_id: string; _require_active?: boolean }
+        Returns: Json
+      }
+      courier_credentials_set: {
+        Args: {
+          _account_id: string
+          _client_id?: string
+          _client_secret?: string
+          _password?: string
+          _username?: string
+          _webhook_secret?: string
+        }
+        Returns: Json
+      }
+      courier_credentials_store_token: {
+        Args: {
+          _access_token: string
+          _account_id: string
+          _expires_at?: string
+          _refresh_token?: string
+        }
+        Returns: undefined
+      }
+      courier_vault_put: {
+        Args: { _name: string; _ref: string; _value: string }
+        Returns: string
+      }
+      courier_vault_read: { Args: { _ref: string }; Returns: string }
+      courier_webhook_match_account: {
+        Args: { _presented: string; _provider_code: string }
+        Returns: string
+      }
       create_courier_settlement: {
         Args: {
           _courier_account_id: string
@@ -8081,6 +8128,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      resolve_courier_account: {
+        Args: { _account_id?: string; _provider_id: string; _store_id: string }
+        Returns: string
+      }
       resolve_customer_for_order: {
         Args: {
           _customer_id?: string
@@ -8426,6 +8477,32 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      set_courier_account_scope: {
+        Args: { _account_id: string; _is_default: boolean; _store_id: string }
+        Returns: {
+          base_url: string | null
+          code: string
+          created_at: string
+          created_by: string | null
+          environment: Database["public"]["Enums"]["courier_environment"]
+          external_store_id: string | null
+          id: string
+          is_default: boolean
+          name: string
+          provider_id: string
+          settings: Json
+          status: Database["public"]["Enums"]["entity_status"]
+          store_id: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "courier_accounts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_courier_account_state: {
         Args: {
           _account_id: string
@@ -8444,6 +8521,7 @@ export type Database = {
           provider_id: string
           settings: Json
           status: Database["public"]["Enums"]["entity_status"]
+          store_id: string | null
           updated_at: string
           updated_by: string | null
         }

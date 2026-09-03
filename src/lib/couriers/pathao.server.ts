@@ -1,16 +1,18 @@
 /**
  * Pathao courier adapter — SERVER ONLY.
  *
- * Credentials live in `courier_account_credentials`, a table that grants
- * nothing to `anon` or `authenticated`; only the service-role client used here
- * can read it. Tokens are cached in the same row, so a shipment booking does
- * not issue a new token every time.
+ * Credentials are never read from a table here. They are resolved through the
+ * single trusted boundary in `credentials.server.ts`, which calls the
+ * service-role-only vault functions. Freshly issued tokens are written back
+ * through the same boundary, so nothing secret is ever stored in a readable
+ * column or handled outside this server module.
  *
  * Implemented: token issue/refresh, create order, order info, price plan,
  * city/zone/area lists (cached in `courier_locations`).
  * NOT verified against the live Pathao API in this project — treat the
  * integration level as "ready_for_api" until a real sandbox call succeeds.
  */
+
 
 import {
   CourierError,
@@ -22,6 +24,11 @@ import {
   type CourierQuoteResult,
   type CourierStatusResult,
 } from "@/types/couriers";
+import {
+  getCourierCredentials,
+  storeCourierToken,
+  type CourierCredentials,
+} from "./credentials.server";
 
 const SANDBOX_BASE = "https://courier-api-sandbox.pathao.com";
 const PRODUCTION_BASE = "https://api-hermes.pathao.com";
@@ -34,16 +41,9 @@ interface AccountContext {
   providerId: string;
   baseUrl: string;
   storeId: string | null;
-  credentials: {
-    client_id: string | null;
-    client_secret: string | null;
-    username: string | null;
-    password: string | null;
-    access_token: string | null;
-    refresh_token: string | null;
-    token_expires_at: string | null;
-  };
+  credentials: CourierCredentials;
 }
+
 
 async function admin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -70,14 +70,12 @@ async function loadAccount(accountId: string): Promise<AccountContext> {
   if (!account) fail("not_found", "Courier account not found");
   if (account.status !== "active") fail("validation", "This courier account is not active");
 
-  const { data: creds } = await db
-    .from("courier_account_credentials")
-    .select(
-      "client_id, client_secret, username, password, access_token, refresh_token, token_expires_at",
-    )
-    .eq("account_id", accountId)
-    .maybeSingle();
-  if (!creds) fail("auth", "No credentials are configured for this courier account");
+  let credentials: CourierCredentials;
+  try {
+    credentials = await getCourierCredentials(accountId);
+  } catch {
+    fail("auth", "No credentials are configured for this courier account");
+  }
 
   return {
     accountId,
@@ -85,9 +83,10 @@ async function loadAccount(accountId: string): Promise<AccountContext> {
     baseUrl:
       account.base_url ?? (account.environment === "production" ? PRODUCTION_BASE : SANDBOX_BASE),
     storeId: account.external_store_id,
-    credentials: creds,
+    credentials,
   };
 }
+
 
 /* ---------- Token management ---------- */
 
@@ -96,15 +95,15 @@ const inFlight = new Map<string, Promise<string>>();
 
 async function issueToken(ctx: AccountContext, useRefresh: boolean): Promise<string> {
   const c = ctx.credentials;
-  if (!c.client_id || !c.client_secret) fail("auth", "Courier client credentials are missing");
+  if (!c.clientId || !c.clientSecret) fail("auth", "Courier client credentials are missing");
 
   const body: Record<string, string> = {
-    client_id: c.client_id,
-    client_secret: c.client_secret,
+    client_id: c.clientId,
+    client_secret: c.clientSecret,
   };
-  if (useRefresh && c.refresh_token) {
+  if (useRefresh && c.refreshToken) {
     body["grant_type"] = "refresh_token";
-    body["refresh_token"] = c.refresh_token;
+    body["refresh_token"] = c.refreshToken;
   } else {
     if (!c.username || !c.password) fail("auth", "Courier username or password is missing");
     body["grant_type"] = "password";
@@ -124,7 +123,7 @@ async function issueToken(ctx: AccountContext, useRefresh: boolean): Promise<str
   }
 
   if (!response.ok) {
-    if (useRefresh) return issueToken({ ...ctx, credentials: { ...c, refresh_token: null } }, false);
+    if (useRefresh) return issueToken({ ...ctx, credentials: { ...c, refreshToken: null } }, false);
     fail("auth", "The courier rejected the authentication request", response.status);
   }
 
@@ -136,34 +135,31 @@ async function issueToken(ctx: AccountContext, useRefresh: boolean): Promise<str
   if (!json.access_token) fail("auth", "The courier returned no access token");
 
   const expiresAt = new Date(Date.now() + (json.expires_in ?? 3600) * 1000).toISOString();
-  const db = await admin();
-  await db
-    .from("courier_account_credentials")
-    .update({
-      access_token: json.access_token,
-      refresh_token: json.refresh_token ?? c.refresh_token,
-      token_expires_at: expiresAt,
-      token_refreshed_at: new Date().toISOString(),
-    })
-    .eq("account_id", ctx.accountId);
+  // tokens go back into the vault through the same trusted boundary
+  await storeCourierToken(ctx.accountId, {
+    accessToken: json.access_token,
+    refreshToken: json.refresh_token ?? c.refreshToken,
+    expiresAt,
+  });
 
   return json.access_token;
 }
 
 async function getValidAccessToken(ctx: AccountContext): Promise<string> {
   const c = ctx.credentials;
-  const expiry = c.token_expires_at ? Date.parse(c.token_expires_at) : 0;
-  if (c.access_token && expiry - TOKEN_SAFETY_WINDOW_MS > Date.now()) return c.access_token;
+  const expiry = c.tokenExpiresAt ? Date.parse(c.tokenExpiresAt) : 0;
+  if (c.accessToken && expiry - TOKEN_SAFETY_WINDOW_MS > Date.now()) return c.accessToken;
 
   const pending = inFlight.get(ctx.accountId);
   if (pending) return pending;
 
-  const promise = issueToken(ctx, Boolean(c.refresh_token)).finally(() =>
+  const promise = issueToken(ctx, Boolean(c.refreshToken)).finally(() =>
     inFlight.delete(ctx.accountId),
   );
   inFlight.set(ctx.accountId, promise);
   return promise;
 }
+
 
 async function request<T>(
   ctx: AccountContext,
@@ -186,7 +182,7 @@ async function request<T>(
   try {
     response = await call(token);
     if (response.status === 401) {
-      const fresh = await issueToken(ctx, Boolean(ctx.credentials.refresh_token));
+      const fresh = await issueToken(ctx, Boolean(ctx.credentials.refreshToken));
       response = await call(fresh);
     }
   } catch {

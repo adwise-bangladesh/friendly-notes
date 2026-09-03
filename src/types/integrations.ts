@@ -140,6 +140,10 @@ export interface IntegrationAccount {
   code: string;
   environment: CourierEnvironment;
   externalStoreId: string | null;
+  /** null = organization-wide account, otherwise the store it is scoped to */
+  storeId: string | null;
+  storeName: string | null;
+  scope: "organization" | "store";
   accountStatus: CourierProviderStatus;
   isDefault: boolean;
   capabilities: IntegrationCapability[];
@@ -147,6 +151,18 @@ export interface IntegrationAccount {
   connection: IntegrationConnectionStatus;
   createdAt: string;
   updatedAt: string;
+}
+
+/** Secret-free view of what a courier account has configured. */
+export interface IntegrationCredentialStatus {
+  account_id: string;
+  has_client_id: boolean;
+  has_username: boolean;
+  has_client_secret: boolean;
+  has_password: boolean;
+  has_webhook_secret: boolean;
+  token_expires_at: string | null;
+  token_refreshed_at: string | null;
 }
 
 export interface IntegrationAccountHealth {
