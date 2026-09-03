@@ -118,10 +118,10 @@ function Page() {
       status,
       ...(search.trim() ? { search: search.trim() } : {}),
       ...(type !== "all" ? { exception_type: type } : {}),
-      ...(viewKey === "mine" && profile?.id ? { assigned_to: profile.id } : {}),
-      ...(viewKey === "unassigned" ? { assigned_to: "none" } : {}),
+      ...(viewKey === "mine" ? { assigned_to: "me" } : {}),
+      ...(viewKey === "unassigned" ? { assigned_to: "unassigned" } : {}),
     }),
-    [activeView, page, pageSize, sort, status, search, type, viewKey, profile?.id],
+    [activeView, page, pageSize, sort, status, search, type, viewKey],
   );
 
   const { data, isPending, isFetching, error } = useQuery({
