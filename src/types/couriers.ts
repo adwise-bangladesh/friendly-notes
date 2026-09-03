@@ -44,6 +44,14 @@ export interface CourierBookingRequest {
   shipmentId: string;
   /** our own identifier handed to the provider — also the outbound idempotency anchor */
   merchantOrderId: string;
+  /**
+   * Authoritative booking key issued by `book_shipment_begin`. Stable across
+   * retries of the same logical booking; only an explicitly abandoned attempt
+   * rotates it. Adapters send it wherever the provider supports an idempotency
+   * key or header; providers without that support (Pathao today) still rely on
+   * `merchantOrderId` and on our own locking to avoid a second parcel.
+   */
+  idempotencyKey?: string | null;
   recipientName: string;
   recipientPhone: string;
   recipientAddress: string;
