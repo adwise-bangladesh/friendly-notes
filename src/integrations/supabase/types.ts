@@ -8057,6 +8057,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      save_product_catalog: {
+        Args: { _payload: Json; _product_id: string }
+        Returns: Json
+      }
       save_purchase_order: { Args: { _payload: Json }; Returns: string }
       save_sales_channel_account: {
         Args: { _payload: Json }
@@ -9335,6 +9339,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      variant_has_history: { Args: { _variant_id: string }; Returns: boolean }
       verification_max_attempts: { Args: never; Returns: number }
       verification_transition_allowed: {
         Args: {
