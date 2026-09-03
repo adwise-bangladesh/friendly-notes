@@ -80,21 +80,61 @@ export async function getCourierAccounts(providerId?: string): Promise<CourierAc
   return (data ?? []) as CourierAccount[];
 }
 
+const COURIER_EVENT_COLUMNS =
+  "id, provider_id, account_id, shipment_id, source, fingerprint, provider_event, provider_status, consignment_id, merchant_order_id, provider_event_at, payload, processing_status, processing_note, received_at, retry_count, last_attempt_at, next_retry_at, last_error, replay_count, last_replay_at";
+
 /** Raw provider events for one shipment — the courier's own words, kept for audit. */
 export async function getShipmentCourierEvents(
   shipmentId: string,
 ): Promise<CourierProviderEvent[]> {
   const { data, error } = await supabase
     .from("courier_provider_events")
-    .select(
-      "id, provider_id, account_id, shipment_id, source, fingerprint, provider_event, provider_status, consignment_id, merchant_order_id, provider_event_at, payload, processing_status, processing_note, received_at",
-    )
+    .select(COURIER_EVENT_COLUMNS)
     .eq("shipment_id", shipmentId)
     .order("received_at", { ascending: false })
     .limit(25);
   if (error) throw error;
   return (data ?? []) as CourierProviderEvent[];
 }
+
+/**
+ * Events that still need attention: never matched to a shipment, parked after
+ * repeated retries, or rejected by the state machine.
+ */
+export async function getCourierEventRecoveryQueue(
+  statuses: string[] = ["unmatched", "retry_scheduled", "dead_letter", "rejected"],
+  limit = 50,
+): Promise<CourierProviderEvent[]> {
+  const { data, error } = await supabase
+    .from("courier_provider_events")
+    .select(COURIER_EVENT_COLUMNS)
+    .in("processing_status", statuses as never)
+    .order("received_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data ?? []) as CourierProviderEvent[];
+}
+
+/** Retry an event that could not be matched yet. Applied events are never redone. */
+export async function retryCourierEvent(eventId: string): Promise<CourierProviderEvent> {
+  const { data, error } = await supabase.rpc("retry_courier_event", { _event_id: eventId });
+  if (error) throw error;
+  return data as unknown as CourierProviderEvent;
+}
+
+/** Deliberate replay of a parked or rejected event, with a recorded reason. */
+export async function replayCourierEvent(
+  eventId: string,
+  reason: string,
+): Promise<CourierProviderEvent> {
+  const { data, error } = await supabase.rpc("replay_courier_event", {
+    _event_id: eventId,
+    _reason: reason,
+  });
+  if (error) throw error;
+  return data as unknown as CourierProviderEvent;
+}
+
 
 /* ---------- Shippable quantities ---------- */
 
