@@ -247,6 +247,11 @@ function Page() {
                 Stores
               </Link>
             </Button>
+            <Button size="sm" asChild>
+              <Link to="/stores/$id/catalog" params={{ id }}>
+                Catalog
+              </Link>
+            </Button>
             {perms.canArchive ? (
               <Select
                 value={store.status}

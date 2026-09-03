@@ -7,6 +7,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ProductEditor } from "@/components/commerce/ProductEditor";
+import { ProductStoreAssignments } from "@/components/stores/ProductStoreAssignments";
 import { getProductEditorRecord } from "@/lib/products";
 import { PRODUCT_STATUS_LABELS } from "@/types/commerce";
 import type { ProductStatus } from "@/types/commerce";
@@ -101,6 +102,7 @@ function Page() {
         }
       />
       <ProductEditor record={data} />
+      <ProductStoreAssignments productId={id} />
     </>
   );
 }
