@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ShieldCheck } from "lucide-react";
+import { invalidateOrderSurfaces } from "@/lib/order-cache";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -102,7 +103,7 @@ function Page() {
     mutationFn: (orderId: string) => claimVerificationWork(orderId),
     onSuccess: () => {
       toast.success("You are now handling this order");
-      void queryClient.invalidateQueries({ queryKey: ["verification-assignments"] });
+      invalidateOrderSurfaces(queryClient);
     },
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Could not claim"),
   });
@@ -111,7 +112,7 @@ function Page() {
     mutationFn: (orderId: string) => releaseVerificationWork(orderId),
     onSuccess: () => {
       toast.success("Released back to the queue");
-      void queryClient.invalidateQueries({ queryKey: ["verification-assignments"] });
+      invalidateOrderSurfaces(queryClient);
     },
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Could not release"),
   });

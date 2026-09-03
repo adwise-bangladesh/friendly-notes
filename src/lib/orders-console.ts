@@ -59,6 +59,9 @@ export interface OrdersConsoleFilters {
   area?: string;
   assigned_to?: string;
   has_exception?: boolean;
+  has_open_return?: boolean;
+  ready_for_warehouse?: boolean;
+  shipping_attention?: boolean;
   attention?: boolean;
   from?: string;
   to?: string;
@@ -103,6 +106,7 @@ export interface OrderConsoleRow {
   courier_name: string | null;
   open_exceptions: number;
   open_returns: number;
+  ready_for_warehouse: boolean;
 }
 
 export interface OrdersConsolePage {
@@ -157,6 +161,8 @@ export interface OrderQuickViewData {
     payment_status: PaymentStatus;
     payment_method: PaymentMethod;
     subtotal: number;
+    product_discount: number;
+    order_discount: number;
     shipping_charge: number;
     grand_total: number;
     paid_amount: number;
@@ -187,18 +193,33 @@ export interface OrderQuickViewData {
     is_mine: boolean;
   } | null;
   reservations: { status: string; quantity: number }[];
+  reservation_summary: {
+    ordered_units: number;
+    active_units: number;
+    committed_units: number;
+  } | null;
   fulfillments: {
     id: string;
     status: string;
     fulfillment_number: string;
     created_at: string;
+    hold_reason: string | null;
+    planned_units: number | null;
+    picked_units: number | null;
+    packed_units: number | null;
   }[];
   shipments: {
     id: string;
     shipment_number: string;
     status: string;
     tracking_number: string | null;
+    external_consignment_id: string | null;
     courier_name: string | null;
+    service_type: string | null;
+    cash_on_delivery_amount: number | null;
+    collected_amount: number | null;
+    hold_reason: string | null;
+    failure_reason: string | null;
     created_at: string;
   }[];
   returns: {
@@ -207,11 +228,27 @@ export interface OrderQuickViewData {
     status: string;
     return_type: string;
     created_at: string;
+    is_open: boolean;
   }[];
-  exceptions: { id: string; exception_type: string; status: string }[];
+  exceptions: {
+    id: string;
+    exception_type: string;
+    status: string;
+    description: string | null;
+  }[];
   recent_notes: { id: string; note: string; note_type: string; created_at: string }[];
+  customer_intelligence: QuickViewIntelligence | null;
   edit_block_reason: string | null;
+  /** Null when this order can be claimed for verification; otherwise the reason. */
+  verification_claim_block_reason: string | null;
   can_manage: boolean;
+}
+
+export interface QuickViewIntelligence {
+  linked: boolean;
+  metrics: Record<string, number | string | boolean | null> | null;
+  flags: { flag: string; reason: string | null; created_at: string }[];
+  recent_orders: { id: string; order_number: string }[];
 }
 
 export async function getOrderQuickView(orderId: string): Promise<OrderQuickViewData> {

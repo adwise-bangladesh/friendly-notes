@@ -21,6 +21,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { OrderQuickView } from "@/components/orders/OrderQuickView";
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import { formatMoney } from "@/lib/currency";
+import { invalidateOrderSurfaces } from "@/lib/order-cache";
 import {
   ORDER_SORTS,
   ORDER_SORT_LABELS,
@@ -37,14 +38,30 @@ import {
   PAYMENT_STATUSES,
   PAYMENT_STATUS_LABELS,
 } from "@/types/orders";
-import type { DeliveryStatus, OrderStatus, PaymentStatus } from "@/types/orders";
 import {
+  FULFILLMENT_STATUSES,
+  FULFILLMENT_STATUS_LABELS,
+  RESERVATION_STATUS_LABELS,
+  ORDER_SOURCES,
+  ORDER_SOURCE_LABELS,
+} from "@/types/orders";
+import type {
+  DeliveryStatus,
+  ReservationStatus,
+  FulfillmentStatus,
+  OrderSource,
+  OrderStatus,
+  PaymentStatus,
+} from "@/types/orders";
+import {
+  RISK_LEVELS,
   RISK_LEVEL_TONE,
+  VERIFICATION_PRIORITIES,
   VERIFICATION_STATUSES,
   VERIFICATION_STATUS_LABELS,
   VERIFICATION_STATUS_TONE,
 } from "@/types/verification";
-import type { VerificationStatus } from "@/types/verification";
+import type { RiskLevel, VerificationPriority, VerificationStatus } from "@/types/verification";
 
 const TITLE = "Orders console · Commerce Operations";
 const DESCRIPTION =
@@ -90,6 +107,10 @@ const BUILT_IN_VIEWS: SavedView[] = [
   { name: "Assigned to me", filters: { assigned_to: "me" } },
   { name: "Unassigned", filters: { assigned_to: "unassigned", verification_status: "pending" } },
   { name: "COD due", filters: { payment_status: "unpaid", delivery_status: "delivered" } },
+  { name: "Ready for warehouse", filters: { ready_for_warehouse: true, sort: "oldest" } },
+  { name: "Shipping attention", filters: { shipping_attention: true } },
+  { name: "High risk", filters: { risk_level: "high", sort: "priority" } },
+  { name: "Open returns", filters: { has_open_return: true } },
   { name: "Open exceptions", filters: { has_exception: true } },
 ];
 
@@ -126,6 +147,14 @@ function Page() {
     return () => window.clearTimeout(t);
   }, [searchInput]);
 
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Selection is only ever valid for the exact result set it was made against.
+  const contextKey = JSON.stringify(filters);
+  useEffect(() => {
+    setSelected([]);
+  }, [contextKey]);
+
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: ["orders-console", filters],
     queryFn: () => getOrdersConsole(filters),
@@ -138,20 +167,24 @@ function Page() {
   const page = filters.page ?? 1;
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
 
-  const allSelected = rows.length > 0 && rows.every((r) => selected.includes(r.id));
+  const pageIds = rows.map((r) => r.id);
+  const allSelected = rows.length > 0 && pageIds.every((id) => selected.includes(id));
 
   const claimSelected = useMutation({
     mutationFn: () => bulkClaimVerification(selected),
     onSuccess: (res) => {
       if (res.failed === 0) toast.success(`Claimed ${res.succeeded} order(s)`);
-      else
+      else {
+        const first = res.results.find((r) => !r.ok);
         toast.warning(
-          `Claimed ${res.succeeded}, skipped ${res.failed}: ${
-            res.results.find((r) => !r.ok)?.error ?? "already claimed"
+          `Claimed ${res.succeeded}, skipped ${res.failed}. ${
+            first ? `${first.order_number ?? "One order"}: ${first.error}` : ""
           }`,
         );
-      setSelected([]);
-      void queryClient.invalidateQueries({ queryKey: ["orders-console"] });
+      }
+      // Keep only the orders that could not be claimed, so the operator can act on them.
+      setSelected(res.results.filter((r) => !r.ok).map((r) => r.order_id));
+      invalidateOrderSurfaces(queryClient);
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -358,7 +391,101 @@ function Page() {
           className="h-8 w-36 text-[13px]"
           aria-label="To date"
         />
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-8 text-[12px]"
+          onClick={() => setShowAdvanced((v) => !v)}
+        >
+          {showAdvanced ? "Fewer filters" : "More filters"}
+        </Button>
       </div>
+
+      {showAdvanced ? (
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <Select
+            value={filters.risk_level ?? "all"}
+            onValueChange={(v) =>
+              setFilter("risk_level", v === "all" ? undefined : (v as RiskLevel))
+            }
+          >
+            <SelectTrigger className="h-8 w-36 text-[13px]" aria-label="Risk level">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All risk levels</SelectItem>
+              {RISK_LEVELS.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s} risk
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={filters.verification_priority ?? "all"}
+            onValueChange={(v) =>
+              setFilter(
+                "verification_priority",
+                v === "all" ? undefined : (v as VerificationPriority),
+              )
+            }
+          >
+            <SelectTrigger className="h-8 w-40 text-[13px]" aria-label="Verification priority">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All priorities</SelectItem>
+              {VERIFICATION_PRIORITIES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s} priority
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={filters.fulfillment_status ?? "all"}
+            onValueChange={(v) =>
+              setFilter("fulfillment_status", v === "all" ? undefined : (v as FulfillmentStatus))
+            }
+          >
+            <SelectTrigger className="h-8 w-44 text-[13px]" aria-label="Fulfillment status">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All fulfillment states</SelectItem>
+              {FULFILLMENT_STATUSES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {FULFILLMENT_STATUS_LABELS[s]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={filters.source ?? "all"}
+            onValueChange={(v) => setFilter("source", v === "all" ? undefined : (v as OrderSource))}
+          >
+            <SelectTrigger className="h-8 w-36 text-[13px]" aria-label="Order source">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All sources</SelectItem>
+              {ORDER_SOURCES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {ORDER_SOURCE_LABELS[s]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Input
+            value={filters.area ?? ""}
+            onChange={(e) => setFilter("area", e.target.value || undefined)}
+            placeholder="Area / thana"
+            className="h-8 w-36 text-[13px]"
+            aria-label="Area"
+          />
+        </div>
+      ) : null}
+
 
       {canManage && selected.length > 0 ? (
         <div className="mb-2 flex items-center gap-2 rounded border border-border bg-muted/40 px-3 py-1.5 text-[13px]">
@@ -410,7 +537,11 @@ function Page() {
                       checked={allSelected}
                       aria-label="Select page"
                       onCheckedChange={(c) =>
-                        setSelected(c === true ? rows.map((r) => r.id) : [])
+                        setSelected((s) =>
+                          c === true
+                            ? [...new Set([...s, ...pageIds])]
+                            : s.filter((id) => !pageIds.includes(id)),
+                        )
                       }
                     />
                   </th>
@@ -422,6 +553,7 @@ function Page() {
                   <th className="px-3 py-2 text-right font-medium">COD due</th>
                   <th className="px-3 py-2 text-left font-medium">Payment</th>
                   <th className="px-3 py-2 text-left font-medium">Verification</th>
+                  <th className="px-3 py-2 text-left font-medium">Warehouse</th>
                   <th className="px-3 py-2 text-left font-medium">Delivery</th>
                   <th className="px-3 py-2 text-left font-medium">Courier</th>
                   <th className="px-3 py-2 text-left font-medium">Owner</th>
@@ -463,14 +595,19 @@ function Page() {
                           />
                         ) : null}
                       </div>
+                      <div className="text-[11.5px] text-muted-foreground">
+                        {o.store_name ?? ORDER_SOURCE_LABELS[o.source]}
+                      </div>
                       <div className="flex gap-1 pt-0.5">
                         <StatusBadge tone={ORDER_TONE[o.status]}>
                           {ORDER_STATUS_LABELS[o.status]}
                         </StatusBadge>
                         {o.risk_level !== "none" ? (
-                          <StatusBadge tone={RISK_LEVEL_TONE[o.risk_level]}>
-                            {o.risk_level}
-                          </StatusBadge>
+                          <span title={o.risk_reason ?? `${o.risk_level} risk`}>
+                            <StatusBadge tone={RISK_LEVEL_TONE[o.risk_level]}>
+                              {o.risk_level}
+                            </StatusBadge>
+                          </span>
                         ) : null}
                       </div>
                     </td>
@@ -488,6 +625,11 @@ function Page() {
                     </td>
                     <td className="px-3 py-2 text-right tabular-nums">
                       {formatMoney(Number(o.grand_total))}
+                      {Number(o.paid_amount) > 0 ? (
+                        <div className="text-[11.5px] text-muted-foreground">
+                          {formatMoney(Number(o.paid_amount))} collected
+                        </div>
+                      ) : null}
                     </td>
                     <td className="px-3 py-2 text-right tabular-nums">
                       {formatMoney(Number(o.due_amount))}
@@ -507,10 +649,28 @@ function Page() {
                         </span>
                       ) : null}
                     </td>
+                    <td className="px-3 py-2 text-muted-foreground">
+                      <div>{RESERVATION_STATUS_LABELS[o.reservation_status as ReservationStatus] ?? o.reservation_status}</div>
+                      <div className="text-[11.5px]">
+                        {o.ready_for_warehouse
+                          ? "Ready for warehouse"
+                          : FULFILLMENT_STATUS_LABELS[o.fulfillment_status]}
+                      </div>
+                    </td>
                     <td className="px-3 py-2">
                       <StatusBadge tone={DELIVERY_STATUS_TONE[o.delivery_status]}>
                         {DELIVERY_STATUS_LABELS[o.delivery_status]}
                       </StatusBadge>
+                      {o.shipment_status ? (
+                        <div className="text-[11.5px] text-muted-foreground">
+                          {o.shipment_status.replace(/_/g, " ")}
+                        </div>
+                      ) : null}
+                      {o.open_returns > 0 ? (
+                        <div className="text-[11.5px] text-destructive">
+                          {o.open_returns} open return{o.open_returns > 1 ? "s" : ""}
+                        </div>
+                      ) : null}
                     </td>
                     <td className="px-3 py-2 text-muted-foreground">
                       {o.courier_name ?? "—"}
@@ -522,7 +682,13 @@ function Page() {
                       {o.assigned_is_mine ? "You" : (o.assigned_name ?? "—")}
                     </td>
                     <td className="px-3 py-2 text-muted-foreground">
-                      {new Date(o.created_at).toLocaleDateString()}
+                      <div>{new Date(o.created_at).toLocaleDateString()}</div>
+                      <div className="text-[11.5px]">
+                        {new Date(o.created_at).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </div>
                     </td>
                   </tr>
                 ))}
