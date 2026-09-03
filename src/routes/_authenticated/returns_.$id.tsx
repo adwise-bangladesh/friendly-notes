@@ -19,6 +19,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { FormSection } from "@/components/commerce/FormSection";
+import { ReturnFinancialOutcome } from "@/components/returns/ReturnFinancialOutcome";
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import {
   getReturnById,
@@ -379,6 +380,14 @@ function Page() {
                 </div>
               )}
             </FormSection>
+          </div>
+
+          <div className="rounded border border-border p-4">
+            <ReturnFinancialOutcome
+              returnId={record.id}
+              orderId={record.order_id}
+              canManage={canManage}
+            />
           </div>
 
           <div className="rounded border border-border p-4">

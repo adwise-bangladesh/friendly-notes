@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { SettlementDiscrepancies } from "@/components/finance/SettlementDiscrepancies";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -191,6 +192,17 @@ function Page() {
           </table>
         </div>
       )}
+
+      <section className="mt-8">
+        <h2 className="text-[15px] font-semibold">Settlement discrepancies</h2>
+        <p className="mb-3 text-[12.5px] text-muted-foreground">
+          Raised automatically when a courier settles a different amount than the shipment
+          collected. Resolve each one so order profit reflects real money.
+        </p>
+        <SettlementDiscrepancies canManage={canManage} />
+      </section>
+
+
 
       <CreateSettlementDialog
         open={createOpen}

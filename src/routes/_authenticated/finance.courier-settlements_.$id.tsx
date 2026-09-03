@@ -26,6 +26,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { FormSection } from "@/components/commerce/FormSection";
+import { SettlementDiscrepancies } from "@/components/finance/SettlementDiscrepancies";
 import { formatMoney } from "@/lib/currency";
 import { useCommercePermissions } from "@/hooks/use-permissions";
 import {
@@ -226,6 +227,19 @@ function Page() {
           </div>
         )}
       </FormSection>
+
+      <div className="mt-6">
+        <FormSection
+          title="Discrepancies"
+          description="Where this payout differs from what the shipment actually collected."
+        >
+          <SettlementDiscrepancies
+            settlementId={id}
+            canManage={canManage}
+            statusFilter={false}
+          />
+        </FormSection>
+      </div>
 
       {canManage && !locked && settlement.account && (
         <AddShipmentDialog

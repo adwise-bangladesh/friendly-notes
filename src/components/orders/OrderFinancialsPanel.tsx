@@ -7,6 +7,7 @@ import { FormSection } from "@/components/commerce/FormSection";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { FinancialAdjustmentDialog } from "./FinancialAdjustmentDialog";
 import { formatMoney } from "@/lib/currency";
+import { PAYMENT_STATUS_LABELS } from "@/types/orders";
 import { getOrderAdjustments, getOrderFinancials, reverseFinancialAdjustment } from "@/lib/finance";
 import {
   ADJUSTMENT_DIRECTION_LABELS,
@@ -113,6 +114,7 @@ export function OrderFinancialsPanel({
           <Line label="Return charges" value={fin.actual.return_charges} />
           <Line label="Other courier charges" value={fin.actual.other_courier_charges} />
           <Line label="Packing cost" value={fin.actual.packing_cost} />
+          <Line label="Customer refunds" value={fin.actual.refunded_amount} />
           <Line label="Adjustment income" value={fin.actual.adjustment_income} />
           <Line label="Adjustment expense" value={fin.actual.adjustment_expense} />
           <div className="mt-1 border-t border-border pt-1">
@@ -130,12 +132,58 @@ export function OrderFinancialsPanel({
         </Block>
       </div>
 
+      <div className="mt-3 grid gap-3 md:grid-cols-3">
+        <Block title="Payment">
+          <Line label="Expected from customer" value={fin.payment.expected_amount} />
+          <Line label="Paid" value={fin.payment.paid_amount} />
+          <Line label="Refunded" value={fin.payment.refunded_amount} />
+          <Line label="Net retained" value={fin.payment.net_retained} strong />
+          <Line label="Still due" value={fin.payment.due_amount} />
+          <p className="mt-1 text-[11.5px] text-muted-foreground">
+            Status: {PAYMENT_STATUS_LABELS[fin.payment.status] ?? fin.payment.status}. Derived from
+            recorded money events, not typed in by hand.
+          </p>
+        </Block>
+
+        <Block title="Returns">
+          <Line label="Returned units" value={fin.returns.returned_units} money={false} />
+          <Line label="Retained from returns" value={fin.returns.retained_amount} />
+          <p className="mt-1 text-[11.5px] text-muted-foreground">
+            {fin.returns.unresolved > 0
+              ? `${fin.returns.unresolved} return(s) still need a financial outcome recorded.`
+              : "All returns have a recorded financial outcome."}
+            {fin.returns.returned_units > 0 && !fin.returns.cost_recovered
+              ? " Returned stock has not been restocked yet, so product cost still counts it."
+              : ""}
+          </p>
+        </Block>
+
+        <Block title="Realization & settlement">
+          <Line label="Units ordered" value={fin.realization.units_ordered} money={false} />
+          <Line label="Units shipped" value={fin.realization.units_shipped} money={false} />
+          <Line
+            label="Open discrepancies"
+            value={fin.settlement.open_discrepancies}
+            money={false}
+          />
+          <Line label="Open discrepancy amount" value={fin.settlement.open_discrepancy_amount} />
+          <p className="mt-1 text-[11.5px] text-muted-foreground">
+            {fin.settlement.open_discrepancies > 0
+              ? "Courier settlement is disputed for part of this order; profit stays provisional until resolved."
+              : fin.realization.fully_realized
+                ? "Everything ordered has shipped and settled."
+                : "Not every ordered unit has shipped yet."}
+          </p>
+        </Block>
+      </div>
+
       <p className="mt-2 text-[11.5px] text-muted-foreground">
         Shipping margin{" "}
         <span className="tabular-nums text-foreground">{formatMoney(fin.shipping_margin)}</span>{" "}
         (customer shipping charge minus{" "}
         {fin.actual.delivery_cost > 0 ? "actual" : "estimated"} courier cost).
       </p>
+
 
       <div className="mt-3">
         <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -224,7 +272,17 @@ function Block({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
-function Line({ label, value, strong }: { label: string; value: number; strong?: boolean }) {
+function Line({
+  label,
+  value,
+  strong,
+  money = true,
+}: {
+  label: string;
+  value: number;
+  strong?: boolean;
+  money?: boolean;
+}) {
   return (
     <div className="flex items-center justify-between py-0.5 text-[12.5px]">
       <span className="text-muted-foreground">{label}</span>
@@ -233,7 +291,7 @@ function Line({ label, value, strong }: { label: string; value: number; strong?:
           strong ? "font-semibold tabular-nums text-foreground" : "tabular-nums text-foreground"
         }
       >
-        {formatMoney(Number(value))}
+        {money ? formatMoney(Number(value)) : Number(value).toLocaleString()}
       </span>
     </div>
   );
