@@ -27,8 +27,19 @@ import type {
  *  - No summary counters are stored, so figures cannot drift.
  *  - Financial values are gated in the database by `can_read_commerce`, so
  *    permissions behave exactly like the rest of the finance surfaces.
- *  - Revenue is aggregated per order, delivery per shipment, so multi-shipment
- *    orders can never double count revenue.
+ *  - Revenue is aggregated per order, delivery per shipment line, so
+ *    multi-shipment orders can never double count revenue.
+ *
+ * Date basis of the headline metrics (the database decides, never the client):
+ *  - Order revenue, estimated profit, collected/refunded/net money and the
+ *    completeness breakdown use the ORDER CREATION date (cohort basis).
+ *  - Delivered merchandise value and actual profit use the SHIPMENT DELIVERY
+ *    date, and only quantities on fully delivered shipments count.
+ *  - Procurement uses purchase order creation and goods receipt dates.
+ *
+ * Store attribution uses `orders.store_id`. Sales channel accounts hang off a
+ * store but are NOT recorded on the order, so channel-level analytics is not
+ * available from the current schema — store level is the finest attribution.
  */
 
 export const DATE_PRESETS = [
@@ -93,23 +104,34 @@ async function rpc<T>(name: string, params: Record<string, unknown>): Promise<T>
   return data as unknown as T;
 }
 
-export function getOverview(range: DateRange, source?: string | null) {
+export function getOverview(range: DateRange, source?: string | null, storeId?: string | null) {
   return rpc<AnalyticsOverview>("analytics_overview", {
     ...args(range),
     _source: source ?? null,
+    _store_id: storeId ?? null,
   });
 }
 
-export function getSalesTrend(range: DateRange, grain: AnalyticsGrain, source?: string | null) {
+export function getSalesTrend(
+  range: DateRange,
+  grain: AnalyticsGrain,
+  source?: string | null,
+  storeId?: string | null,
+) {
   return rpc<SalesTrendPoint[]>("analytics_sales_trend", {
     ...args(range),
     _grain: grain,
     _source: source ?? null,
+    _store_id: storeId ?? null,
   });
 }
 
-export function getOrderAnalytics(range: DateRange, source?: string | null) {
-  return rpc<AnalyticsOrders>("analytics_orders", { ...args(range), _source: source ?? null });
+export function getOrderAnalytics(range: DateRange, source?: string | null, storeId?: string | null) {
+  return rpc<AnalyticsOrders>("analytics_orders", {
+    ...args(range),
+    _source: source ?? null,
+    _store_id: storeId ?? null,
+  });
 }
 
 export function getDeliveryAnalytics(range: DateRange) {
@@ -136,11 +158,17 @@ export function getCustomerTrend(range: DateRange, grain: AnalyticsGrain) {
   return rpc<CustomerTrendPoint[]>("analytics_customer_trend", { ...args(range), _grain: grain });
 }
 
-export function getProductPerformance(range: DateRange, limit = 20) {
+export function getProductPerformance(
+  range: DateRange,
+  limit = 20,
+  storeId?: string | null,
+  productId?: string | null,
+) {
   return rpc<ProductPerformanceRow[]>("analytics_product_performance", {
     ...args(range),
     _limit: limit,
-    _product_id: null,
+    _product_id: productId ?? null,
+    _store_id: storeId ?? null,
   });
 }
 

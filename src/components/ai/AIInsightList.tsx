@@ -7,8 +7,24 @@ import { setInsightStatus } from "@/lib/ai";
 import {
   AI_SEVERITY_LABELS,
   AI_SEVERITY_TONE,
+  insightFreshness,
   type AIInsight,
 } from "@/types/ai";
+
+const FRESHNESS: Record<string, { label: string; tone: "success" | "warning" | "neutral"; hint: string }> = {
+  current: { label: "Current", tone: "success", hint: "Based on the latest analysis for this scope." },
+  superseded: {
+    label: "Superseded",
+    tone: "warning",
+    hint: "A newer analysis replaced this observation — do not act on it.",
+  },
+  expired: {
+    label: "Expired",
+    tone: "warning",
+    hint: "This observation is past its validity window — re-run the analysis.",
+  },
+  reviewed: { label: "Reviewed", tone: "neutral", hint: "Already acknowledged or dismissed." },
+};
 
 /**
  * Insights are observations. Acknowledging or dismissing one is a review
@@ -58,6 +74,14 @@ export function AIInsightList({
                   {AI_SEVERITY_LABELS[insight.severity]}
                 </StatusBadge>
                 <StatusBadge tone="neutral">{insight.category}</StatusBadge>
+                {(() => {
+                  const f = FRESHNESS[insightFreshness(insight)]!;
+                  return (
+                    <span title={f.hint}>
+                      <StatusBadge tone={f.tone}>{f.label}</StatusBadge>
+                    </span>
+                  );
+                })()}
                 <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
                   AI generated · confidence {Math.round(insight.confidence * 100)}%
                 </span>

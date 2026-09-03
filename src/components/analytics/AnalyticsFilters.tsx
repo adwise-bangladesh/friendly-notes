@@ -6,6 +6,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { useQuery } from "@tanstack/react-query";
+import { getActiveStores } from "@/lib/stores";
 import { DATE_PRESETS, type DatePresetId } from "@/lib/analytics";
 import type { AnalyticsGrain } from "@/types/analytics";
 
@@ -27,6 +29,8 @@ interface Props {
   onGrainChange?: (value: AnalyticsGrain) => void;
   source?: string | null;
   onSourceChange?: (value: string | null) => void;
+  storeId?: string | null;
+  onStoreChange?: (value: string | null) => void;
 }
 
 /** Shared date/grain/source filter used by every analytics page. */
@@ -37,7 +41,16 @@ export function AnalyticsFilters({
   onGrainChange,
   source,
   onSourceChange,
+  storeId,
+  onStoreChange,
 }: Props) {
+  const stores = useQuery({
+    queryKey: ["analytics", "store-options"],
+    queryFn: getActiveStores,
+    enabled: Boolean(onStoreChange),
+    staleTime: 5 * 60_000,
+  });
+
   return (
     <div className="flex flex-wrap items-end gap-3">
       <div className="space-y-1">
@@ -69,6 +82,28 @@ export function AnalyticsFilters({
               <SelectItem value="day">Day</SelectItem>
               <SelectItem value="week">Week</SelectItem>
               <SelectItem value="month">Month</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      ) : null}
+
+      {onStoreChange ? (
+        <div className="space-y-1">
+          <Label className="text-[11px] uppercase tracking-wide text-muted-foreground">Store</Label>
+          <Select
+            value={storeId ?? "all"}
+            onValueChange={(v) => onStoreChange(v === "all" ? null : v)}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All stores</SelectItem>
+              {(stores.data ?? []).map((s) => (
+                <SelectItem key={s.id} value={s.id}>
+                  {s.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useCommercePermissions } from "@/hooks/use-permissions";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +16,11 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { DataTable } from "@/components/shared/DataTable";
 import type { Column } from "@/components/shared/DataTable";
-import { getAutomationExecutions, getAutomationRules } from "@/lib/automation";
+import {
+  getAutomationExecutions,
+  getAutomationRules,
+  replayAutomationExecution,
+} from "@/lib/automation";
 import type { AutomationExecution } from "@/types/automation";
 import { AUTOMATION_EXECUTION_TONE } from "@/types/automation";
 
@@ -38,6 +44,19 @@ export const Route = createFileRoute("/_authenticated/automation/executions")({
 function AutomationHistoryPage() {
   const [ruleId, setRuleId] = useState("all");
   const [status, setStatus] = useState("all");
+  const { role } = useCommercePermissions();
+  const canReplay = role === "admin" || role === "owner";
+  const queryClient = useQueryClient();
+
+  const replay = useMutation({
+    mutationFn: (executionId: string) => replayAutomationExecution(executionId),
+    onSuccess: (result) => {
+      if (result.status === "completed") toast.success("Replay completed");
+      else toast.error(result.error_message || "Replay failed again");
+      void queryClient.invalidateQueries({ queryKey: ["automation", "executions"] });
+    },
+    onError: (error: Error) => toast.error(error.message || "Could not replay this execution"),
+  });
 
   const rules = useQuery({
     queryKey: ["automation", "rules", "all"],
@@ -98,13 +117,35 @@ function AutomationHistoryPage() {
       align: "right",
       render: (row) => row.automation_depth,
     },
+    ...(canReplay
+      ? [
+          {
+            key: "replay",
+            header: "Replay",
+            align: "right" as const,
+            render: (row: AutomationExecution) =>
+              row.status === "failed" ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={replay.isPending}
+                  onClick={() => replay.mutate(row.id)}
+                >
+                  Replay
+                </Button>
+              ) : (
+                <span className="text-[12px] text-muted-foreground">—</span>
+              ),
+          },
+        ]
+      : []),
   ];
 
   return (
     <div>
       <PageHeader
         title="Automation History"
-        description="Every evaluation is recorded once per source event. History cannot be edited or deleted."
+        description="Every evaluation is recorded once per source event. History cannot be edited or deleted — a replay is recorded as a new execution, and admins can replay a failed execution up to three times."
         actions={
           <Button asChild size="sm" variant="outline">
             <Link to="/automation">

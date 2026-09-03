@@ -69,6 +69,13 @@ export interface AutomationExecution {
   completed_at: string | null;
 }
 
+export interface AutomationReplayResult {
+  execution_id: string;
+  status: AutomationExecutionStatus;
+  replay_attempt: number;
+  error_message?: string | null;
+}
+
 export interface AutomationTriggerDefinition {
   entity_type: string;
   fields: Record<string, AutomationFieldType>;

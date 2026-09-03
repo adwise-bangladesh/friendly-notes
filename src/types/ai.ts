@@ -83,6 +83,19 @@ export interface AIInsight {
   reviewed_at: string | null;
   created_at: string;
   expires_at: string | null;
+  /** Set when a newer run replaced this insight for the same scope. */
+  superseded_at: string | null;
+  superseded_by_run_id: string | null;
+}
+
+/** Derived state shown in the UI — never stored. */
+export type AIInsightFreshness = "current" | "superseded" | "expired" | "reviewed";
+
+export function insightFreshness(insight: AIInsight): AIInsightFreshness {
+  if (insight.status !== "active") return "reviewed";
+  if (insight.superseded_at) return "superseded";
+  if (insight.expires_at && new Date(insight.expires_at) <= new Date()) return "expired";
+  return "current";
 }
 
 export interface AIRecommendation {
@@ -104,8 +117,11 @@ export interface AIRecommendation {
 }
 
 export interface AIBrainOverview {
+  /** Active, not superseded and not expired. */
   active_insights: number;
   critical_insights: number;
+  superseded_insights: number;
+  expired_insights: number;
   pending_recommendations: number;
   runs_last_7_days: number;
   failed_runs_last_7_days: number;

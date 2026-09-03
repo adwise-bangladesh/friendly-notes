@@ -116,6 +116,11 @@ function AIBrainPage() {
         <Stat label="Pending suggestions" value={overview.data?.pending_recommendations ?? 0} icon={CheckCircle2} />
         <Stat label="Runs (7 days)" value={overview.data?.runs_last_7_days ?? 0} icon={Activity} />
       </div>
+      <p className="text-xs text-muted-foreground">
+        Active insights exclude {overview.data?.superseded_insights ?? 0} superseded and{" "}
+        {overview.data?.expired_insights ?? 0} expired observations. Superseded insights are kept
+        for history but must not be acted on.
+      </p>
 
       <Tabs defaultValue="system">
         <TabsList>

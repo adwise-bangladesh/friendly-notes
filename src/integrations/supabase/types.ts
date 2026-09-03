@@ -148,6 +148,8 @@ export type Database = {
           severity: Database["public"]["Enums"]["ai_insight_severity"]
           status: Database["public"]["Enums"]["ai_insight_status"]
           summary: string
+          superseded_at: string | null
+          superseded_by_run_id: string | null
           title: string
         }
         Insert: {
@@ -165,6 +167,8 @@ export type Database = {
           severity: Database["public"]["Enums"]["ai_insight_severity"]
           status?: Database["public"]["Enums"]["ai_insight_status"]
           summary: string
+          superseded_at?: string | null
+          superseded_by_run_id?: string | null
           title: string
         }
         Update: {
@@ -182,12 +186,21 @@ export type Database = {
           severity?: Database["public"]["Enums"]["ai_insight_severity"]
           status?: Database["public"]["Enums"]["ai_insight_status"]
           summary?: string
+          superseded_at?: string | null
+          superseded_by_run_id?: string | null
           title?: string
         }
         Relationships: [
           {
             foreignKeyName: "ai_insights_analysis_run_id_fkey"
             columns: ["analysis_run_id"]
+            isOneToOne: false
+            referencedRelation: "ai_analysis_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_insights_superseded_by_run_id_fkey"
+            columns: ["superseded_by_run_id"]
             isOneToOne: false
             referencedRelation: "ai_analysis_runs"
             referencedColumns: ["id"]
@@ -5565,6 +5578,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      ai_default_insight_ttl: { Args: never; Returns: string }
       ai_fail_analysis_run: {
         Args: { _error: string; _run_id: string }
         Returns: {
@@ -5594,6 +5608,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      ai_insight_freshness: {
+        Args: { _insight: Database["public"]["Tables"]["ai_insights"]["Row"] }
+        Returns: string
+      }
       ai_set_insight_status: {
         Args: {
           _insight_id: string
@@ -5614,6 +5632,8 @@ export type Database = {
           severity: Database["public"]["Enums"]["ai_insight_severity"]
           status: Database["public"]["Enums"]["ai_insight_status"]
           summary: string
+          superseded_at: string | null
+          superseded_by_run_id: string | null
           title: string
         }
         SetofOptions: {
@@ -5742,8 +5762,10 @@ export type Database = {
       analytics_movement_summary: {
         Args: { _from: string; _to: string }
         Returns: {
+          category: string
           movement_type: string
           movements: number
+          net_quantity: number
           total_quantity: number
         }[]
       }
@@ -5762,6 +5784,7 @@ export type Database = {
         Args: {
           _from: string
           _source?: Database["public"]["Enums"]["order_source"]
+          _store_id?: string
           _to: string
         }
         Returns: Json
@@ -5770,6 +5793,7 @@ export type Database = {
         Args: {
           _from: string
           _source?: Database["public"]["Enums"]["order_source"]
+          _store_id?: string
           _to: string
         }
         Returns: Json
@@ -5783,21 +5807,26 @@ export type Database = {
           _from: string
           _limit?: number
           _product_id?: string
+          _store_id?: string
           _to: string
         }
         Returns: {
           cost_snapshot_complete: boolean
           estimated_profit: number
+          net_estimated_profit: number
+          net_revenue: number
           orders: number
           product_cost: number
           product_id: string
           product_name: string
+          returned_value: number
           revenue: number
           sku: string
           units_ordered: number
           units_returned: number
           variant_id: string
           variant_name: string
+          variants_grouped: boolean
         }[]
       }
       analytics_purchased_products: {
@@ -5817,6 +5846,7 @@ export type Database = {
           _from: string
           _grain?: string
           _source?: Database["public"]["Enums"]["order_source"]
+          _store_id?: string
           _to: string
         }
         Returns: {
@@ -5847,6 +5877,7 @@ export type Database = {
           variant_name: string
         }[]
       }
+      analytics_store_guard: { Args: { _store_id: string }; Returns: undefined }
       analytics_supplier_spend: {
         Args: { _from: string; _limit?: number; _to: string }
         Returns: {
@@ -6158,8 +6189,34 @@ export type Database = {
         Returns: Json
       }
       automation_max_depth: { Args: never; Returns: number }
+      automation_max_replays: { Args: never; Returns: number }
       automation_order_context: { Args: { _order_id: string }; Returns: Json }
       automation_registry: { Args: never; Returns: Json }
+      automation_replay_execution: {
+        Args: { _execution_id: string }
+        Returns: {
+          automation_depth: number
+          completed_at: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          error_message: string | null
+          event_type: Database["public"]["Enums"]["automation_trigger_type"]
+          id: string
+          input_snapshot: Json
+          result: Json | null
+          rule_id: string
+          source_event_id: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["automation_execution_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "automation_rule_executions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       automation_sanitize_error: { Args: { _msg: string }; Returns: string }
       automation_validate_rule: {
         Args: {
