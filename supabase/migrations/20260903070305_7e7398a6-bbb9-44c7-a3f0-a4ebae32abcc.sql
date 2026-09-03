@@ -1,0 +1,10 @@
+revoke all on function public.guard_store_catalog_write() from anon;
+revoke all on function public.guard_catalog_history_append_only() from anon;
+revoke all on function public.store_product_available_qty(uuid) from anon;
+revoke all on function public.add_product_to_store(uuid,uuid,numeric,text) from anon;
+revoke all on function public.update_store_product(uuid,jsonb) from anon;
+revoke all on function public.set_store_product_price(uuid,numeric,text) from anon;
+revoke all on function public.activate_store_product(uuid) from anon;
+revoke all on function public.archive_store_product(uuid) from anon;
+revoke all on function public.create_or_update_channel_listing(uuid,uuid,jsonb) from anon;
+revoke all on function public.set_channel_listing_status(uuid,public.channel_listing_status,text) from anon;
