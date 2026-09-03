@@ -87,6 +87,14 @@ export type ChannelCapability =
   | "status_refresh"
   | "unpublish";
 
+/** Structured failure classification understood by the background queue. */
+export type ChannelFailureClass =
+  | "transient"
+  | "permanent"
+  | "rate_limited"
+  | "authentication"
+  | "unknown";
+
 export interface PublishResult {
   ok: boolean;
   /** Sanitised, user-facing. */
@@ -99,9 +107,12 @@ export interface PublishResult {
   synced_qty?: number | null;
   /**
    * How the background engine should treat a failure.
-   * `transient` is retried with backoff, `permanent` stops immediately.
+   * `transient` retries with backoff, `rate_limited` waits for the provider
+   * window, `authentication` and `permanent` are never retried automatically.
    */
-  failure_class?: "transient" | "permanent" | "unknown";
+  failure_class?: ChannelFailureClass;
+  /** Provider-requested earliest retry time (ISO), for rate limiting. */
+  retry_after?: string | null;
 }
 
 export interface SalesChannelAdapter {
@@ -151,9 +162,20 @@ export interface SalesChannelAdapter {
 export class SalesChannelError extends Error {
   /** True when retrying the same request later could plausibly succeed. */
   readonly retryable: boolean;
-  constructor(message: string, retryable = false) {
+  /** Structured classification the queue interprets; parsing stays in adapters. */
+  readonly failureClass: ChannelFailureClass;
+  /** Provider-requested earliest retry time (ISO), when it supplied one. */
+  readonly retryAfter: string | null;
+  constructor(
+    message: string,
+    retryable = false,
+    failureClass?: ChannelFailureClass,
+    retryAfter: string | null = null,
+  ) {
     super(message);
     this.name = "SalesChannelError";
     this.retryable = retryable;
+    this.failureClass = failureClass ?? (retryable ? "transient" : "permanent");
+    this.retryAfter = retryAfter;
   }
 }
