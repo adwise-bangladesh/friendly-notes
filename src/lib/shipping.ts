@@ -42,7 +42,9 @@ const SHIPMENT_COLUMNS = `
   courier_account_id, provider_status, provider_status_slug, provider_status_at,
   last_synced_at, quoted_delivery_fee, booked_delivery_fee,
   return_tracking_number, return_reason, partial_delivery_note,
-  provider_recipient_city_id, provider_recipient_zone_id, provider_recipient_area_id
+  provider_recipient_city_id, provider_recipient_zone_id, provider_recipient_area_id,
+  booking_idempotency_key, booking_snapshot, booking_attempt_started_at,
+  booking_attempt_count, booking_last_error, booking_outcome_unknown
 `;
 
 /* ---------- Courier providers ---------- */
