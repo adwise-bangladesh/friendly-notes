@@ -12,62 +12,30 @@
  */
 
 import type { IntegrationCapability, IntegrationProvider } from "@/types/integrations";
+import {
+  COURIER_CAPABILITY_PROFILES,
+  integrationCapabilitiesFor,
+} from "./couriers/capabilities";
 
-const PATHAO_CAPABILITIES: IntegrationCapability[] = [
-  "create_shipment",
-  "refresh_tracking",
-  "delivery_quote",
-  "location_lookup",
-  "webhook_processing",
-];
+/**
+ * Courier providers are projected from the single capability declaration, so
+ * the Integrations Center can never advertise more than the adapters implement.
+ */
+const COURIER_PROVIDERS: IntegrationProvider[] = Object.values(COURIER_CAPABILITY_PROFILES).map(
+  (profile) => ({
+    providerKey: profile.providerKey,
+    name: profile.name,
+    category: "courier",
+    capabilities: integrationCapabilitiesFor(profile.providerKey),
+    hasAdapter: profile.hasAdapter,
+    supportsAccounts: true,
+    integrationLevel: profile.integrationLevel,
+    accountRequirements: profile.accountRequirements,
+    ...(profile.note ? { note: profile.note } : {}),
+  }),
+);
 
-const MANUAL_ONLY: IntegrationCapability[] = ["manual_workflow", "webhook_processing"];
-
-const PROVIDERS: IntegrationProvider[] = [
-  {
-    providerKey: "pathao",
-    name: "Pathao Courier",
-    category: "courier",
-    capabilities: PATHAO_CAPABILITIES,
-    hasAdapter: true,
-    supportsAccounts: true,
-    integrationLevel: "ready_for_api",
-    accountRequirements: ["Client ID", "Client secret", "Username", "Password", "Store ID"],
-  },
-  {
-    providerKey: "steadfast",
-    name: "Steadfast Courier",
-    category: "courier",
-    capabilities: MANUAL_ONLY,
-    hasAdapter: false,
-    supportsAccounts: true,
-    integrationLevel: "configured",
-    accountRequirements: [],
-    note: "No API adapter yet — shipments are operated manually through the shipping desk.",
-  },
-  {
-    providerKey: "redx",
-    name: "RedX",
-    category: "courier",
-    capabilities: MANUAL_ONLY,
-    hasAdapter: false,
-    supportsAccounts: true,
-    integrationLevel: "configured",
-    accountRequirements: [],
-    note: "No API adapter yet — shipments are operated manually through the shipping desk.",
-  },
-  {
-    providerKey: "paperfly",
-    name: "Paperfly",
-    category: "courier",
-    capabilities: MANUAL_ONLY,
-    hasAdapter: false,
-    supportsAccounts: true,
-    integrationLevel: "configured",
-    accountRequirements: [],
-    note: "No API adapter yet — shipments are operated manually through the shipping desk.",
-  },
-];
+const PROVIDERS: IntegrationProvider[] = [...COURIER_PROVIDERS];
 
 /** Categories the Integrations Center will host later. Nothing is connectable yet. */
 export const PLANNED_PROVIDERS: IntegrationProvider[] = [
